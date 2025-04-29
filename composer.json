@@ -1,0 +1,14 @@
+{
+    "name": "gymintranet/web-app",
+    "description": "Intranet para gimnasio",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.8",
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "GymIntranet\\": "app/"
+        }
+    }
+}
