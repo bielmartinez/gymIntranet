@@ -20,10 +20,9 @@ class User {
      * En ProvaGym, usamos el correo como nombre de usuario
      */
     public function findByUsername($username) {
-        // Intentar con la columna 'role' que es el nombre más común en inglés
         $this->db->query('SELECT usuari_id as id, correu as email, contrasenya as password, 
                         CONCAT(nom, " ", cognoms) as fullName,
-                        role as role, actiu as isActive
+                        role as role, actiu as isActive, phone, data_naixement as birthDate
                         FROM usuaris WHERE correu = :username');
         $this->db->bind(':username', $username);
         
@@ -32,20 +31,7 @@ class User {
         if($this->db->rowCount() > 0){
             return $row;
         } else {
-            // Si no encuentra, intentar con la columna 'user_role'
-            $this->db->query('SELECT usuari_id as id, correu as email, contrasenya as password, 
-                            CONCAT(nom, " ", cognoms) as fullName,
-                            user_role as role, actiu as isActive
-                            FROM usuaris WHERE correu = :username');
-            $this->db->bind(':username', $username);
-            
-            $row = $this->db->singleArray();
-            
-            if($this->db->rowCount() > 0){
-                return $row;
-            } else {
-                return false;
-            }
+            return false;
         }
     }
 
@@ -55,7 +41,7 @@ class User {
     public function findByEmail($email) {
         $this->db->query('SELECT usuari_id as id, correu as email, contrasenya as password, 
                         CONCAT(nom, " ", cognoms) as fullName,
-                        role as role, actiu as isActive
+                        role as role, actiu as isActive, phone, data_naixement as birthDate
                         FROM usuaris WHERE correu = :email');
         $this->db->bind(':email', $email);
         
@@ -73,8 +59,8 @@ class User {
      */
     public function findById($id) {
         $this->db->query('SELECT usuari_id as id, correu as email, contrasenya as password, 
-                        CONCAT(nom, " ", cognoms) as fullName,
-                        role as role, actiu as isActive
+                        CONCAT(nom, " ", cognoms) as fullName, nom, cognoms,
+                        role as role, actiu as isActive, phone, data_naixement as birthDate
                         FROM usuaris WHERE usuari_id = :id');
         $this->db->bind(':id', $id);
         
@@ -89,11 +75,11 @@ class User {
 
     /**
      * Guarda un token de restablecimiento de contraseña
-     * Nota: Necesitaríamos añadir una columna 'reset_token' a la tabla usuaris
      */
     public function savePasswordResetToken($userId, $token) {
-        $this->db->query('UPDATE usuaris SET reset_token = :token, 
-                        reset_token_expiration = DATE_ADD(NOW(), INTERVAL 1 HOUR) 
+        $this->db->query('UPDATE usuaris SET token_recuperacio = :token, 
+                        token_expiracio = DATE_ADD(NOW(), INTERVAL 1 HOUR),
+                        token_creat = NOW() 
                         WHERE usuari_id = :id');
         $this->db->bind(':token', $token);
         $this->db->bind(':id', $userId);
@@ -105,9 +91,9 @@ class User {
      * Encuentra un usuario por su token de restablecimiento
      */
     public function findByResetToken($token) {
-        $this->db->query('SELECT usuari_id as id, correu as email, reset_token as token, 
-                        UNIX_TIMESTAMP(reset_token_expiration) as token_expiration 
-                        FROM usuaris WHERE reset_token = :token');
+        $this->db->query('SELECT usuari_id as id, correu as email, token_recuperacio as token, 
+                        UNIX_TIMESTAMP(token_expiracio) as token_expiration 
+                        FROM usuaris WHERE token_recuperacio = :token');
         $this->db->bind(':token', $token);
         
         $row = $this->db->singleArray();
@@ -120,11 +106,20 @@ class User {
     }
 
     /**
-     * Verifica si un token es válido
+     * Verifica si un token de restablecimiento es válido
      */
     public function isTokenValid($token) {
         $user = $this->findByResetToken($token);
-        return $user && $user['token_expiration'] > time();
+        
+        if (!$user) {
+            return false;
+        }
+        
+        // Verificar si el token ha expirado
+        $tokenExpiration = $user['token_expiration'];
+        $currentTime = time();
+        
+        return $tokenExpiration > $currentTime;
     }
 
     /**
@@ -142,7 +137,7 @@ class User {
      * Limpia el token de restablecimiento de contraseña
      */
     public function clearResetToken($userId) {
-        $this->db->query('UPDATE usuaris SET reset_token = NULL, reset_token_expiration = NULL WHERE usuari_id = :id');
+        $this->db->query('UPDATE usuaris SET token_recuperacio = NULL, token_expiracio = NULL, token_creat = NULL WHERE usuari_id = :id');
         $this->db->bind(':id', $userId);
         
         return $this->db->execute();
@@ -164,41 +159,229 @@ class User {
             // Formatear correctamente la fecha de nacimiento para MySQL o NULL si está vacía
             $birthDate = !empty($userData['birthDate']) ? $userData['birthDate'] : null;
             
-            // Verificar qué columnas existen realmente en la tabla usuaris
-            Logger::log('DEBUG', 'Obteniendo estructura de la tabla usuaris');
+            // Crear el usuario con todos los campos disponibles
+            $this->db->query('INSERT INTO usuaris (correu, contrasenya, nom, cognoms, 
+                            role, actiu, phone, data_naixement, creat_el) 
+                            VALUES (:email, :password, :nom, :cognoms, 
+                            :role, :actiu, :phone, :birthDate, NOW())');
             
-            // Intentar con la consulta más simple posible
-            try {
-                $this->db->query('INSERT INTO usuaris (correu, contrasenya, nom, cognoms, actiu, role, creat_el) 
-                                VALUES (:email, :password, :nom, :cognoms, :actiu, :role, NOW())');
-                
-                $this->db->bind(':email', $userData['email']);
-                $this->db->bind(':password', $userData['password']);
-                $this->db->bind(':nom', $nombre);
-                $this->db->bind(':cognoms', $apellidos);
-                $this->db->bind(':actiu', true);
-                $this->db->bind(':role', $userData['role']);
-                
-                Logger::log('DEBUG', 'Ejecutando SQL para crear usuario con campos mínimos');
-                
-                if($this->db->execute()) {
-                    $lastId = $this->db->lastInsertId();
-                    Logger::log('INFO', 'Usuario creado correctamente con ID: ' . $lastId);
-                    return $lastId;
-                } else {
-                    Logger::log('ERROR', 'Error al ejecutar SQL para crear usuario con campos mínimos');
-                    return false;
-                }
-            } catch (PDOException $e) {
-                Logger::log('ERROR', 'Excepción PDO al crear usuario con campos mínimos: ' . $e->getMessage());
+            $this->db->bind(':email', $userData['email']);
+            $this->db->bind(':password', $userData['password']);
+            $this->db->bind(':nom', $nombre);
+            $this->db->bind(':cognoms', $apellidos);
+            $this->db->bind(':role', $userData['role']);
+            $this->db->bind(':actiu', true);
+            $this->db->bind(':phone', $userData['phone'] ?? null);
+            $this->db->bind(':birthDate', $birthDate);
+            
+            Logger::log('DEBUG', 'Ejecutando SQL para crear usuario');
+            
+            if($this->db->execute()) {
+                $lastId = $this->db->lastInsertId();
+                Logger::log('INFO', 'Usuario creado correctamente con ID: ' . $lastId);
+                return $lastId;
+            } else {
+                Logger::log('ERROR', 'Error al ejecutar SQL para crear usuario');
                 return false;
             }
         } catch (Exception $e) {
             Logger::log('ERROR', 'Excepción general al crear usuario: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Obtiene todos los usuarios
+     * @param string $roleFilter Opcional: filtrar por rol
+     * @return array Lista de usuarios
+     */
+    public function getAllUsers($roleFilter = null) {
+        $sql = 'SELECT usuari_id as id, correu as email, 
+                CONCAT(nom, " ", cognoms) as fullName,
+                role, actiu as isActive, phone, data_naixement as birthDate,
+                creat_el as createdAt, ultim_acces as lastAccess
+                FROM usuaris';
         
-        Logger::log('ERROR', 'Error al ejecutar SQL para crear usuario');
-        return false;
+        if ($roleFilter) {
+            $sql .= ' WHERE role = :role';
+        }
+        
+        $sql .= ' ORDER BY createdAt DESC';
+        
+        $this->db->query($sql);
+        
+        if ($roleFilter) {
+            $this->db->bind(':role', $roleFilter);
+        }
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Actualiza la información de un usuario
+     */
+    public function update($userId, $userData) {
+        try {
+            // Separar nombre y apellidos del nombre completo si existe
+            if (isset($userData['fullName'])) {
+                $fullNameParts = explode(' ', $userData['fullName'], 2);
+                $userData['nom'] = $fullNameParts[0];
+                $userData['cognoms'] = isset($fullNameParts[1]) ? $fullNameParts[1] : '';
+            }
+            
+            // Construir la consulta dinámica
+            $sql = 'UPDATE usuaris SET ';
+            $params = [];
+            
+            // Añadir cada campo al SQL solo si está presente en userData
+            if (isset($userData['nom'])) {
+                $params[] = 'nom = :nom';
+            }
+            
+            if (isset($userData['cognoms'])) {
+                $params[] = 'cognoms = :cognoms';
+            }
+            
+            if (isset($userData['email'])) {
+                $params[] = 'correu = :email';
+            }
+            
+            if (isset($userData['password'])) {
+                $params[] = 'contrasenya = :password';
+            }
+            
+            if (isset($userData['role'])) {
+                $params[] = 'role = :role';
+            }
+            
+            if (isset($userData['isActive'])) {
+                $params[] = 'actiu = :actiu';
+            }
+            
+            if (isset($userData['phone'])) {
+                $params[] = 'phone = :phone';
+            }
+            
+            if (isset($userData['birthDate'])) {
+                $params[] = 'data_naixement = :birthDate';
+            }
+            
+            // Combinar parámetros con comas
+            $sql .= implode(', ', $params);
+            $sql .= ' WHERE usuari_id = :id';
+            
+            $this->db->query($sql);
+            
+            // Vincular cada parámetro solo si está presente
+            if (isset($userData['nom'])) {
+                $this->db->bind(':nom', $userData['nom']);
+            }
+            
+            if (isset($userData['cognoms'])) {
+                $this->db->bind(':cognoms', $userData['cognoms']);
+            }
+            
+            if (isset($userData['email'])) {
+                $this->db->bind(':email', $userData['email']);
+            }
+            
+            if (isset($userData['password'])) {
+                $this->db->bind(':password', $userData['password']);
+            }
+            
+            if (isset($userData['role'])) {
+                $this->db->bind(':role', $userData['role']);
+            }
+            
+            if (isset($userData['isActive'])) {
+                $this->db->bind(':actiu', $userData['isActive']);
+            }
+            
+            if (isset($userData['phone'])) {
+                $this->db->bind(':phone', $userData['phone']);
+            }
+            
+            if (isset($userData['birthDate'])) {
+                $this->db->bind(':birthDate', $userData['birthDate']);
+            }
+            
+            $this->db->bind(':id', $userId);
+            
+            return $this->db->execute();
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Error al actualizar usuario: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza la fecha de último acceso
+     */
+    public function updateLastAccess($userId) {
+        $this->db->query('UPDATE usuaris SET ultim_acces = NOW() WHERE usuari_id = :id');
+        $this->db->bind(':id', $userId);
+        
+        return $this->db->execute();
+    }
+
+    /**
+     * Desactiva un usuario (soft delete)
+     */
+    public function deactivate($userId) {
+        $this->db->query('UPDATE usuaris SET actiu = 0 WHERE usuari_id = :id');
+        $this->db->bind(':id', $userId);
+        
+        return $this->db->execute();
+    }
+
+    /**
+     * Activa un usuario
+     */
+    public function activate($userId) {
+        $this->db->query('UPDATE usuaris SET actiu = 1 WHERE usuari_id = :id');
+        $this->db->bind(':id', $userId);
+        
+        return $this->db->execute();
+    }
+
+    /**
+     * Obtiene todos los monitores con sus IDs de personal
+     * @return array Lista de monitores con datos de personal
+     */
+    public function getAllMonitors() {
+        $sql = 'SELECT u.usuari_id, u.nom, u.cognoms, u.correu as email, p.personal_id 
+                FROM usuaris u 
+                JOIN personal p ON u.usuari_id = p.usuari_id 
+                WHERE u.role = "staff" AND u.actiu = 1';
+        
+        $this->db->query($sql);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Crea una entrada en la tabla personal para un usuario staff
+     * @param int $userId ID del usuario
+     * @param bool $isAdmin Si el usuario es admin o no
+     * @return bool
+     */
+    public function createStaffRecord($userId) {
+        $this->db->query('INSERT INTO personal (usuari_id, es_admin, data_contracte) VALUES (:usuari_id, :es_admin, CURDATE())');
+        $this->db->bind(':usuari_id', $userId);
+        $this->db->bind(':es_admin', 0); // Por defecto no es admin
+        
+        return $this->db->execute();
+    }
+    
+    /**
+     * Verifica si un usuario ya tiene registro en la tabla de personal
+     * @param int $userId ID del usuario
+     * @return bool
+     */
+    public function hasStaffRecord($userId) {
+        $this->db->query('SELECT COUNT(*) as count FROM personal WHERE usuari_id = :usuari_id');
+        $this->db->bind(':usuari_id', $userId);
+        $result = $this->db->single();
+        
+        return $result->count > 0;
     }
 }

@@ -1,559 +1,617 @@
-<?php 
-// El header y footer ahora son incluidos por direct-view.php
-// No necesitamos incluirlos aquí
-// Solo mantenemos el logger para registro de actividad
-include_once __DIR__ . '/../../utils/Logger.php';
-Logger::log('INFO', 'Acceso a staff/class_management.php');
+<?php
+/**
+ * Vista para la gestión de clases por parte del personal (staff)
+ * Permite ver, crear y editar clases
+ */
+
+// Cargar el modelo de clases
+require_once APPROOT . '/models/Class.php';
+$classModel = new Class_();
+
+// Cargar la información de las clases
+$classes = $classModel->getAllClasses();
+
+// Cargar el modelo para tipos de clases
+require_once APPROOT . '/models/TypeClass.php';
+$typeClassModel = new TypeClass();
+$typeClasses = $typeClassModel->getAll();
+
+// Cargar el modelo de usuarios para los monitores
+require_once APPROOT . '/models/User.php';
+$userModel = new User();
+$monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye personal_id
+
+// Obtener el ID del usuario actual (monitor)
+$currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+
+// Obtener el personal_id del usuario actual
+$currentStaffId = null;
+foreach ($monitors as $monitor) {
+    if ($monitor->usuari_id == $currentUserId) {
+        $currentStaffId = $monitor->personal_id;
+        break;
+    }
+}
+
+// Filtrar clases por monitor actual si es necesario
+$userClasses = [];
+foreach ($classes as $class) {
+    // Si es el monitor asignado a esta clase o es admin, añadir a la lista
+    if ($class->monitor_id == $currentStaffId || $_SESSION['user_role'] === 'admin') {
+        $userClasses[] = $class;
+    }
+}
 ?>
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Main content -->
-    <main class="col-12 px-4">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Gestión de Clases</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newClassModal">
-            <i class="fas fa-plus me-1"></i> Nueva Clase
-          </button>
-        </div>
-      </div>
-
-      <!-- Filtros y selector de vista -->
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <div class="btn-group me-3">
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="viewWeek">Vista Semanal</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary active" id="viewList">Vista Lista</button>
-          </div>
-          
-          <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              Filtrar por tipo
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0"><?php echo $data['title']; ?></h1>
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#newClassModal">
+                <i class="fas fa-plus-circle me-2"></i>Nueva clase
             </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Todas las clases</a></li>
-              <li><a class="dropdown-item" href="#">Yoga</a></li>
-              <li><a class="dropdown-item" href="#">Pilates</a></li>
-              <li><a class="dropdown-item" href="#">Funcional</a></li>
-              <li><a class="dropdown-item" href="#">Spinning</a></li>
-              <li><a class="dropdown-item" href="#">Zumba</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="input-group">
-            <input type="text" class="form-control form-control-sm" placeholder="Buscar clase...">
-            <button class="btn btn-sm btn-outline-secondary" type="button">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vista de calendario semanal (oculto por defecto) -->
-      <div id="calendarView" style="display: none;" class="mb-4">
-        <div id="staffCalendar"></div>
-      </div>
-
-      <!-- Vista de lista (visible por defecto) -->
-      <div id="listView" class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">Mis Clases</h6>
         </div>
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Clase</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Duración</th>
-                  <th>Sala</th>
-                  <th>Inscritos</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Yoga Avanzado</td>
-                  <td>10/04/2025</td>
-                  <td>09:00</td>
-                  <td>60 min</td>
-                  <td>Sala 3</td>
-                  <td>12/15</td>
-                  <td><span class="badge bg-success">Confirmada</span></td>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClassModal">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#attendanceModal">
-                        <i class="fas fa-clipboard-list"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-trash"></i>
-                      </button>
+            <?php if(isset($_SESSION['staff_message'])): ?>
+                <div class="alert alert-<?php echo $_SESSION['staff_message_type']; ?> alert-dismissible fade show" role="alert">
+                    <?php 
+                        echo $_SESSION['staff_message']; 
+                        unset($_SESSION['staff_message']);
+                        unset($_SESSION['staff_message_type']);
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+            
+            <!-- Filtros de clase -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <form class="row g-3" id="classFilter">
+                                <div class="col-md-3">
+                                    <label for="dateFilter" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="dateFilter" name="dateFilter">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="classTypeFilter" class="form-label">Tipo de clase</label>
+                                    <select class="form-select" id="classTypeFilter" name="classTypeFilter">
+                                        <option value="">Todas</option>
+                                        <?php foreach ($typeClasses as $typeClass): ?>
+                                            <option value="<?= $typeClass->tipus_classe_id ?>"><?= $typeClass->nom ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="roomFilter" class="form-label">Sala</label>
+                                    <select class="form-select" id="roomFilter" name="roomFilter">
+                                        <option value="">Todas</option>
+                                        <?php 
+                                        // Obtener salas únicas de las clases existentes
+                                        $salas = [];
+                                        foreach ($classes as $class) {
+                                            if (!in_array($class->sala, $salas)) {
+                                                $salas[] = $class->sala;
+                                            }
+                                        }
+                                        foreach ($salas as $sala): 
+                                            if (!empty($sala)):
+                                        ?>
+                                            <option value="<?= $sala ?>"><?= $sala ?></option>
+                                        <?php 
+                                            endif;
+                                        endforeach; 
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                                    <button type="reset" class="btn btn-secondary">Limpiar</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Pilates Intermedio</td>
-                  <td>10/04/2025</td>
-                  <td>11:00</td>
-                  <td>55 min</td>
-                  <td>Sala 2</td>
-                  <td>8/12</td>
-                  <td><span class="badge bg-success">Confirmada</span></td>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClassModal">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#attendanceModal">
-                        <i class="fas fa-clipboard-list"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Funcional HIIT</td>
-                  <td>11/04/2025</td>
-                  <td>17:30</td>
-                  <td>45 min</td>
-                  <td>Sala 1</td>
-                  <td>5/20</td>
-                  <td><span class="badge bg-warning">Baja asistencia</span></td>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClassModal">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#attendanceModal">
-                        <i class="fas fa-clipboard-list"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Spinning Intenso</td>
-                  <td>12/04/2025</td>
-                  <td>10:00</td>
-                  <td>50 min</td>
-                  <td>Sala Spinning</td>
-                  <td>18/20</td>
-                  <td><span class="badge bg-success">Confirmada</span></td>
-                  <td>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClassModal">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#attendanceModal">
-                        <i class="fas fa-clipboard-list"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                </div>
+            </div>
+            
+            <!-- Listado de clases -->
+            <div class="table-responsive">
+                <table class="table table-hover" id="classesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Duración</th>
+                            <th>Sala</th>
+                            <th>Capacidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($userClasses)): ?>
+                            <!-- No generamos contenido aquí, DataTables se encargará de mostrar el mensaje -->
+                        <?php else: ?>
+                            <?php foreach ($userClasses as $class): 
+                                // Obtener información del tipo de clase
+                                $typeClass = $typeClassModel->getById($class->tipus_classe_id);
+                                // Calcular porcentaje de ocupación para la barra de progreso
+                                $porcentajeOcupacion = ($class->capacitat_maxima > 0) ? 
+                                                      ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
+                                $barraColor = $porcentajeOcupacion < 50 ? 'bg-success' : 
+                                             ($porcentajeOcupacion < 80 ? 'bg-warning' : 'bg-danger');
+                            ?>
+                                <tr>
+                                    <td><?= $class->classe_id ?></td>
+                                    <td><?= $typeClass ? $typeClass->nom : 'N/A' ?></td>
+                                    <td><?= date('d/m/Y', strtotime($class->data)) ?></td>
+                                    <td><?= date('H:i', strtotime($class->hora)) ?></td>
+                                    <td><?= $class->duracio ?> min</td>
+                                    <td><?= $class->sala ?></td>
+                                    <td>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar <?= $barraColor ?>" role="progressbar" 
+                                                 style="width: <?= $porcentajeOcupacion ?>%;" 
+                                                 aria-valuenow="<?= $class->capacitat_actual ?>" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="<?= $class->capacitat_maxima ?>">
+                                                <?= $class->capacitat_actual ?>/<?= $class->capacitat_maxima ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-primary btn-sm view-class-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewClassModal" 
+                                                    data-class-id="<?= $class->classe_id ?>">
+                                                <i class="fas fa-eye" title="Ver detalles"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-warning btn-sm edit-class-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editClassModal" 
+                                                    data-class-id="<?= $class->classe_id ?>">
+                                                <i class="fas fa-edit" title="Editar"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="confirmDeleteClass(<?= $class->classe_id ?>)">
+                                                <i class="fas fa-trash" title="Eliminar"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-
-      <!-- Estadísticas de asistencia -->
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Asistencia Media por Tipo de Clase</h6>
-            </div>
-            <div class="card-body">
-              <div class="chart-container" style="position: relative; height:250px;">
-                <canvas id="classTypeChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Asistencia por Día de la Semana</h6>
-            </div>
-            <div class="card-body">
-              <div class="chart-container" style="position: relative; height:250px;">
-                <canvas id="weekdayChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+    </div>
 </div>
 
-<!-- Modal Nueva Clase -->
+<!-- Modal para nueva clase -->
 <div class="modal fade" id="newClassModal" tabindex="-1" aria-labelledby="newClassModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="newClassModalLabel">Crear Nueva Clase</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="className" class="form-label">Nombre de la clase</label>
-              <input type="text" class="form-control" id="className" placeholder="ej. Yoga Principiantes">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="newClassModalLabel">Nueva Clase</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-md-6">
-              <label for="classType" class="form-label">Tipo de clase</label>
-              <select class="form-select" id="classType">
-                <option selected>Selecciona el tipo...</option>
-                <option value="yoga">Yoga</option>
-                <option value="pilates">Pilates</option>
-                <option value="funcional">Funcional</option>
-                <option value="spinning">Spinning</option>
-                <option value="zumba">Zumba</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="classDate" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="classDate">
-            </div>
-            <div class="col-md-3">
-              <label for="startTime" class="form-label">Hora inicio</label>
-              <input type="time" class="form-control" id="startTime">
-            </div>
-            <div class="col-md-3">
-              <label for="duration" class="form-label">Duración (min)</label>
-              <input type="number" class="form-control" id="duration" min="30" max="120" value="60">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="classRoom" class="form-label">Sala</label>
-              <select class="form-select" id="classRoom">
-                <option selected>Selecciona la sala...</option>
-                <option value="1">Sala 1 - Multiusos</option>
-                <option value="2">Sala 2 - Yoga/Pilates</option>
-                <option value="3">Sala 3 - Funcional</option>
-                <option value="4">Sala Spinning</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="capacity" class="form-label">Capacidad máxima</label>
-              <input type="number" class="form-control" id="capacity" min="5" max="30" value="15">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="classDescription" class="form-label">Descripción</label>
-            <textarea class="form-control" id="classDescription" rows="3" placeholder="Describe brevemente la clase..."></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="classLevel" class="form-label">Nivel</label>
-            <div class="btn-group w-100" role="group" aria-label="Nivel de clase">
-              <input type="radio" class="btn-check" name="classLevel" id="levelBeginner" autocomplete="off">
-              <label class="btn btn-outline-success" for="levelBeginner">Principiante</label>
-              
-              <input type="radio" class="btn-check" name="classLevel" id="levelIntermediate" autocomplete="off" checked>
-              <label class="btn btn-outline-warning" for="levelIntermediate">Intermedio</label>
-              
-              <input type="radio" class="btn-check" name="classLevel" id="levelAdvanced" autocomplete="off">
-              <label class="btn btn-outline-danger" for="levelAdvanced">Avanzado</label>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="repeatClass">
-                <label class="form-check-label" for="repeatClass">
-                  Repetir semanalmente
-                </label>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn" style="background-color: #f2f6f8; color: #000;">Crear Clase</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Editar Clase -->
-<div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editClassModalLabel">Editar Clase</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Similar al formulario de nueva clase pero con datos prellenados -->
-        <form>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="editClassName" class="form-label">Nombre de la clase</label>
-              <input type="text" class="form-control" id="editClassName" value="Yoga Avanzado">
-            </div>
-            <div class="col-md-6">
-              <label for="editClassType" class="form-label">Tipo de clase</label>
-              <select class="form-select" id="editClassType">
-                <option>Selecciona el tipo...</option>
-                <option value="yoga" selected>Yoga</option>
-                <option value="pilates">Pilates</option>
-                <option value="funcional">Funcional</option>
-                <option value="spinning">Spinning</option>
-                <option value="zumba">Zumba</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="editClassDate" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="editClassDate" value="2025-04-10">
-            </div>
-            <div class="col-md-3">
-              <label for="editStartTime" class="form-label">Hora inicio</label>
-              <input type="time" class="form-control" id="editStartTime" value="09:00">
-            </div>
-            <div class="col-md-3">
-              <label for="editDuration" class="form-label">Duración (min)</label>
-              <input type="number" class="form-control" id="editDuration" min="30" max="120" value="60">
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary">Guardar Cambios</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Control de Asistencia -->
-<div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="attendanceModalLabel">Control de Asistencia - Yoga Avanzado (10/04/2025)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
-            <h6>Lista de Inscritos (12/15)</h6>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="markAllPresent">
-              <label class="form-check-label" for="markAllPresent">Marcar todos como presentes</label>
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Socio</th>
-                  <th>Email</th>
-                  <th>Asistencia</th>
-                  <th>Comentarios</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Ana Martínez</td>
-                  <td>ana.martinez@email.com</td>
-                  <td>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="attendanceCheck1" checked>
-                      <label class="form-check-label" for="attendanceCheck1">Presente</label>
+            <div class="modal-body">
+                <form id="newClassForm" action="<?= URLROOT ?>/staff/addClass" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="classType" class="form-label">Tipo de clase</label>
+                            <select class="form-select" id="classType" name="tipus_classe_id" required>
+                                <option value="">Seleccione un tipo</option>
+                                <?php foreach ($typeClasses as $typeClass): ?>
+                                    <option value="<?= $typeClass->tipus_classe_id ?>"><?= $typeClass->nom ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="classDate" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="classDate" name="data" required>
+                        </div>
                     </div>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Añadir comentario">
-                      <i class="fas fa-comment"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Carlos López</td>
-                  <td>carlos.lopez@email.com</td>
-                  <td>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="attendanceCheck2" checked>
-                      <label class="form-check-label" for="attendanceCheck2">Presente</label>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="classTime" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="classTime" name="hora" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="classDuration" class="form-label">Duración (minutos)</label>
+                            <input type="number" class="form-control" id="classDuration" name="duracio" min="15" max="120" step="5" value="60" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="classRoom" class="form-label">Sala</label>
+                            <input type="text" class="form-control" id="classRoom" name="sala" required>
+                        </div>
                     </div>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" title="Añadir comentario">
-                      <i class="fas fa-comment"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Elena Rodríguez</td>
-                  <td>elena.rodriguez@email.com</td>
-                  <td>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="attendanceCheck3">
-                      <label class="form-check-label" for="attendanceCheck3">Presente</label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="classCapacity" class="form-label">Capacidad máxima</label>
+                            <input type="number" class="form-control" id="classCapacity" name="capacitat_maxima" min="1" max="50" value="20" required>
+                        </div>
+                        <input type="hidden" name="monitor_id" value="<?= $currentStaffId ?>">
                     </div>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="Ha enviado justificante">
-                      <i class="fas fa-comment"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="newClassForm">Crear clase</button>
+            </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary">Guardar Asistencia</button>
-      </div>
     </div>
-  </div>
 </div>
+
+<!-- Modal para editar clase -->
+<div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="editClassModalLabel">Editar Clase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editClassForm" action="<?= URLROOT ?>/staff/updateClass" method="post">
+                    <input type="hidden" id="editClassId" name="classe_id" value="">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editClassType" class="form-label">Tipo de clase</label>
+                            <select class="form-select" id="editClassType" name="tipus_classe_id" required>
+                                <option value="">Seleccione un tipo</option>
+                                <?php foreach ($typeClasses as $typeClass): ?>
+                                    <option value="<?= $typeClass->tipus_classe_id ?>"><?= $typeClass->nom ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editClassDate" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="editClassDate" name="data" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="editClassTime" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="editClassTime" name="hora" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editClassDuration" class="form-label">Duración (minutos)</label>
+                            <input type="number" class="form-control" id="editClassDuration" name="duracio" min="15" max="120" step="5" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="editClassRoom" class="form-label">Sala</label>
+                            <input type="text" class="form-control" id="editClassRoom" name="sala" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editClassCapacity" class="form-label">Capacidad máxima</label>
+                            <input type="number" class="form-control" id="editClassCapacity" name="capacitat_maxima" min="1" max="50" required>
+                        </div>
+                        <input type="hidden" id="editClassMonitor" name="monitor_id" value="<?= $currentStaffId ?>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-warning" form="editClassForm">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles de clase -->
+<div class="modal fade" id="viewClassModal" tabindex="-1" aria-labelledby="viewClassModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="viewClassModalLabel">Detalles de la Clase</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Tipo de clase</h6>
+                        <p class="lead" id="viewClassType">Cargando...</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Fecha y hora</h6>
+                        <p class="lead" id="viewClassDateTime">Cargando...</p>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Duración</h6>
+                        <p class="lead" id="viewClassDuration">Cargando...</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Sala</h6>
+                        <p class="lead" id="viewClassRoom">Cargando...</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Ocupación</h6>
+                        <p class="lead" id="viewClassOccupation">Cargando...</p>
+                    </div>
+                </div>
+                
+                <h5 class="border-bottom pb-2 mb-3">Alumnos inscritos</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="studentsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Fecha reserva</th>
+                                <th>Asistencia</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- Aquí se cargarán los alumnos desde la base de datos mediante JavaScript -->
+                            <tr>
+                                <td colspan="6" class="text-center">Cargando alumnos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="saveAttendance()">Guardar asistencia</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario para eliminar clase (se envía mediante JavaScript) -->
+<form id="deleteClassForm" action="<?= URLROOT ?>/staff/deleteClass" method="post" style="display: none;">
+    <input type="hidden" id="deleteClassId" name="classe_id">
+</form>
+
+<!-- Añadir referencias a jQuery y DataTables antes del script -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Cambio entre vistas de lista y calendario
-  const viewWeekBtn = document.getElementById('viewWeek');
-  const viewListBtn = document.getElementById('viewList');
-  const calendarView = document.getElementById('calendarView');
-  const listView = document.getElementById('listView');
-  
-  viewWeekBtn.addEventListener('click', function() {
-    calendarView.style.display = 'block';
-    listView.style.display = 'none';
-    viewWeekBtn.classList.add('active');
-    viewListBtn.classList.remove('active');
-    
-    // Inicializar calendario si no se ha hecho ya
-    if (!window.staffCalendarObj) {
-      initializeCalendar();
-    }
-  });
-  
-  viewListBtn.addEventListener('click', function() {
-    calendarView.style.display = 'none';
-    listView.style.display = 'block';
-    viewWeekBtn.classList.remove('active');
-    viewListBtn.classList.add('active');
-  });
-  
-  // Función para inicializar el calendario
-  function initializeCalendar() {
-    const calendarEl = document.getElementById('staffCalendar');
-    window.staffCalendarObj = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'timeGridWeek',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'timeGridWeek,timeGridDay'
-      },
-      slotMinTime: '07:00:00',
-      slotMaxTime: '22:00:00',
-      allDaySlot: false,
-      locale: 'es',
-      events: [
-        {
-          title: 'Yoga Avanzado',
-          start: '2025-04-10T09:00:00',
-          end: '2025-04-10T10:00:00',
-          backgroundColor: '#4e73df'
-        },
-        {
-          title: 'Pilates Intermedio',
-          start: '2025-04-10T11:00:00',
-          end: '2025-04-10T11:55:00',
-          backgroundColor: '#1cc88a'
-        },
-        {
-          title: 'Funcional HIIT',
-          start: '2025-04-11T17:30:00',
-          end: '2025-04-11T18:15:00',
-          backgroundColor: '#36b9cc'
-        },
-        {
-          title: 'Spinning Intenso',
-          start: '2025-04-12T10:00:00',
-          end: '2025-04-12T10:50:00',
-          backgroundColor: '#f6c23e'
-        }
-      ]
-    });
-    window.staffCalendarObj.render();
-  }
-  
-  // Gráficos de estadísticas
-  const classTypeCtx = document.getElementById('classTypeChart').getContext('2d');
-  const classTypeChart = new Chart(classTypeCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Yoga', 'Pilates', 'Funcional', 'Spinning', 'Zumba'],
-      datasets: [{
-        label: '% de asistencia',
-        data: [85, 72, 65, 90, 78],
-        backgroundColor: [
-          '#150000'
-        ],
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          ticks: {
-            callback: function(value) {
-              return value + '%';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Esperar a que jQuery esté cargado
+        setTimeout(function() {
+            if (typeof $ !== 'undefined') {
+                try {
+                    // Inicializar DataTables para la tabla de clases
+                    if (document.getElementById('classesTable')) {
+                        const dataTable = $('#classesTable').DataTable({
+                            language: {
+                                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
+                                emptyTable: 'No hay clases disponibles'
+                            },
+                            order: [[2, 'asc'], [3, 'asc']], // Ordenar por fecha (col 2) y hora (col 3)
+                            responsive: true,
+                            columnDefs: [
+                                { targets: 6, orderable: false }, // Columna de capacidad no ordenable
+                                { targets: 7, orderable: false }  // Columna de acciones no ordenable
+                            ],
+                            drawCallback: function() {
+                                // Reenlazar eventos después de redibujado de tabla
+                                $('.view-class-btn').off().on('click', function() {
+                                    const classId = $(this).attr('data-class-id');
+                                    loadClassDetails(classId);
+                                });
+                                $('.edit-class-btn').off().on('click', function() {
+                                    const classId = $(this).attr('data-class-id');
+                                    loadClassForEditing(classId);
+                                });
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error al inicializar DataTables:', error);
+                }
+            } else {
+                console.warn('jQuery no está disponible para inicializar DataTables');
             }
-          }
+        }, 500); // Esperar 500ms para asegurar que jQuery se ha cargado
+        
+        // Inicializar filtro de fechas con la fecha actual
+        document.getElementById('dateFilter').valueAsDate = new Date();
+        
+        // Manejar el evento de ver detalles de una clase
+        document.querySelectorAll('.view-class-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const classId = this.getAttribute('data-class-id');
+                loadClassDetails(classId);
+            });
+        });
+        
+        // Manejar el evento de editar una clase
+        document.querySelectorAll('.edit-class-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const classId = this.getAttribute('data-class-id');
+                loadClassForEditing(classId);
+            });
+        });
+    });
+    
+    // Función para cargar detalles de una clase
+    function loadClassDetails(classId) {
+        fetch(`<?= URLROOT ?>/staff/getClassDetails/${classId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar detalles de la clase
+                    document.getElementById('viewClassType').textContent = data.typeClassName || 'N/A';
+                    document.getElementById('viewClassDateTime').textContent = 
+                        `${data.class.data} - ${data.class.hora}`;
+                    document.getElementById('viewClassDuration').textContent = 
+                        `${data.class.duracio} minutos`;
+                    document.getElementById('viewClassRoom').textContent = data.class.sala;
+                    document.getElementById('viewClassOccupation').textContent = 
+                        `${data.class.capacitat_actual}/${data.class.capacitat_maxima}`;
+                    
+                    // Cargar estudiantes inscritos si están disponibles
+                    const studentsTable = document.getElementById('studentTableBody');
+                    studentsTable.innerHTML = '';
+                    
+                    if (data.students && data.students.length > 0) {
+                        data.students.forEach(student => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${student.usuari_id}</td>
+                                <td>${student.nom} ${student.cognoms}</td>
+                                <td>${student.correu}</td>
+                                <td>${student.data_reserva}</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input attendance-switch" type="checkbox" 
+                                               role="switch" id="attendanceSwitch${student.reserva_id}" 
+                                               data-reservation-id="${student.reserva_id}"
+                                               ${student.assistencia ? 'checked' : ''}>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="cancelReservation(${student.reserva_id}, ${classId})">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </button>
+                                </td>
+                            `;
+                            studentsTable.appendChild(row);
+                        });
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td colspan="6" class="text-center">No hay alumnos inscritos en esta clase</td>
+                        `;
+                        studentsTable.appendChild(row);
+                    }
+                } else {
+                    alert('Error al cargar los detalles de la clase');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            });
+    }
+    
+    // Función para cargar una clase para edición
+    function loadClassForEditing(classId) {
+        fetch(`<?= URLROOT ?>/staff/getClassDetails/${classId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('editClassId').value = data.class.classe_id;
+                    document.getElementById('editClassType').value = data.class.tipus_classe_id;
+                    document.getElementById('editClassDate').value = data.class.data;
+                    document.getElementById('editClassTime').value = data.class.hora;
+                    document.getElementById('editClassDuration').value = data.class.duracio;
+                    document.getElementById('editClassRoom').value = data.class.sala;
+                    document.getElementById('editClassCapacity').value = data.class.capacitat_maxima;
+                } else {
+                    alert('Error al cargar los datos de la clase');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            });
+    }
+    
+    // Función para confirmar eliminación de clase
+    function confirmDeleteClass(classId) {
+        if (confirm(`¿Está seguro de que desea eliminar la clase #${classId}? Esta acción eliminará todas las reservas asociadas.`)) {
+            document.getElementById('deleteClassId').value = classId;
+            document.getElementById('deleteClassForm').submit();
         }
-      }
     }
-  });
-  
-  const weekdayCtx = document.getElementById('weekdayChart').getContext('2d');
-  const weekdayChart = new Chart(weekdayCtx, {
-    type: 'line',
-    data: {
-      labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-      datasets: [{
-        label: 'Núm. de asistentes',
-        data: [42, 38, 45, 40, 52, 35, 20],
-        borderColor: '#4e73df',
-        backgroundColor: 'rgba(78, 115, 223, 0.2)',
-        fill: true,
-        tension: 0.1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
+    
+    // Función para guardar la asistencia
+    function saveAttendance() {
+        const attendanceSwitches = document.querySelectorAll('.attendance-switch');
+        const attendanceData = [];
+        
+        attendanceSwitches.forEach(switchElement => {
+            attendanceData.push({
+                reservationId: switchElement.getAttribute('data-reservation-id'),
+                attended: switchElement.checked ? 1 : 0
+            });
+        });
+        
+        if (attendanceData.length === 0) {
+            alert('No hay asistencias para guardar');
+            return;
+        }
+        
+        // Enviar datos al servidor
+        fetch('<?= URLROOT ?>/staff/updateAttendance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ attendance: attendanceData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#viewClassModal').modal('hide');
+                
+                // Mostrar mensaje de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    <strong>¡Éxito!</strong> La asistencia ha sido registrada correctamente.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                document.querySelector('.card-body').insertBefore(alertDiv, document.querySelector('.row'));
+            } else {
+                alert('Error al guardar la asistencia: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al conectar con el servidor');
+        });
     }
-  });
-});
+    
+    // Función para cancelar una reserva
+    function cancelReservation(reservationId, classId) {
+        if (confirm(`¿Está seguro de que desea cancelar esta reserva?`)) {
+            fetch('<?= URLROOT ?>/staff/cancelReservation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ 
+                    reservationId: reservationId,
+                    classId: classId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar la vista de los estudiantes
+                    loadClassDetails(classId);
+                    
+                    // Mostrar mensaje de éxito
+                    alert('Reserva cancelada correctamente');
+                } else {
+                    alert('Error al cancelar la reserva: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            });
+        }
+    }
 </script>

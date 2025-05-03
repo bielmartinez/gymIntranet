@@ -5,6 +5,63 @@
 <div class="container-fluid">
   <div class="row">
     <main class="col-12 px-md-4">
+      <!-- Links rápidos movidos al principio -->
+      <div class="col-12 mt-3 mb-4">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Accesos Rápidos</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-3 col-md-6 mb-4">
+                <a href="<?php echo URLROOT; ?>/user/classes" class="text-decoration-none">
+                  <div class="card bg-primary text-white shadow">
+                    <div class="card-body text-center">
+                      <i class="fas fa-dumbbell fa-3x mb-3"></i>
+                      <h5>Clases</h5>
+                      <div class="text-white-50">Reserva tus clases</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-lg-3 col-md-6 mb-4">
+                <a href="<?php echo URLROOT; ?>/user/courts" class="text-decoration-none">
+                  <div class="card bg-success text-white shadow">
+                    <div class="card-body text-center">
+                      <i class="fas fa-volleyball-ball fa-3x mb-3"></i>
+                      <h5>Pistas</h5>
+                      <div class="text-white-50">Reserva pistas deportivas</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-lg-3 col-md-6 mb-4">
+                <a href="<?php echo URLROOT; ?>/user/tracking" class="text-decoration-none">
+                  <div class="card bg-info text-white shadow">
+                    <div class="card-body text-center">
+                      <i class="fas fa-heartbeat fa-3x mb-3"></i>
+                      <h5>Seguimiento</h5>
+                      <div class="text-white-50">Controla tu progreso</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-lg-3 col-md-6 mb-4">
+                <a href="#" class="text-decoration-none">
+                  <div class="card bg-warning text-white shadow">
+                    <div class="card-body text-center">
+                      <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                      <h5>Eventos</h5>
+                      <div class="text-white-50">Próximos eventos</div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Bienvenido/a, <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'; ?></h1>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -176,63 +233,6 @@
         </div>
       </div>
         
-      <!-- Links rápidos -->
-      <div class="col-12">
-        <div class="card shadow mb-4">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Accesos Rápidos</h6>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-lg-3 col-md-6 mb-4">
-                <a href="<?php echo URLROOT; ?>/user/classes" class="text-decoration-none">
-                  <div class="card bg-primary text-white shadow">
-                    <div class="card-body text-center">
-                      <i class="fas fa-dumbbell fa-3x mb-3"></i>
-                      <h5>Clases</h5>
-                      <div class="text-white-50">Reserva tus clases</div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="col-lg-3 col-md-6 mb-4">
-                <a href="<?php echo URLROOT; ?>/user/courts" class="text-decoration-none">
-                  <div class="card bg-success text-white shadow">
-                    <div class="card-body text-center">
-                      <i class="fas fa-volleyball-ball fa-3x mb-3"></i>
-                      <h5>Pistas</h5>
-                      <div class="text-white-50">Reserva pistas deportivas</div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="col-lg-3 col-md-6 mb-4">
-                <a href="<?php echo URLROOT; ?>/user/tracking" class="text-decoration-none">
-                  <div class="card bg-info text-white shadow">
-                    <div class="card-body text-center">
-                      <i class="fas fa-heartbeat fa-3x mb-3"></i>
-                      <h5>Seguimiento</h5>
-                      <div class="text-white-50">Controla tu progreso</div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <div class="col-lg-3 col-md-6 mb-4">
-                <a href="#" class="text-decoration-none">
-                  <div class="card bg-warning text-white shadow">
-                    <div class="card-body text-center">
-                      <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                      <h5>Eventos</h5>
-                      <div class="text-white-50">Próximos eventos</div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <!-- Rutina recomendada -->
       <div class="row mb-4">
         <div class="col-12">

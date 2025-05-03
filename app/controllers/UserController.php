@@ -62,18 +62,235 @@ class UserController {
      * Muestra la página de clases
      */
     public function classes() {
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Cargar modelo de tipos de clases
+        require_once APPROOT . '/models/TypeClass.php';
+        $typeClassModel = new TypeClass();
+        
+        // Obtener todos los tipos de clases
+        $classTypes = $typeClassModel->getAll();
+        
+        // Obtener las clases disponibles y las reservas del usuario
+        $availableClasses = $reservationModel->getAvailableClasses();
+        $userReservations = [];
+        
+        if (isset($_SESSION['user_id'])) {
+            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+        }
+        
         $data = [
             'title' => 'Clases',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
+            'available_classes' => $availableClasses,
+            'user_reservations' => $userReservations,
+            'class_types' => $classTypes
         ];
-        
-        // Aquí se cargarían las clases desde el modelo
         
         // Cargar el header
         include_once APPROOT . '/views/shared/header/main.php';
         
         // Cargar la vista
         include_once APPROOT . '/views/users/classes.php';
+        
+        // Cargar el footer
+        include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Filtrar clases por fecha
+     */
+    public function filterClasses() {
+        // Verificar si se recibió una fecha
+        if (!isset($_POST['date']) || empty($_POST['date'])) {
+            // Redirigir a la página de clases sin filtro
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Cargar modelo de tipos de clases
+        require_once APPROOT . '/models/TypeClass.php';
+        $typeClassModel = new TypeClass();
+        
+        // Obtener todos los tipos de clases
+        $classTypes = $typeClassModel->getAll();
+        
+        // Obtener la fecha del formulario
+        $filterDate = $_POST['date'];
+        
+        // Obtener las clases disponibles para esa fecha
+        $availableClasses = $reservationModel->getAvailableClasses($filterDate);
+        $userReservations = [];
+        
+        if (isset($_SESSION['user_id'])) {
+            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+        }
+        
+        $data = [
+            'title' => 'Clases - ' . $filterDate,
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
+            'available_classes' => $availableClasses,
+            'user_reservations' => $userReservations,
+            'filter_date' => $filterDate,
+            'class_types' => $classTypes
+        ];
+        
+        // Cargar el header
+        include_once APPROOT . '/views/shared/header/main.php';
+        
+        // Cargar la vista
+        include_once APPROOT . '/views/users/classes.php';
+        
+        // Cargar el footer
+        include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Reservar una clase
+     */
+    public function reserveClass() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['message'] = 'Debes iniciar sesión para reservar una clase';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        }
+        
+        // Verificar si se recibió un ID de clase
+        if (!isset($_POST['class_id']) || empty($_POST['class_id'])) {
+            $_SESSION['message'] = 'No se ha seleccionado ninguna clase';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        $classId = $_POST['class_id'];
+        $userId = $_SESSION['user_id'];
+        
+        // Verificar si el usuario ya tiene una reserva para esta clase
+        if ($reservationModel->userHasReservation($userId, $classId)) {
+            $_SESSION['message'] = 'Ya tienes una reserva para esta clase';
+            $_SESSION['message_type'] = 'warning';
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Verificar si la clase tiene plazas disponibles
+        if (!$reservationModel->isClassAvailable($classId)) {
+            $_SESSION['message'] = 'Esta clase no tiene plazas disponibles';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Crear la reserva
+        $reservationModel->setUserId($userId);
+        $reservationModel->setClassId($classId);
+        $reservationModel->setAttendance(0); // No ha asistido todavía
+        
+        if ($reservationModel->create()) {
+            $_SESSION['message'] = 'Reserva realizada con éxito';
+            $_SESSION['message_type'] = 'success';
+        } else {
+            $_SESSION['message'] = 'Error al realizar la reserva';
+            $_SESSION['message_type'] = 'danger';
+        }
+        
+        header('Location: ' . URLROOT . '/user/classes');
+        exit;
+    }
+    
+    /**
+     * Cancelar una reserva
+     */
+    public function cancelReservation() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['message'] = 'Debes iniciar sesión para cancelar una reserva';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        }
+        
+        // Verificar si se recibió un ID de reserva
+        if (!isset($_POST['reservation_id']) || empty($_POST['reservation_id'])) {
+            $_SESSION['message'] = 'No se ha seleccionado ninguna reserva';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        $reservationId = $_POST['reservation_id'];
+        
+        // Verificar que la reserva pertenezca al usuario actual
+        $reservationModel->findById($reservationId);
+        
+        if ($reservationModel->getUserId() != $_SESSION['user_id']) {
+            $_SESSION['message'] = 'No tienes permiso para cancelar esta reserva';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/user/classes');
+            exit;
+        }
+        
+        // Cancelar la reserva
+        $reservationModel->setId($reservationId);
+        if ($reservationModel->cancel()) {
+            $_SESSION['message'] = 'Reserva cancelada con éxito';
+            $_SESSION['message_type'] = 'success';
+        } else {
+            $_SESSION['message'] = 'Error al cancelar la reserva';
+            $_SESSION['message_type'] = 'danger';
+        }
+        
+        header('Location: ' . URLROOT . '/user/classes');
+        exit;
+    }
+    
+    /**
+     * Ver las reservas del usuario
+     */
+    public function myReservations() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['message'] = 'Debes iniciar sesión para ver tus reservas';
+            $_SESSION['message_type'] = 'danger';
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Obtener las reservas del usuario
+        $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+        
+        $data = [
+            'title' => 'Mis Reservas',
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
+            'reservations' => $userReservations
+        ];
+        
+        // Cargar el header
+        include_once APPROOT . '/views/shared/header/main.php';
+        
+        // Cargar la vista
+        include_once APPROOT . '/views/users/my_reservations.php';
         
         // Cargar el footer
         include_once APPROOT . '/views/shared/footer/main.php';
@@ -394,44 +611,86 @@ class UserController {
      */
     private function sendWelcomeEmail($userData) {
         $to = $userData['email'];
-        $subject = "Bienvenido/a a Gym Intranet";
+        $subject = "Benvingut/da a Gym Intranet!";
         
         $body = "
         <html>
         <head>
-            <title>Bienvenido/a a Gym Intranet</title>
+            <title>Benvingut/da a Gym Intranet!</title>
             <style>
-                body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background-color: #4A90E2; color: white; padding: 10px; text-align: center; }
-                .content { padding: 20px; background-color: #f8f9fa; }
-                .button { display: inline-block; background-color: #4A90E2; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; }
-                .footer { font-size: 12px; color: #666; text-align: center; margin-top: 20px; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 0; background-color: #f9f9f9; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                .header { background: linear-gradient(135deg, #150000 0%, #3a0000 100%); color: white; padding: 30px 20px; text-align: center; }
+                .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+                .header img { max-width: 120px; margin-bottom: 15px; }
+                .content { padding: 30px; background-color: #ffffff; }
+                .welcome-message { font-size: 18px; margin-bottom: 25px; color: #444; text-align: center; }
+                .info-box { background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #150000; }
+                .benefits { margin: 30px 0; }
+                .benefit-item { display: flex; align-items: center; margin-bottom: 15px; }
+                .benefit-icon { width: 30px; text-align: center; margin-right: 15px; color: #150000; font-size: 20px; }
+                .button-container { text-align: center; margin: 30px 0; }
+                .button { display: inline-block; background-color: #150000; color: white; text-decoration: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; transition: background-color 0.3s; }
+                .button:hover { background-color: #3a0000; }
+                .social-links { text-align: center; margin-top: 30px; }
+                .social-links a { display: inline-block; margin: 0 10px; color: #444; text-decoration: none; }
+                .social-icon { font-size: 24px; }
+                .footer { background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #777; }
             </style>
         </head>
         <body>
             <div class='container'>
                 <div class='header'>
-                    <h2>¡Bienvenido/a a Gym Intranet!</h2>
+                    <h1>BENVINGUT/DA A GYM INTRANET!</h1>
                 </div>
                 <div class='content'>
-                    <p>Hola {$userData['fullName']},</p>
-                    <p>Tu cuenta ha sido creada exitosamente.</p>
-                    <p><strong>Datos de acceso:</strong></p>
-                    <ul>
-                        <li><strong>Usuario/Email:</strong> {$userData['email']}</li>
-                        <li><strong>Contraseña:</strong> La contraseña que estableciste durante el registro</li>
-                    </ul>
-                    <p>Por favor, guarda esta información en un lugar seguro.</p>
-                    <p>Puedes acceder a tu cuenta haciendo clic en el botón a continuación:</p>
-                    <p style='text-align: center;'>
-                        <a href='".URLROOT."/auth/login' class='button'>Iniciar sesión</a>
-                    </p>
-                    <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                    <p class='welcome-message'>Hola <strong>{$userData['fullName']}</strong>, ens alegra tenir-te amb nosaltres!</p>
+                    
+                    <p>El teu compte ha estat creat amb èxit i ja pots començar a gaudir de tots els beneficis del nostre centre esportiu.</p>
+                    
+                    <div class='info-box'>
+                        <h3>💡 INFORMACIÓ D'ACCÉS</h3>
+                        <p>Pots iniciar sessió a la nostra plataforma amb les següents dades:</p>
+                        <p><strong>Email:</strong> {$userData['email']}</p>
+                        <p><strong>Contrasenya:</strong> La que has establert durant el registre</p>
+                    </div>
+                    
+                    <div class='benefits'>
+                        <h3>QUÈ POTS FER A LA NOSTRA PLATAFORMA?</h3>
+                        <div class='benefit-item'>
+                            <div class='benefit-icon'>🏋️</div>
+                            <div>Reservar classes dirigides amb els nostres millors instructors</div>
+                        </div>
+                        <div class='benefit-item'>
+                            <div class='benefit-icon'>🎾</div>
+                            <div>Reservar pistes esportives per a les teves activitats favorites</div>
+                        </div>
+                        <div class='benefit-item'>
+                            <div class='benefit-icon'>📊</div>
+                            <div>Fer seguiment del teu progrés físic personal</div>
+                        </div>
+                        <div class='benefit-item'>
+                            <div class='benefit-icon'>📱</div>
+                            <div>Accedir a la teva informació des de qualsevol dispositiu</div>
+                        </div>
+                    </div>
+                    
+                    <div class='button-container'>
+                        <a href='".URLROOT."/auth/login' class='button'>ACCEDIR ARA</a>
+                    </div>
+                    
+                    <p>Si tens alguna pregunta o necessites ajuda, no dubtis en contactar amb el nostre equip de suport.</p>
+                    
+                    <div class='social-links'>
+                        <p>Segueix-nos a les xarxes socials:</p>
+                        <a href='#' class='social-icon'>📱</a>
+                        <a href='#' class='social-icon'>📘</a>
+                        <a href='#' class='social-icon'>📸</a>
+                    </div>
                 </div>
                 <div class='footer'>
-                    <p>Atentamente,<br>El equipo de Gym Intranet</p>
-                    <p>&copy; " . date('Y') . " Gym Intranet. Todos los derechos reservados.</p>
+                    <p>© " . date('Y') . " Gym Intranet. Tots els drets reservats.</p>
+                    <p>Aquest és un missatge automàtic, si us plau no responguis a aquest correu.</p>
                 </div>
             </div>
         </body>
@@ -439,5 +698,62 @@ class UserController {
         
         // Enviar email usando PHPMailer
         return MailService::sendMail($to, $subject, $body);
+    }
+    
+    /**
+     * Muestra las notificaciones del usuario (versión simplificada)
+     * @param int $page Página actual (para paginación)
+     */
+    public function notifications($page = 1) {
+        // Cargar modelo de notificaciones
+        require_once APPROOT . '/models/Notification.php';
+        $notificationModel = new Notification();
+        
+        // Configuración de paginación
+        $perPage = 10;
+        
+        // Obtener todas las notificaciones (ahora simplificado, sin filtrar por usuario)
+        $allNotifications = $notificationModel->getAllNotifications();
+        $totalNotifications = count($allNotifications);
+        $totalPages = ceil($totalNotifications / $perPage);
+        
+        // Ajustar la página actual si es necesario
+        if ($page < 1) $page = 1;
+        if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+        
+        // Obtener solo las notificaciones para la página actual
+        $offset = ($page - 1) * $perPage;
+        $notifications = array_slice($allNotifications, $offset, $perPage);
+        
+        $data = [
+            'title' => 'Notificaciones',
+            'notifications' => $notifications,
+            'totalPages' => $totalPages,
+            'currentPage' => $page,
+            'totalNotifications' => $totalNotifications
+        ];
+        
+        // Cargar el header
+        include_once APPROOT . '/views/shared/header/main.php';
+        
+        // Cargar la vista de notificaciones
+        include_once APPROOT . '/views/users/notifications.php';
+        
+        // Cargar el footer
+        include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Obtiene el número de notificaciones disponibles
+     * Versión simplificada que ahora devuelve todas las notificaciones
+     * @return int Número de notificaciones
+     */
+    public function getUnreadNotificationsCount() {
+        // Cargar modelo de notificaciones
+        require_once APPROOT . '/models/Notification.php';
+        $notificationModel = new Notification();
+        
+        // Obtener conteo total de notificaciones (simplificado)
+        return $notificationModel->getNotificationsCount();
     }
 }
