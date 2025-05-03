@@ -64,7 +64,7 @@ class User {
                         FROM usuaris WHERE usuari_id = :id');
         $this->db->bind(':id', $id);
         
-        $row = $this->db->singleArray();
+        $row = $this->db->single(); // Cambiado de singleArray() a single() para devolver un objeto
         
         if($this->db->rowCount() > 0){
             return $row;
@@ -345,43 +345,16 @@ class User {
     }
 
     /**
-     * Obtiene todos los monitores con sus IDs de personal
-     * @return array Lista de monitores con datos de personal
+     * Obtiene todos los usuarios que son monitores (staff)
+     * @return array Lista de monitores
      */
     public function getAllMonitors() {
-        $sql = 'SELECT u.usuari_id, u.nom, u.cognoms, u.correu as email, p.personal_id 
-                FROM usuaris u 
-                JOIN personal p ON u.usuari_id = p.usuari_id 
-                WHERE u.role = "staff" AND u.actiu = 1';
+        $sql = 'SELECT usuari_id as personal_id, usuari_id, nom, cognoms, correu
+                FROM usuaris 
+                WHERE role = "staff" AND actiu = 1
+                ORDER BY nom, cognoms';
         
         $this->db->query($sql);
         return $this->db->resultSet();
-    }
-
-    /**
-     * Crea una entrada en la tabla personal para un usuario staff
-     * @param int $userId ID del usuario
-     * @param bool $isAdmin Si el usuario es admin o no
-     * @return bool
-     */
-    public function createStaffRecord($userId) {
-        $this->db->query('INSERT INTO personal (usuari_id, es_admin, data_contracte) VALUES (:usuari_id, :es_admin, CURDATE())');
-        $this->db->bind(':usuari_id', $userId);
-        $this->db->bind(':es_admin', 0); // Por defecto no es admin
-        
-        return $this->db->execute();
-    }
-    
-    /**
-     * Verifica si un usuario ya tiene registro en la tabla de personal
-     * @param int $userId ID del usuario
-     * @return bool
-     */
-    public function hasStaffRecord($userId) {
-        $this->db->query('SELECT COUNT(*) as count FROM personal WHERE usuari_id = :usuari_id');
-        $this->db->bind(':usuari_id', $userId);
-        $result = $this->db->single();
-        
-        return $result->count > 0;
     }
 }

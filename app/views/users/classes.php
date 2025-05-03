@@ -1,7 +1,4 @@
 <?php 
-// El header y footer ahora son incluidos por direct-view.php
-// No necesitamos incluirlos aquí
-
 // Definir variables para evitar errores
 $availableClasses = $data['available_classes'] ?? [];
 $userReservations = $data['user_reservations'] ?? [];
@@ -29,17 +26,17 @@ if (isset($_SESSION['message'])) {
           <form action="<?= URLROOT ?>/user/filterClasses" method="post" class="me-2">
             <div class="input-group">
               <input type="date" class="form-control form-control-sm" name="date" value="<?= $filterDate ?>">
-              <button class="btn btn-sm btn-outline-secondary" type="submit">Filtrar</button>
+              <button class="btn btn-sm btn-outline-primary" type="submit">Filtrar</button>
             </div>
           </form>
           <div class="dropdown">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-filter"></i> Filtrar
+              <i class="fas fa-filter"></i> Filtrar por tipo
             </button>
             <ul class="dropdown-menu" aria-labelledby="filterDropdown">
               <li><a class="dropdown-item filter-class" href="#" data-filter="all">Todas las clases</a></li>
               <?php foreach ($classTypes as $type): ?>
-              <li><a class="dropdown-item filter-class" href="#" data-filter="<?= $type->id ?>"><?= $type->nom ?></a></li>
+              <li><a class="dropdown-item filter-class" href="#" data-filter="<?= $type->tipus_classe_id ?>"><?= $type->nom ?></a></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -49,74 +46,80 @@ if (isset($_SESSION['message'])) {
       <!-- Mis Reservas -->
       <?php if (isset($_SESSION['user_id']) && !empty($userReservations)): ?>
       <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-          <h6 class="m-0 font-weight-bold text-primary">Mis Reservas</h6>
-          <a href="<?= URLROOT ?>/user/myReservations" class="btn btn-sm btn-outline-primary">Ver todas</a>
+        <div class="card-header bg-primary text-white py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold">Mis Próximas Reservas</h6>
+          <a href="<?= URLROOT ?>/user/myReservations" class="btn btn-sm btn-light">Ver todas</a>
         </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Clase</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Instructor</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php 
-                // Mostrar solo las próximas 3 reservas
-                $count = 0;
-                foreach ($userReservations as $reservation): 
-                  if ($count >= 3) break;
-                  $count++;
-                ?>
-                <tr>
-                  <td><?= $reservation->tipus_nom ?></td>
-                  <td><?= date('d/m/Y', strtotime($reservation->data)) ?></td>
-                  <td><?= date('H:i', strtotime($reservation->hora)) ?></td>
-                  <td><?= $reservation->monitor_nom ?></td>
-                  <td>
-                    <form action="<?= URLROOT ?>/user/cancelReservation" method="post" style="display:inline;">
+        <div class="card-body pb-0">
+          <div class="row">
+            <?php 
+            // Mostrar solo las próximas 3 reservas
+            $count = 0;
+            $today = date('Y-m-d');
+            
+            foreach ($userReservations as $reservation): 
+              if ($reservation->data < $today) continue; // Saltar reservas pasadas
+              if ($count >= 3) break; // Mostrar máximo 3
+              $count++;
+            ?>
+            <div class="col-md-4 mb-4">
+              <div class="card border-left-primary shadow-sm h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0"><?= $reservation->tipus_nom ?></h5>
+                    <span class="badge bg-primary"><?= date('d/m/Y', strtotime($reservation->data)) ?></span>
+                  </div>
+                  <div class="mb-2">
+                    <i class="far fa-clock text-muted me-2"></i>
+                    <span><?= date('H:i', strtotime($reservation->hora)) ?></span>
+                  </div>
+                  <div class="mb-2">
+                    <i class="fas fa-user text-muted me-2"></i>
+                    <span><?= $reservation->monitor_nom ?></span>
+                  </div>
+                  <div class="d-grid mt-3">
+                    <form action="<?= URLROOT ?>/user/cancelReservation" method="post">
                       <input type="hidden" name="reservation_id" value="<?= $reservation->reserva_id ?>">
-                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de cancelar esta reserva?')">
-                        <i class="fas fa-times"></i> Cancelar
+                      <button type="submit" class="btn btn-sm btn-outline-danger w-100" 
+                              onclick="return confirm('¿Estás seguro de cancelar esta reserva?')">
+                        <i class="fas fa-times me-1"></i> Cancelar
                       </button>
                     </form>
-                  </td>
-                </tr>
-                <?php endforeach; ?>
-              </tbody>
-            </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+            
+            <?php if ($count === 0): ?>
+            <div class="col-12">
+              <div class="alert alert-light text-center">
+                No tienes reservas próximas.
+              </div>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
       </div>
       <?php endif; ?>
 
-      <!-- Classes Available -->
-      <h2 class="mt-4">Clases Disponibles</h2>
-      <div class="row">
+      <!-- Clases Disponibles -->
+      <div class="mb-3">
+        <h4>Clases disponibles para <?= date('d/m/Y', strtotime($filterDate)) ?></h4>
+        <p class="text-muted">Reserva tu plaza en nuestras clases y empieza a disfrutar de nuestras actividades.</p>
+      </div>
+
+      <div class="row" id="classesContainer">
         <?php if (empty($availableClasses)): ?>
           <div class="col-12">
             <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>
               No hay clases disponibles para la fecha seleccionada.
+              <a href="<?= URLROOT ?>/user/classes" class="btn btn-sm btn-primary ms-2">Ver todas las clases</a>
             </div>
           </div>
         <?php else: ?>
           <?php foreach ($availableClasses as $class): 
-            // Determinar el color según el tipo de clase
-            $cardColor = "primary"; // color por defecto
-            
-            // Buscar el tipo de clase para obtener el color personalizado si existe
-            foreach ($classTypes as $type) {
-              if ($type->id == $class->tipus_classe_id && !empty($type->color)) {
-                $cardColor = $type->color;
-                break;
-              }
-            }
-            
             // Comprobar si el usuario ya tiene reserva para esta clase
             $userHasReservation = false;
             if (isset($_SESSION['user_id'])) {
@@ -127,40 +130,88 @@ if (isset($_SESSION['message'])) {
                 }
               }
             }
+            
+            // Calcular el porcentaje de ocupación para el estilo visual
+            $ocupacionPorcentaje = ($class->capacitat_maxima > 0) ? 
+                                  ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
+            
+            $cardStyle = "";
+            $textClass = "";
+            $buttonClass = "btn-primary";
+            
+            if ($ocupacionPorcentaje >= 80) {
+              $cardStyle = "border-danger";
+              $textClass = "text-danger";
+              $buttonClass = "btn-danger";
+            } elseif ($ocupacionPorcentaje >= 50) {
+              $cardStyle = "border-warning";
+              $textClass = "text-warning";
+              $buttonClass = "btn-warning";
+            } else {
+              $cardStyle = "border-success";
+              $textClass = "text-success";
+              $buttonClass = "btn-success";
+            }
           ?>
           <div class="col-md-4 mb-4 class-card" data-class-type="<?= $class->tipus_classe_id ?>">
-            <div class="card shadow h-100">
-              <div class="card-header bg-<?= $cardColor ?> text-white">
-                <div class="d-flex justify-content-between align-items-center">
-                  <h5 class="mb-0"><?= $class->tipus_nom ?></h5>
-                  <span class="badge bg-light text-dark">
-                    <?= date('d/m/Y', strtotime($class->data)) ?>
-                  </span>
-                </div>
+            <div class="card shadow-sm h-100 <?= $cardStyle ?>">
+              <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0 fw-bold"><?= $class->tipus_nom ?></h5>
+                <span class="badge bg-primary">
+                  <?= date('d/m/Y', strtotime($class->data)) ?>
+                </span>
               </div>
               <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                  <span><i class="far fa-clock me-2"></i> <?= date('H:i', strtotime($class->hora)) ?> - <?= date('H:i', strtotime($class->hora) + $class->duracio * 60) ?></span>
-                  <span><i class="fas fa-user-friends me-2"></i> <?= $class->capacitat_actual ?>/<?= $class->capacitat_maxima ?></span>
+                <div class="d-flex justify-content-between mb-3">
+                  <div>
+                    <i class="far fa-clock me-1"></i> 
+                    <?= date('H:i', strtotime($class->hora)) ?> - <?= date('H:i', strtotime($class->hora) + $class->duracio * 60) ?>
+                  </div>
+                  <div class="<?= $textClass ?> fw-bold">
+                    <i class="fas fa-users me-1"></i>
+                    <?= $class->capacitat_actual ?>/<?= $class->capacitat_maxima ?>
+                  </div>
                 </div>
-                <div class="mb-2">
-                  <span><i class="fas fa-map-marker-alt me-2"></i> <?= $class->sala ?></span>
+                
+                <div class="progress mb-3" style="height: 10px;">
+                  <div class="progress-bar bg-<?= $ocupacionPorcentaje >= 80 ? 'danger' : ($ocupacionPorcentaje >= 50 ? 'warning' : 'success') ?>" 
+                       role="progressbar" 
+                       style="width: <?= $ocupacionPorcentaje ?>%;" 
+                       aria-valuenow="<?= $ocupacionPorcentaje ?>" 
+                       aria-valuemin="0" 
+                       aria-valuemax="100"></div>
+                </div>
+                
+                <div class="mb-3">
+                  <i class="fas fa-map-marker-alt me-2"></i> <?= $class->sala ?>
                 </div>
                 <div class="mb-3">
-                  <span><i class="fas fa-user me-2"></i> <?= $class->monitor_nom ?></span>
+                  <i class="fas fa-user me-2"></i> <?= $class->monitor_nom ?>
                 </div>
-                <p class="small text-muted"><?= $class->tipus_descripcio ?></p>
-                <div class="d-grid">
+                
+                <?php if (!empty($class->tipus_descripcio)): ?>
+                <p class="small text-muted mb-3"><?= $class->tipus_descripcio ?></p>
+                <?php endif; ?>
+                
+                <div class="d-grid mt-3">
                   <?php if (!isset($_SESSION['user_id'])): ?>
-                    <a href="<?= URLROOT ?>/auth/login" class="btn btn-secondary">Inicia sesión para reservar</a>
+                    <a href="<?= URLROOT ?>/auth/login" class="btn btn-outline-secondary">
+                      <i class="fas fa-sign-in-alt me-1"></i> Inicia sesión para reservar
+                    </a>
                   <?php elseif ($userHasReservation): ?>
-                    <button class="btn btn-success" disabled>Ya reservada</button>
+                    <button class="btn btn-success" disabled>
+                      <i class="fas fa-check me-1"></i> Ya reservada
+                    </button>
                   <?php elseif ($class->capacitat_actual >= $class->capacitat_maxima): ?>
-                    <button class="btn btn-secondary" disabled>Clase completa</button>
+                    <button class="btn btn-secondary" disabled>
+                      <i class="fas fa-ban me-1"></i> Clase completa
+                    </button>
                   <?php else: ?>
                     <form action="<?= URLROOT ?>/user/reserveClass" method="post">
                       <input type="hidden" name="class_id" value="<?= $class->classe_id ?>">
-                      <button type="submit" class="btn btn-<?= $cardColor ?> w-100">Reservar</button>
+                      <button type="submit" class="btn <?= $buttonClass ?> w-100">
+                        <i class="fas fa-bookmark me-1"></i> Reservar plaza
+                      </button>
                     </form>
                   <?php endif; ?>
                 </div>
@@ -174,13 +225,15 @@ if (isset($_SESSION['message'])) {
   </div>
 </div>
 
-<!-- Include FullCalendar library -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Filter classes
+    // Establecer la fecha actual como valor predeterminado para el filtro si no hay filtro previo
+    const dateInput = document.querySelector('input[name="date"]');
+    if (dateInput && dateInput.value === "") {
+      dateInput.valueAsDate = new Date();
+    }
+    
+    // Filtrar clases por tipo
     document.querySelectorAll('.filter-class').forEach(item => {
       item.addEventListener('click', event => {
         event.preventDefault();

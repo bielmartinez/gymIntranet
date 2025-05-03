@@ -168,12 +168,11 @@ class Reservation {
      */
     public function findByUserId($userId) {
         $sql = "SELECT r.*, c.*, tc.nom as tipus_nom, tc.descripcio as tipus_descripcio, 
-                    CONCAT(u.nom, ' ', u.cognoms) as monitor_nom
+                    CONCAT(u_monitor.nom, ' ', u_monitor.cognoms) as monitor_nom
                 FROM reserves r
                 JOIN classes c ON r.classe_id = c.classe_id
                 JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
-                JOIN personal p ON c.monitor_id = p.personal_id
-                JOIN usuaris u ON p.usuari_id = u.usuari_id
+                JOIN usuaris u_monitor ON c.monitor_id = u_monitor.usuari_id
                 WHERE r.usuari_id = :user_id
                 ORDER BY c.data ASC, c.hora ASC";
         
@@ -246,8 +245,7 @@ class Reservation {
                 CONCAT(u.nom, ' ', u.cognoms) as monitor_nom
                 FROM classes c 
                 JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
-                JOIN personal p ON c.monitor_id = p.personal_id
-                JOIN usuaris u ON p.usuari_id = u.usuari_id
+                JOIN usuaris u ON c.monitor_id = u.usuari_id
                 WHERE c.capacitat_actual < c.capacitat_maxima";
         
         if($date) {

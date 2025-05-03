@@ -353,12 +353,19 @@
                                     
                                     // Verificar si es un objeto o un array
                                     $title = is_object($notification) ? $notification->title : $notification['title'];
+                                    $id = is_object($notification) ? $notification->id : $notification['id'];
                             ?>
-                                <li>
-                                    <a class="dropdown-item notification-item" href="<?php echo URLROOT; ?>/user/notifications">
-                                        <i class="fas fa-info-circle text-info me-2"></i>
-                                        <?php echo htmlspecialchars($title); ?>
-                                    </a>
+                                <li class="notification-item-container" id="notification-item-<?php echo $id; ?>">
+                                    <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                                        <a class="notification-link text-truncate" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" href="<?php echo URLROOT; ?>/user/notifications">
+                                            <i class="fas fa-info-circle text-info me-2"></i>
+                                            <?php echo htmlspecialchars($title); ?>
+                                        </a>
+                                        <button type="button" class="btn-dismiss-notification btn btn-link text-secondary p-0 ms-2" 
+                                                data-id="<?php echo $id; ?>" title="Descartar notificación">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </li>
                             <?php 
                                 endforeach;

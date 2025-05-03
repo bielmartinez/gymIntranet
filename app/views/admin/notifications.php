@@ -44,19 +44,19 @@
                         <tbody>
                             <?php foreach($data['notifications'] as $notification): ?>
                                 <tr>
-                                    <td><?php echo $notification['id']; ?></td>
-                                    <td><?php echo $notification['title']; ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($notification['created_at'])); ?></td>
+                                    <td><?php echo $notification->id; ?></td>
+                                    <td><?php echo $notification->title; ?></td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($notification->created_at)); ?></td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <button type="button" class="btn btn-outline-primary view-notification" 
-                                                    data-id="<?php echo $notification['id']; ?>"
+                                                    data-id="<?php echo $notification->id; ?>"
                                                     data-bs-toggle="modal" data-bs-target="#viewNotificationModal">
                                                 <i class="fas fa-eye" title="Ver detalles"></i>
                                             </button>
                                             <button type="button" class="btn btn-outline-danger delete-notification" 
-                                                    data-id="<?php echo $notification['id']; ?>"
-                                                    data-title="<?php echo htmlspecialchars($notification['title']); ?>">
+                                                    data-id="<?php echo $notification->id; ?>"
+                                                    data-title="<?php echo htmlspecialchars($notification->title); ?>">
                                                 <i class="fas fa-trash" title="Eliminar"></i>
                                             </button>
                                         </div>

@@ -62,7 +62,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
               <select class="form-control" id="filterMonitor" name="monitor_id">
                 <option value="">Todos</option>
                 <?php foreach ($monitors as $monitor): ?>
-                  <option value="<?= $monitor->personal_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
+                  <option value="<?= $monitor->usuari_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -177,7 +177,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
             <select class="form-control" id="classMonitor" name="monitor_id" required>
               <option value="">Seleccionar monitor</option>
               <?php foreach ($monitors as $monitor): ?>
-                <option value="<?= $monitor->personal_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
+                <option value="<?= $monitor->usuari_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
               <?php endforeach; ?>
             </select>
           </div>
@@ -236,7 +236,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
             <select class="form-control" id="editClassMonitor" name="monitor_id" required>
               <option value="">Seleccionar monitor</option>
               <?php foreach ($monitors as $monitor): ?>
-                <option value="<?= $monitor->personal_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
+                <option value="<?= $monitor->usuari_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
               <?php endforeach; ?>
             </select>
           </div>

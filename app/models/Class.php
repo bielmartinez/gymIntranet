@@ -120,8 +120,7 @@ class Class_ {
         $sql = "SELECT c.*, t.nom as tipus_nom, CONCAT(u.nom, ' ', u.cognoms) as monitor_nom 
                 FROM classes c 
                 JOIN tipus_classes t ON c.tipus_classe_id = t.tipus_classe_id
-                JOIN personal p ON c.monitor_id = p.personal_id
-                JOIN usuaris u ON p.usuari_id = u.usuari_id
+                JOIN usuaris u ON c.monitor_id = u.usuari_id
                 WHERE 1=1";
         
         $params = [];

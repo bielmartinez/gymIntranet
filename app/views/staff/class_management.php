@@ -24,20 +24,11 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
 // Obtener el ID del usuario actual (monitor)
 $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 
-// Obtener el personal_id del usuario actual
-$currentStaffId = null;
-foreach ($monitors as $monitor) {
-    if ($monitor->usuari_id == $currentUserId) {
-        $currentStaffId = $monitor->personal_id;
-        break;
-    }
-}
-
 // Filtrar clases por monitor actual si es necesario
 $userClasses = [];
 foreach ($classes as $class) {
     // Si es el monitor asignado a esta clase o es admin, añadir a la lista
-    if ($class->monitor_id == $currentStaffId || $_SESSION['user_role'] === 'admin') {
+    if ($class->monitor_id == $currentUserId || $_SESSION['user_role'] === 'admin') {
         $userClasses[] = $class;
     }
 }
@@ -234,7 +225,7 @@ foreach ($classes as $class) {
                             <label for="classCapacity" class="form-label">Capacidad máxima</label>
                             <input type="number" class="form-control" id="classCapacity" name="capacitat_maxima" min="1" max="50" value="20" required>
                         </div>
-                        <input type="hidden" name="monitor_id" value="<?= $currentStaffId ?>">
+                        <input type="hidden" name="monitor_id" value="<?= $currentUserId ?>">
                     </div>
                 </form>
             </div>
@@ -291,7 +282,7 @@ foreach ($classes as $class) {
                             <label for="editClassCapacity" class="form-label">Capacidad máxima</label>
                             <input type="number" class="form-control" id="editClassCapacity" name="capacitat_maxima" min="1" max="50" required>
                         </div>
-                        <input type="hidden" id="editClassMonitor" name="monitor_id" value="<?= $currentStaffId ?>">
+                        <input type="hidden" id="editClassMonitor" name="monitor_id" value="<?= $currentUserId ?>">
                     </div>
                 </form>
             </div>
@@ -338,26 +329,51 @@ foreach ($classes as $class) {
                 </div>
                 
                 <h5 class="border-bottom pb-2 mb-3">Alumnos inscritos</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover" id="studentsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Fecha reserva</th>
-                                <th>Asistencia</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            <!-- Aquí se cargarán los alumnos desde la base de datos mediante JavaScript -->
-                            <tr>
-                                <td colspan="6" class="text-center">Cargando alumnos...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="studentTableBody">
+                    <!-- Aquí se cargarán los alumnos desde la base de datos mediante JavaScript -->
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando alumnos...</span>
+                        </div>
+                        <p class="mt-2">Cargando alumnos...</p>
+                    </div>
                 </div>
+
+                <div id="noStudents" class="alert alert-info text-center" style="display:none;">
+                    <i class="fas fa-info-circle me-2"></i> No hay alumnos inscritos en esta clase.
+                </div>
+
+                <template id="studentRowTemplate">
+                    <div class="card mb-2 student-card">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-1">
+                                    <span class="badge bg-secondary student-id"></span>
+                                </div>
+                                <div class="col-md-3">
+                                    <h6 class="mb-0 student-name"></h6>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="student-email text-muted small"></span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="student-date small"></span>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input attendance-switch" type="checkbox" role="switch">
+                                        <label class="form-check-label">Asistencia</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-sm btn-outline-danger cancel-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -460,35 +476,21 @@ foreach ($classes as $class) {
                     
                     if (data.students && data.students.length > 0) {
                         data.students.forEach(student => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${student.usuari_id}</td>
-                                <td>${student.nom} ${student.cognoms}</td>
-                                <td>${student.correu}</td>
-                                <td>${student.data_reserva}</td>
-                                <td>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input attendance-switch" type="checkbox" 
-                                               role="switch" id="attendanceSwitch${student.reserva_id}" 
-                                               data-reservation-id="${student.reserva_id}"
-                                               ${student.assistencia ? 'checked' : ''}>
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger" 
-                                            onclick="cancelReservation(${student.reserva_id}, ${classId})">
-                                        <i class="fas fa-times"></i> Cancelar
-                                    </button>
-                                </td>
-                            `;
-                            studentsTable.appendChild(row);
+                            const template = document.getElementById('studentRowTemplate').content.cloneNode(true);
+                            template.querySelector('.student-id').textContent = student.usuari_id;
+                            template.querySelector('.student-name').textContent = `${student.nom} ${student.cognoms}`;
+                            template.querySelector('.student-email').textContent = student.correu;
+                            template.querySelector('.student-date').textContent = student.data_reserva;
+                            const attendanceSwitch = template.querySelector('.attendance-switch');
+                            attendanceSwitch.setAttribute('data-reservation-id', student.reserva_id);
+                            attendanceSwitch.checked = student.assistencia ? true : false;
+                            template.querySelector('.cancel-btn').addEventListener('click', () => {
+                                cancelReservation(student.reserva_id, classId);
+                            });
+                            studentsTable.appendChild(template);
                         });
                     } else {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td colspan="6" class="text-center">No hay alumnos inscritos en esta clase</td>
-                        `;
-                        studentsTable.appendChild(row);
+                        document.getElementById('noStudents').style.display = 'block';
                     }
                 } else {
                     alert('Error al cargar los detalles de la clase');

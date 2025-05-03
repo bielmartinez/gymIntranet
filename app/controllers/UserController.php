@@ -756,4 +756,92 @@ class UserController {
         // Obtener conteo total de notificaciones (simplificado)
         return $notificationModel->getNotificationsCount();
     }
+
+    /**
+     * Marca una notificación como leída (mediante AJAX)
+     * @param int $notificationId ID de la notificación a marcar
+     */
+    public function markNotificationAsRead($notificationId = null) {
+        // Verificar si es una solicitud AJAX
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'message' => 'Solicitud no permitida']);
+            return;
+        }
+        
+        // Verificar si hay un usuario logueado
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+        
+        // Verificar ID de notificación
+        if (!$notificationId) {
+            // Intentar obtenerlo del cuerpo de la solicitud
+            $json = file_get_contents('php://input');
+            $data = json_decode($json);
+            $notificationId = $data->notificationId ?? null;
+            
+            if (!$notificationId) {
+                echo json_encode(['success' => false, 'message' => 'ID de notificación no proporcionado']);
+                return;
+            }
+        }
+        
+        // Cargar modelo de notificaciones
+        require_once APPROOT . '/models/Notification.php';
+        $notificationModel = new Notification();
+        
+        // Marcar como leída
+        $success = $notificationModel->markAsRead($notificationId, $_SESSION['user_id']);
+        
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Notificación marcada como leída']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al marcar la notificación']);
+        }
+    }
+    
+    /**
+     * Descarta una notificación (mediante AJAX)
+     * @param int $notificationId ID de la notificación a descartar
+     */
+    public function dismissNotification($notificationId = null) {
+        // Verificar si es una solicitud AJAX
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'message' => 'Solicitud no permitida']);
+            return;
+        }
+        
+        // Verificar si hay un usuario logueado
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+        
+        // Verificar ID de notificación
+        if (!$notificationId) {
+            // Intentar obtenerlo del cuerpo de la solicitud
+            $json = file_get_contents('php://input');
+            $data = json_decode($json);
+            $notificationId = $data->notificationId ?? null;
+            
+            if (!$notificationId) {
+                echo json_encode(['success' => false, 'message' => 'ID de notificación no proporcionado']);
+                return;
+            }
+        }
+        
+        // Cargar modelo de notificaciones
+        require_once APPROOT . '/models/Notification.php';
+        $notificationModel = new Notification();
+        
+        // Descartar notificación
+        $success = $notificationModel->dismissNotification($notificationId, $_SESSION['user_id']);
+        
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Notificación descartada']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al descartar la notificación']);
+        }
+    }
 }
