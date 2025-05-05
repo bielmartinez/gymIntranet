@@ -194,7 +194,6 @@ include_once APPROOT . '/views/shared/header/main.php';
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="submit" form="addExerciseForm" class="btn btn-primary">Añadir ejercicio</button>
-                <button type="button" id="btnAddDirectly" class="btn btn-success">Añadir directamente</button>
             </div>
         </div>
     </div>
@@ -249,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
+                throw new Error('Error en la respuesta del servidor: ' + response.status);
             }
             return response.json();
         })
@@ -257,6 +256,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ocultar spinner de carga
             loadingSpinner.classList.add('d-none');
             
+            // Verificar si hay un error en la respuesta
+            if (data.error) {
+                searchResults.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${data.error}
+                    </div>
+                `;
+                return;
+            }
+
             // Mostrar resultados
             displaySearchResults(data);
         })
@@ -274,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para mostrar los resultados de búsqueda
     function displaySearchResults(data) {
-        if (!data || data.length === 0 || data.error) {
+        if (!data || data.length === 0) {
             searchResults.innerHTML = `
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
@@ -292,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const exerciseName = exercise.name || 'Ejercicio sin nombre';
             const muscleTarget = exercise.target || exercise.bodyPart || 'No especificado';
             const equipment = exercise.equipment || 'No especificado';
+            const description = Array.isArray(exercise.instructions) ? exercise.instructions.join('. ') : '';
             
             resultsHTML += `
                 <div class="col">
@@ -307,26 +318,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             </p>
                         </div>
                         <div class="card-footer bg-transparent">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-sm btn-primary w-100 add-exercise-btn" 
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-sm btn-primary add-exercise-btn" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#addExerciseModal"
                                         data-name="${exerciseName}"
                                         data-image="${imageUrl}"
-                                        data-description="${(exercise.instructions || []).join('. ')}">
+                                        data-muscle="${muscleTarget}"
+                                        data-equipment="${equipment}"
+                                        data-description="${description}">
                                     <i class="fas fa-plus me-1"></i> Añadir a rutina
                                 </button>
-                                <form action="<?= URLROOT ?>/staffRoutine/addDirectFromApi/<?= $routineId ?>" method="post">
-                                    <input type="hidden" name="name" value="${exerciseName}">
-                                    <input type="hidden" name="description" value="${(exercise.instructions || []).join('. ')}">
-                                    <input type="hidden" name="muscle" value="${muscleTarget}">
-                                    <input type="hidden" name="equipment" value="${equipment}">
-                                    <input type="hidden" name="series" value="3">
-                                    <input type="hidden" name="repetitions" value="12">
-                                    <input type="hidden" name="rest" value="60">
-                                    <input type="hidden" name="order" value="1">
-                                    <button type="submit" class="btn btn-success btn-sm">Añadir directamente</button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-success" 
+                                        onclick="addDirectlyWithParams('${exerciseName.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}', '${imageUrl}', 3, 12, 60, 1, '${muscleTarget}', '${equipment}')">
+                                    <i class="fas fa-bolt me-1"></i> Añadir directamente
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -342,18 +348,27 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function() {
                 const name = this.getAttribute('data-name');
                 const image = this.getAttribute('data-image');
+                const muscle = this.getAttribute('data-muscle');
+                const equipment = this.getAttribute('data-equipment');
                 const description = this.getAttribute('data-description');
                 
                 document.getElementById('exercise_name').value = name;
                 document.getElementById('exercise_description').value = description;
                 document.getElementById('exercise_image_url').value = image;
+                document.getElementById('exercise_details').innerHTML = `
+                    <p><strong>Nombre:</strong> ${name}</p>
+                    <p><strong>Músculo objetivo:</strong> ${muscle}</p>
+                    <p><strong>Equipo:</strong> ${equipment}</p>
+                    <p><strong>Descripción:</strong> ${description}</p>
+                `;
                 
-                // Si no hay ID de rutina, redirigir al listado
-                const routineIdInput = document.querySelector('input[name="routine_id"]');
-                if (!routineIdInput.value) {
-                    alert('Por favor selecciona primero una rutina');
-                    window.location.href = '<?= URLROOT ?>/staffRoutine';
-                    return;
+                // Mostrar imagen de previsualización
+                const previewImage = document.getElementById('exercise_preview');
+                if (image) {
+                    previewImage.src = image;
+                    previewImage.style.display = 'block';
+                } else {
+                    previewImage.style.display = 'none';
                 }
             });
         });
@@ -375,19 +390,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Función para añadir directamente desde la vista de resultados
-function addDirectly(name, description, imageUrl) {
-    // Valores por defecto
-    const series = 3;
-    const repetitions = 12; 
-    const rest = 60;
-    const order = 1;
-    
-    addDirectlyWithParams(name, description, imageUrl, series, repetitions, rest, order);
-}
-
 // Función para añadir ejercicio directamente con parámetros específicos
-function addDirectlyWithParams(name, description, imageUrl, series, repetitions, rest, order) {
+function addDirectlyWithParams(name, description, imageUrl, series, repetitions, rest, order, muscle = '', equipment = '') {
     // Crear formulario dinámicamente
     const form = document.createElement('form');
     form.method = 'POST';
@@ -402,7 +406,9 @@ function addDirectlyWithParams(name, description, imageUrl, series, repetitions,
         'series': series,
         'repetitions': repetitions,
         'rest': rest,
-        'order': order
+        'order': order,
+        'muscle': muscle,
+        'equipment': equipment
     };
 
     for (const [key, value] of Object.entries(fields)) {

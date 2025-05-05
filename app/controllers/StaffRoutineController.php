@@ -518,7 +518,17 @@ class StaffRoutineController
                 break;
         }
 
-        // Transformar los resultados si es necesario
+        // Si hubo un error, verificar y registrar
+        if (empty($results)) {
+            $error = $this->exerciseApiService->getLastError();
+            error_log("API Error: " . ($error ? $error : "No specific error message"));
+            // Devolvemos un error genérico
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'No se pudieron obtener resultados. Intente de nuevo más tarde.']);
+            exit;
+        }
+
+        // Transformar los resultados añadiendo URLs de imágenes de ejemplo si no existen
         $formattedResults = [];
         foreach ($results as $exercise) {
             // Si es una búsqueda por equipo, podemos filtrar los resultados
@@ -528,14 +538,22 @@ class StaffRoutineController
                 }
             }
 
+            // Generar una URL de imagen de ejemplo si no hay gifUrl
+            $gifUrl = $exercise['gifUrl'] ?? '';
+            if (empty($gifUrl)) {
+                // Asignar una imagen predeterminada basada en el músculo o tipo
+                $muscle = strtolower($exercise['target'] ?? $exercise['bodyPart'] ?? 'general');
+                $gifUrl = $this->getDefaultExerciseImage($muscle);
+            }
+
             // Formatear los resultados para el frontend
             $formattedResults[] = [
                 'id' => isset($exercise['id']) ? $exercise['id'] : uniqid(), // Generar un ID único si no existe
                 'name' => $exercise['name'] ?? '',
                 'target' => $exercise['target'] ?? '',
-                'equipment' => $exercise['equipment'] ?? '',
                 'bodyPart' => $exercise['bodyPart'] ?? '',
-                'gifUrl' => $exercise['gifUrl'] ?? '',
+                'equipment' => $exercise['equipment'] ?? '',
+                'gifUrl' => $gifUrl,
                 'instructions' => isset($exercise['instructions']) ? explode('. ', $exercise['instructions']) : []
             ];
         }
@@ -544,6 +562,35 @@ class StaffRoutineController
         header('Content-Type: application/json');
         echo json_encode($formattedResults);
         exit;
+    }
+
+    /**
+     * Obtiene una imagen predeterminada para un ejercicio basado en el grupo muscular
+     * @param string $muscle Nombre del grupo muscular
+     * @return string URL de la imagen predeterminada
+     */
+    private function getDefaultExerciseImage($muscle) {
+        // Mapeo de músculos a imágenes predeterminadas
+        $defaultImages = [
+            'chest' => 'https://api.exercisedb.io/image/wkQvyEq1gjCBh5',
+            'back' => 'https://api.exercisedb.io/image/wHo9o1RFkJV5Tl',
+            'biceps' => 'https://api.exercisedb.io/image/xQXt6ViMpRpSP4',
+            'triceps' => 'https://api.exercisedb.io/image/216QiVfdCzG8LT',
+            'shoulders' => 'https://api.exercisedb.io/image/Db9Wo2fLaTqgVk',
+            'legs' => 'https://api.exercisedb.io/image/Pvk-fQeMSQabgT',
+            'abs' => 'https://api.exercisedb.io/image/68AgWiRf5m6Vt6',
+            'calves' => 'https://api.exercisedb.io/image/h69fbKzE-iI0sF'
+        ];
+        
+        // Intentar encontrar una imagen que coincida con el músculo
+        foreach ($defaultImages as $key => $url) {
+            if (stripos($muscle, $key) !== false) {
+                return $url;
+            }
+        }
+        
+        // Si no hay coincidencia, devolver una imagen genérica
+        return 'https://api.exercisedb.io/image/Db9Wo2fLaTqgVk';
     }
 
     // Método para añadir un ejercicio desde la API directamente
