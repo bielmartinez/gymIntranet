@@ -26,6 +26,27 @@ class StaffController {
     }
     
     /**
+     * Método helper para cargar vistas con datos
+     * @param string $view Nombre de la vista a cargar
+     * @param array $data Datos a pasar a la vista
+     */
+    private function loadView($view, $data = []) {
+        // Cargar el header
+        include_once APPROOT . '/views/shared/header/main.php';
+        
+        // Cargar la vista solicitada
+        if (file_exists(APPROOT . '/views/' . $view . '.php')) {
+            include_once APPROOT . '/views/' . $view . '.php';
+        } else {
+            // Mostrar un error si la vista no existe
+            include_once APPROOT . '/views/shared/error/404.php';
+        }
+        
+        // Cargar el footer
+        include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
      * Página de inicio para el personal
      */
     public function index() {
@@ -337,6 +358,179 @@ class StaffController {
         
         // Cargar footer
         include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Muestra la página de gestión de clases del staff
+     * Permitirá ver el horario del monitor y los alumnos asignados
+     */
+    public function classes() {
+        // Cargar modelo de clases
+        require_once APPROOT . '/models/Class.php';
+        $classModel = new Class_();
+        
+        // Obtener el ID del staff autenticado
+        $staffId = $_SESSION['user_id'];
+        
+        // Obtener las clases asignadas a este monitor
+        $classes = $classModel->getClassesByStaff($staffId);
+        
+        // Preparar datos para la vista
+        $data = [
+            'title' => 'Mis Clases',
+            'classes' => $classes
+        ];
+        
+        // Cargar vista
+        $this->loadView('staff/class_management', $data);
+    }
+    
+    /**
+     * Obtener los detalles de los alumnos de una clase
+     * @param int $classId ID de la clase
+     */
+    public function getClassStudents($classId) {
+        // Verificar que la petición sea AJAX
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            header('HTTP/1.1 403 Forbidden');
+            echo 'Esta ruta solo acepta peticiones AJAX';
+            return;
+        }
+        
+        // Cargar modelos necesarios
+        require_once APPROOT . '/models/Class.php';
+        require_once APPROOT . '/models/Reservation.php';
+        
+        $classModel = new Class_();
+        $reservationModel = new Reservation();
+        
+        // Obtener la clase
+        $class = $classModel->getClassById($classId);
+        
+        if (!$class) {
+            echo json_encode(['success' => false, 'message' => 'Clase no encontrada']);
+            return;
+        }
+        
+        // Verificar que el staff actual sea el instructor asignado
+        if ($_SESSION['user_role'] !== 'admin' && $class->monitor_id != $_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permiso para ver esta clase']);
+            return;
+        }
+        
+        // Obtener reservas/alumnos para esta clase
+        $students = $reservationModel->getStudentsByClassId($classId);
+        
+        // Devolver como JSON
+        echo json_encode([
+            'success' => true,
+            'class' => $class,
+            'students' => $students
+        ]);
+    }
+    
+    /**
+     * Actualiza el registro de asistencia de los alumnos
+     */
+    public function updateStudentAttendance() {
+        // Verificar que la petición sea AJAX y POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || 
+            !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            header('HTTP/1.1 403 Forbidden');
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Obtener datos del cuerpo de la petición
+        $json = file_get_contents('php://input');
+        $data = json_decode($json);
+        
+        if (empty($data->attendance)) {
+            echo json_encode(['success' => false, 'message' => 'No se proporcionaron datos de asistencia']);
+            return;
+        }
+        
+        // Actualizar cada registro de asistencia
+        $updatedCount = 0;
+        foreach ($data->attendance as $attendance) {
+            if ($reservationModel->updateAttendance($attendance->reservationId, $attendance->attended)) {
+                $updatedCount++;
+            }
+        }
+        
+        // Devolver resultado
+        if ($updatedCount > 0) {
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Asistencia actualizada correctamente', 
+                'updatedCount' => $updatedCount
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'No se pudo actualizar la asistencia'
+            ]);
+        }
+    }
+    
+    /**
+     * Cancelar una reserva de un estudiante específica
+     */
+    public function cancelStudentReservation() {
+        // Verificar que la petición sea AJAX y POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || 
+            !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            header('HTTP/1.1 403 Forbidden');
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+        
+        // Cargar modelos necesarios
+        require_once APPROOT . '/models/Reservation.php';
+        require_once APPROOT . '/models/Class.php';
+        
+        $reservationModel = new Reservation();
+        $classModel = new Class_();
+        
+        // Obtener datos del cuerpo de la petición
+        $json = file_get_contents('php://input');
+        $data = json_decode($json);
+        
+        if (empty($data->reservationId) || empty($data->classId)) {
+            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+            return;
+        }
+        
+        // Verificar permisos (solo el monitor asignado o un admin pueden cancelar)
+        $class = $classModel->getClassById($data->classId);
+        
+        if (!$class) {
+            echo json_encode(['success' => false, 'message' => 'Clase no encontrada']);
+            return;
+        }
+        
+        if ($_SESSION['user_role'] !== 'admin' && $class->monitor_id != $_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permiso para cancelar esta reserva']);
+            return;
+        }
+        
+        // Cancelar la reserva usando el método correcto: cancelReservation
+        if ($reservationModel->cancelReservation($data->reservationId)) {
+            // Actualizar capacidad actual de la clase
+            if ($classModel->updateCapacity($data->classId, -1)) {
+                echo json_encode(['success' => true, 'message' => 'Reserva cancelada correctamente']);
+            } else {
+                echo json_encode(['success' => true, 'message' => 'Reserva cancelada, pero hubo un problema al actualizar la capacidad']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la reserva']);
+        }
     }
 }
 ?>

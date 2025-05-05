@@ -357,4 +357,13 @@ class User {
         $this->db->query($sql);
         return $this->db->resultSet();
     }
+
+    /**
+     * Obtiene usuarios por rol específico
+     * @param string $role El rol a filtrar ('user', 'staff', 'admin', etc.)
+     * @return array Lista de usuarios con el rol especificado
+     */
+    public function getUsersByRole($role) {
+        return $this->getAllUsers($role);
+    }
 }

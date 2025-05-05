@@ -264,16 +264,32 @@ class Reservation {
     }
     
     /**
+     * Obtener todos los estudiantes inscritos en una clase
+     * @param int $classId ID de la clase
+     * @return array Estudiantes inscritos
+     */
+    public function getStudentsByClassId($classId) {
+        $this->db->query('SELECT r.*, u.id as usuari_id, u.nom, u.cognoms, u.correu,
+                          DATE_FORMAT(r.data_reserva, "%d/%m/%Y %H:%i") as data_reserva
+                          FROM reserves r
+                          JOIN usuaris u ON r.usuari_id = u.id
+                          WHERE r.classe_id = :class_id
+                          ORDER BY r.data_reserva ASC');
+        $this->db->bind(':class_id', $classId);
+        return $this->db->resultSet();
+    }
+    
+    /**
      * Actualizar el estado de asistencia de una reserva
      * @param int $reservationId ID de la reserva
-     * @param bool $attended Si el usuario asistió o no a la clase
-     * @return bool
+     * @param bool $attended Si asistió (1) o no (0)
+     * @return bool Si se actualizó correctamente
      */
     public function updateAttendance($reservationId, $attended) {
-        $sql = "UPDATE reserves SET assistencia = :attendance WHERE reserva_id = :id";
-        $this->db->query($sql);
-        $this->db->bind(':id', $reservationId);
-        $this->db->bind(':attendance', $attended ? 1 : 0);
+        $this->db->query('UPDATE reserves SET assistencia = :assistencia 
+                         WHERE reserva_id = :reserva_id');
+        $this->db->bind(':reserva_id', $reservationId);
+        $this->db->bind(':assistencia', $attended);
         return $this->db->execute();
     }
     

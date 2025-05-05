@@ -219,5 +219,21 @@ class Class_ {
         
         return $this->db->execute();
     }
+    
+    /**
+     * Obtiene todas las clases asignadas a un monitor específico
+     * @param int $staffId ID del monitor/staff
+     * @return array Array de clases
+     */
+    public function getClassesByStaff($staffId) {
+        $this->db->query('SELECT c.*, t.nom as tipus_nom, u.nom as monitor_nom
+                         FROM classes c 
+                         JOIN tipus_classes t ON c.tipus_classe_id = t.tipus_classe_id 
+                         JOIN usuaris u ON c.monitor_id = u.usuari_id 
+                         WHERE c.monitor_id = :staff_id 
+                         ORDER BY c.data, c.hora');
+        $this->db->bind(':staff_id', $staffId);
+        return $this->db->resultSet();
+    }
 }
 ?>

@@ -285,6 +285,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/admin/classes">Gestionar Clases</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
+                    </li>
                     <?php elseif(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'staff'): ?>
                     <!-- Menú de Staff -->
                     <li class="nav-item">
@@ -293,19 +296,19 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/staff/classes">Gestionar Clases</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
+                    </li>
                     <?php else: ?>
                     <!-- Menú de Usuario Normal -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/dashboard">Dashboard</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/user/classes">Clases</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/tracking">Seguimiento</a>
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/routines">Rutinas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/courts">Pistas</a>
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/tracking">Seguimiento</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/user/notifications">

@@ -551,7 +551,7 @@ foreach ($classes as $class) {
         }
         
         // Enviar datos al servidor
-        fetch('<?= URLROOT ?>/staff/updateAttendance', {
+        fetch('<?= URLROOT ?>/staff/updateStudentAttendance', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -587,7 +587,7 @@ foreach ($classes as $class) {
     // Función para cancelar una reserva
     function cancelReservation(reservationId, classId) {
         if (confirm(`¿Está seguro de que desea cancelar esta reserva?`)) {
-            fetch('<?= URLROOT ?>/staff/cancelReservation', {
+            fetch('<?= URLROOT ?>/staff/cancelStudentReservation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
