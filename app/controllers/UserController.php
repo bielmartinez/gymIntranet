@@ -56,9 +56,25 @@ class UserController {
      * Muestra el dashboard del usuario
      */
     public function dashboard() {
+        // Cargar reservas del usuario
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        $userReservations = [];
+        
+        if (isset($_SESSION['user_id'])) {
+            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+        }
+        
+        // Cargar clases de los próximos 3 días
+        require_once APPROOT . '/models/Class.php';
+        $classModel = new Class_();
+        $upcomingClasses = $classModel->getUpcomingClasses(3); // Próximos 3 días
+        
         $data = [
             'title' => 'Dashboard',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
+            'user_reservations' => $userReservations,
+            'upcoming_classes' => $upcomingClasses
         ];
         
         // Cargar el header
@@ -385,24 +401,14 @@ class UserController {
     }
     
     /**
-     * Muestra la página de perfil
+     * Método profile redirige al dashboard ya que se ha eliminado la funcionalidad de perfil
      */
     public function profile() {
-        $data = [
-            'title' => 'Mi Perfil',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
-        ];
-        
-        // Aquí se cargarían los datos del perfil desde el modelo
-        
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/profile.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Redirigir al dashboard ya que la funcionalidad de perfil ha sido eliminada
+        $_SESSION['toast_message'] = 'La sección de perfil no está disponible';
+        $_SESSION['toast_type'] = 'info';
+        header('Location: ' . URLROOT . '/user/dashboard');
+        exit;
     }
     
     /**

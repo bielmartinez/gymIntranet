@@ -119,13 +119,9 @@ include_once APPROOT . '/views/shared/header/main.php';
                                                 ?>
                                             </td>
                                             <td>
-                                                <?php if(!empty($routine->ruta_pdf)): ?>
-                                                    <a href="<?= URLROOT ?>/staffRoutine/downloadPDF/<?= $routine->rutina_id ?>" class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-file-pdf"></i>
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span class="badge bg-warning text-dark">Sin PDF</span>
-                                                <?php endif; ?>
+                                                <a href="<?= URLROOT ?>/staffRoutine/downloadPDF/<?= $routine->rutina_id ?>" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-file-pdf"></i> PDF
+                                                </a>
                                             </td>
                                             <td>
                                                 <div class="btn-group">

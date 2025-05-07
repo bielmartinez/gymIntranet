@@ -305,18 +305,10 @@
                         <a class="nav-link" href="<?php echo URLROOT; ?>/user/classes">Clases</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/routines">Rutinas</a>
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/userRoutine">Rutinas</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/user/tracking">Seguimiento</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/user/notifications">
-                            <i class="fas fa-bell me-1"></i> Notificaciones
-                            <?php if(isset($unreadCount) && $unreadCount > 0): ?>
-                                <span class="badge rounded-pill bg-danger"><?php echo $unreadCount; ?></span>
-                            <?php endif; ?>
-                        </a>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -383,9 +375,6 @@
                             <i class="fas fa-user-circle me-1"></i> <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'; ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/user/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Perfil</a></li>
-                            <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/user/settings"><i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i> Configuración</a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/auth/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Cerrar sesión</a></li>
                         </ul>
                     </li>

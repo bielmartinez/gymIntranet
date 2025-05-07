@@ -23,15 +23,21 @@ if (isset($_SESSION['message'])) {
         <h1 class="h2">Clases Disponibles</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
           <!-- Filtro por fecha -->
-          <form action="<?= URLROOT ?>/user/filterClasses" method="post" class="me-2">
+          <form action="<?= URLROOT ?>/User/filterClasses" method="post" class="me-2" id="dateFilterForm">
             <div class="input-group">
-              <input type="date" class="form-control form-control-sm" name="date" value="<?= $filterDate ?>">
+              <input type="date" class="form-control form-control-sm" name="date" id="dateFilter" value="<?= $filterDate ?>">
               <button class="btn btn-sm btn-outline-primary" type="submit">Filtrar</button>
+              <?php if($filterDate && $filterDate != date('Y-m-d')): ?>
+              <button class="btn btn-sm btn-outline-secondary" type="button" id="resetDateFilter">
+                <i class="fas fa-times"></i>
+              </button>
+              <?php endif; ?>
             </div>
           </form>
           <div class="dropdown">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-filter"></i> Filtrar por tipo
+              <span id="activeTypeFilter" class="badge bg-primary ms-1" style="display: none;"></span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="filterDropdown">
               <li><a class="dropdown-item filter-class" href="#" data-filter="all">Todas las clases</a></li>
@@ -48,7 +54,7 @@ if (isset($_SESSION['message'])) {
       <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white py-3 d-flex flex-row align-items-center justify-content-between">
           <h6 class="m-0 font-weight-bold">Mis Próximas Reservas</h6>
-          <a href="<?= URLROOT ?>/user/myReservations" class="btn btn-sm btn-light">Ver todas</a>
+          <a href="<?= URLROOT ?>/User/myReservations" class="btn btn-sm btn-light">Ver todas</a>
         </div>
         <div class="card-body pb-0">
           <div class="row">
@@ -78,7 +84,7 @@ if (isset($_SESSION['message'])) {
                     <span><?= $reservation->monitor_nom ?></span>
                   </div>
                   <div class="d-grid mt-3">
-                    <form action="<?= URLROOT ?>/user/cancelReservation" method="post">
+                    <form action="<?= URLROOT ?>/User/cancelReservation" method="post">
                       <input type="hidden" name="reservation_id" value="<?= $reservation->reserva_id ?>">
                       <button type="submit" class="btn btn-sm btn-outline-danger w-100" 
                               onclick="return confirm('¿Estás seguro de cancelar esta reserva?')">
@@ -115,7 +121,7 @@ if (isset($_SESSION['message'])) {
             <div class="alert alert-info">
               <i class="fas fa-info-circle me-2"></i>
               No hay clases disponibles para la fecha seleccionada.
-              <a href="<?= URLROOT ?>/user/classes" class="btn btn-sm btn-primary ms-2">Ver todas las clases</a>
+              <a href="<?= URLROOT ?>/User/classes" class="btn btn-sm btn-primary ms-2">Ver todas las clases</a>
             </div>
           </div>
         <?php else: ?>
@@ -207,7 +213,7 @@ if (isset($_SESSION['message'])) {
                       <i class="fas fa-ban me-1"></i> Clase completa
                     </button>
                   <?php else: ?>
-                    <form action="<?= URLROOT ?>/user/reserveClass" method="post">
+                    <form action="<?= URLROOT ?>/User/reserveClass" method="post">
                       <input type="hidden" name="class_id" value="<?= $class->classe_id ?>">
                       <button type="submit" class="btn <?= $buttonClass ?> w-100">
                         <i class="fas fa-bookmark me-1"></i> Reservar plaza
@@ -233,20 +239,98 @@ if (isset($_SESSION['message'])) {
       dateInput.valueAsDate = new Date();
     }
     
+    // Variables para tracking de filtros activos
+    let activeTypeFilter = 'all';
+    const noResultsMessage = document.createElement('div');
+    noResultsMessage.className = 'col-12';
+    noResultsMessage.innerHTML = `
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        No hay clases disponibles con los filtros seleccionados.
+        <button class="btn btn-sm btn-outline-primary ms-2" id="resetAllFilters">Restablecer filtros</button>
+      </div>
+    `;
+    
+    // Función para aplicar filtros
+    function applyFilters() {
+      let visibleCards = 0;
+      
+      document.querySelectorAll('.class-card').forEach(card => {
+        // Verificar si cumple con el filtro de tipo
+        const matchesTypeFilter = (activeTypeFilter === 'all' || card.dataset.classType === activeTypeFilter);
+        
+        // Mostrar u ocultar la tarjeta según los filtros
+        if (matchesTypeFilter) {
+          card.style.display = 'block';
+          visibleCards++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Mostrar mensaje si no hay resultados
+      const classesContainer = document.getElementById('classesContainer');
+      if (visibleCards === 0 && !document.querySelector('.alert-info')) {
+        classesContainer.appendChild(noResultsMessage);
+      } else if (visibleCards > 0) {
+        const existingMessage = classesContainer.querySelector('.alert-info');
+        if (existingMessage && existingMessage.parentNode === classesContainer) {
+          classesContainer.removeChild(existingMessage);
+        }
+      }
+      
+      // Actualizar indicador de filtro activo
+      updateActiveFilterIndicator();
+    }
+    
+    // Actualizar indicador visual de filtro activo
+    function updateActiveFilterIndicator() {
+      const activeFilterBadge = document.getElementById('activeTypeFilter');
+      
+      if (activeTypeFilter === 'all') {
+        activeFilterBadge.style.display = 'none';
+      } else {
+        // Encontrar el nombre del tipo de clase seleccionado
+        const selectedFilterElement = document.querySelector(`.filter-class[data-filter="${activeTypeFilter}"]`);
+        if (selectedFilterElement) {
+          activeFilterBadge.textContent = selectedFilterElement.textContent;
+          activeFilterBadge.style.display = 'inline-block';
+        }
+      }
+    }
+    
     // Filtrar clases por tipo
     document.querySelectorAll('.filter-class').forEach(item => {
       item.addEventListener('click', event => {
         event.preventDefault();
-        const filter = event.target.dataset.filter;
-        
-        document.querySelectorAll('.class-card').forEach(card => {
-          if (filter === 'all' || card.dataset.classType === filter) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        });
+        activeTypeFilter = event.target.dataset.filter;
+        applyFilters();
       });
     });
+
+    // Restablecer filtro de fecha
+    const resetDateFilterButton = document.getElementById('resetDateFilter');
+    if (resetDateFilterButton) {
+      resetDateFilterButton.addEventListener('click', () => {
+        const dateFilterForm = document.getElementById('dateFilterForm');
+        const dateFilterInput = document.getElementById('dateFilter');
+        dateFilterInput.valueAsDate = new Date();
+        dateFilterForm.submit();
+      });
+    }
+    
+    // Restablecer todos los filtros (botón dinámico)
+    document.addEventListener('click', function(event) {
+      if (event.target && event.target.id === 'resetAllFilters') {
+        activeTypeFilter = 'all';
+        const dateFilterForm = document.getElementById('dateFilterForm');
+        const dateFilterInput = document.getElementById('dateFilter');
+        dateFilterInput.valueAsDate = new Date();
+        dateFilterForm.submit();
+      }
+    });
+    
+    // Aplicar filtros iniciales
+    applyFilters();
   });
 </script>

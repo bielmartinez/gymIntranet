@@ -311,6 +311,13 @@ class StaffRoutineController
                 exit;
             }
             
+            // Verificar y corregir el orden del ejercicio si es necesario
+            if ($data['order'] > 0) {
+                $data['order'] = $this->routineModel->verifyAndFixExerciseOrder($routineId, $data['order']);
+            } else {
+                $data['order'] = $this->routineModel->getNextExerciseOrder($routineId);
+            }
+            
             // Añadir ejercicio
             $result = $this->routineModel->addExercise($data);
             if ($result) {
@@ -414,6 +421,11 @@ class StaffRoutineController
                 header('Location: ' . URLROOT . '/staffRoutine/editExercise/' . $id);
                 exit;
             }
+            
+            // Si se ha modificado el orden del ejercicio, verificar y arreglar conflictos
+            if ($data['order'] != $exercise->ordre) {
+                $data['order'] = $this->routineModel->verifyAndFixExerciseOrder($exercise->rutina_id, $data['order'], $id);
+            }
 
             // Actualizar ejercicio
             if ($this->routineModel->updateExercise($data)) {
@@ -503,28 +515,18 @@ class StaffRoutineController
         // Obtener ejercicios de la rutina
         $exercises = $this->routineModel->getExercisesByRoutineId($id);
 
-        // Generar PDF con la clase PDFGenerator
-        $pdfGenerator = new PDFGenerator();
-        $fileName = 'rutina_' . $id . '_' . time() . '.pdf';
-        $filePath = APPROOT . '/../public/uploads/routines/' . $fileName;
+        // Generar PDF con la clase PDFGenerator y enviarlo directamente para descarga
+        $downloadName = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
+        $result = $this->pdfGenerator->downloadRoutinePDF($routine, $exercises, $downloadName);
         
-        $result = $pdfGenerator->generateRoutinePDF($routine, $exercises, $filePath);
-        
-        if ($result) {
-            // Actualizar ruta del PDF en la base de datos
-            $pdfPath = 'uploads/routines/' . $fileName;
-            
-            if ($this->routineModel->updateRoutinePdf($id, $pdfPath)) {
-                $_SESSION['toast_message'] = 'PDF generado y guardado correctamente';
-                $_SESSION['toast_type'] = 'success';
-            } else {
-                $_SESSION['toast_message'] = 'PDF generado pero hubo un error al guardar la ruta';
-                $_SESSION['toast_type'] = 'warning';
-            }
-        } else {
+        if (!$result) {
             $_SESSION['toast_message'] = 'Error al generar el PDF';
             $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
+            exit;
         }
+        
+        // No necesitamos redireccionar ya que la salida del PDF termina la ejecución del script
     }
 
     // Método para descargar PDF de rutina
@@ -541,32 +543,28 @@ class StaffRoutineController
         // Obtener datos de la rutina
         $routine = $this->routineModel->getRoutineById($id);
         
-        if (!$routine || empty($routine->ruta_pdf)) {
-            $_SESSION['toast_message'] = 'PDF no encontrado';
+        if (!$routine) {
+            $_SESSION['toast_message'] = 'Rutina no encontrada';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staffRoutine');
             exit;
         }
 
-        $filePath = APPROOT . '/../public/' . $routine->ruta_pdf;
+        // Obtener ejercicios de la rutina
+        $exercises = $this->routineModel->getExercisesByRoutineId($id);
         
-        if (file_exists($filePath)) {
-            // Configurar cabeceras para descarga
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($filePath));
-            readfile($filePath);
-            exit;
-        } else {
-            $_SESSION['toast_message'] = 'El archivo PDF no existe en el servidor';
+        // Generar PDF con la clase PDFGenerator y enviarlo directamente para descarga
+        $downloadName = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
+        $result = $this->pdfGenerator->downloadRoutinePDF($routine, $exercises, $downloadName);
+        
+        if (!$result) {
+            $_SESSION['toast_message'] = 'Error al generar el PDF';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
             exit;
         }
+        
+        // No necesitamos redireccionar ya que la salida del PDF termina la ejecución del script
     }
 
     // Buscar ejercicios en API externa

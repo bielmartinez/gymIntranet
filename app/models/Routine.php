@@ -30,9 +30,17 @@ class Routine {
                          (SELECT COUNT(*) FROM exercicis e WHERE e.rutina_id = r.rutina_id) AS exercise_count 
                          FROM rutines r 
                          WHERE r.usuari_id = :usuari_id 
-                         ORDER BY r.rutina_id DESC');
+                         ORDER BY r.creat_el DESC');
         $this->db->bind(':usuari_id', $userId);
-        return $this->db->resultSet();
+        
+        $result = $this->db->resultSet();
+        
+        // Registrar para depuración
+        if (class_exists('Logger') && empty($result)) {
+            Logger::log('DEBUG', 'No se encontraron rutinas para el usuario ID: ' . $userId);
+        }
+        
+        return $result;
     }
 
     // Obtener una rutina por ID
@@ -67,22 +75,10 @@ class Routine {
         $this->db->query('UPDATE rutines SET usuari_id = :usuari_id, nom = :nom, descripcio = :descripcio WHERE rutina_id = :rutina_id');
         
         // Vincular valores
-        $this->db->bind(':rutina_id', $data['rutina_id']);
+        $this->db->bind(':rutina_id', $data['id']);
         $this->db->bind(':usuari_id', $data['usuari_id']);
-        $this->db->bind(':nom', $data['nom']);
-        $this->db->bind(':descripcio', $data['descripcio']);
-
-        // Ejecutar
-        return $this->db->execute();
-    }
-
-    // Actualizar la ruta del PDF de una rutina
-    public function updateRoutinePdf($id, $pdfPath) {
-        $this->db->query('UPDATE rutines SET ruta_pdf = :ruta_pdf WHERE rutina_id = :rutina_id');
-        
-        // Vincular valores
-        $this->db->bind(':rutina_id', $id);
-        $this->db->bind(':ruta_pdf', $pdfPath);
+        $this->db->bind(':nom', $data['name']);
+        $this->db->bind(':descripcio', $data['description']);
 
         // Ejecutar
         return $this->db->execute();
@@ -286,6 +282,55 @@ class Routine {
         $this->db->query('SELECT * FROM exercicis WHERE exercici_id = :exercici_id');
         $this->db->bind(':exercici_id', $id);
         return $this->db->single();
+    }
+    
+    /**
+     * Verifica si ya existe un ejercicio con ese orden y si es así, reordena los ejercicios
+     * @param int $routineId ID de la rutina
+     * @param int $order Orden seleccionado
+     * @param int|null $excludeExerciseId ID del ejercicio a excluir (para actualizaciones)
+     * @return int Orden final a utilizar
+     */
+    public function verifyAndFixExerciseOrder($routineId, $order, $excludeExerciseId = null) {
+        // Verificar si ya existe un ejercicio con ese orden en la misma rutina
+        if ($excludeExerciseId) {
+            $this->db->query('SELECT COUNT(*) as count FROM exercicis 
+                             WHERE rutina_id = :rutina_id 
+                             AND ordre = :ordre 
+                             AND exercici_id != :exercici_id');
+            $this->db->bind(':exercici_id', $excludeExerciseId);
+        } else {
+            $this->db->query('SELECT COUNT(*) as count FROM exercicis 
+                             WHERE rutina_id = :rutina_id 
+                             AND ordre = :ordre');
+        }
+        
+        $this->db->bind(':rutina_id', $routineId);
+        $this->db->bind(':ordre', $order);
+        
+        $result = $this->db->single();
+        
+        // Si no hay conflictos, retornar el orden original
+        if ($result->count == 0) {
+            return $order;
+        }
+        
+        // Si hay conflicto, incrementar el orden de los ejercicios a partir del orden seleccionado
+        $this->db->query('UPDATE exercicis 
+                         SET ordre = ordre + 1 
+                         WHERE rutina_id = :rutina_id 
+                         AND ordre >= :ordre');
+        $this->db->bind(':rutina_id', $routineId);
+        $this->db->bind(':ordre', $order);
+        
+        $this->db->execute();
+        
+        // Registrar acción
+        if (class_exists('Logger')) {
+            Logger::log('DEBUG', "Reordenados ejercicios de rutina ID: $routineId a partir del orden: $order");
+        }
+        
+        return $order;
     }
     
     /**

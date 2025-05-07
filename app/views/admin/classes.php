@@ -9,22 +9,49 @@ if (isset($_SESSION['admin_message'])) {
     unset($_SESSION['admin_message_type']);
 }
 
-// Cargar el modelo de clases
-require_once APPROOT . '/models/Class.php';
-$classModel = new Class_();
+// IMPORTANTE: Solo cargar las clases si no vienen ya de un filtrado
+// Si hay datos de filtrado pasados desde el controlador, usarlos
+if (!isset($data['classes'])) {
+    // Cargar el modelo de clases
+    require_once APPROOT . '/models/Class.php';
+    $classModel = new Class_();
+    
+    // Cargar la información de las clases
+    $classes = $classModel->getAllClasses();
+} else {
+    // Usar las clases ya filtradas
+    $classes = $data['classes'];
+}
 
-// Cargar la información de las clases
-$classes = $classModel->getAllClasses();
+// Cargar el modelo para tipos de clases si no hay datos de filtrado
+if (!isset($data['classTypes'])) {
+    require_once APPROOT . '/models/TypeClass.php';
+    $typeClassModel = new TypeClass();
+    $typeClasses = $typeClassModel->getAll();
+} else {
+    $typeClasses = $data['classTypes'];
+}
 
-// Cargar el modelo para tipos de clases
-require_once APPROOT . '/models/TypeClass.php';
-$typeClassModel = new TypeClass();
-$typeClasses = $typeClassModel->getAll();
+// Cargar el modelo de personal para los monitores si no hay datos de filtrado
+if (!isset($data['monitors'])) {
+    require_once APPROOT . '/models/User.php';
+    $userModel = new User();
+    $monitors = $userModel->getAllMonitors();
+} else {
+    $monitors = $data['monitors'];
+}
 
-// Cargar el modelo de personal para los monitores
-require_once APPROOT . '/models/User.php';
-$userModel = new User();
-$monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye personal_id
+// Valores por defecto para los filtros
+$filterDate = '';
+$filterType = '';
+$filterMonitor = '';
+
+// Si hay filtros aplicados, establecer los valores seleccionados
+if (isset($data['filters'])) {
+    $filterDate = !empty($data['filters']['date']) ? $data['filters']['date'] : '';
+    $filterType = !empty($data['filters']['type_id']) ? $data['filters']['type_id'] : '';
+    $filterMonitor = !empty($data['filters']['monitor_id']) ? $data['filters']['monitor_id'] : '';
+}
 ?>
 
 <div class="container-fluid">
@@ -43,17 +70,17 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
           <h6 class="m-0 font-weight-bold text-primary">Filtros de Búsqueda</h6>
         </div>
         <div class="card-body">
-          <form id="filterForm" action="<?= URLROOT ?>/admin/filterClasses" method="post" class="row g-3">
+          <form id="filterForm" action="<?= URLROOT ?>/Admin/filterClasses" method="post" class="row g-3">
             <div class="col-md-3">
               <label for="filterDate" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="filterDate" name="date">
+              <input type="date" class="form-control" id="filterDate" name="date" value="<?= $filterDate ?>">
             </div>
             <div class="col-md-3">
               <label for="filterType" class="form-label">Tipo de Clase</label>
               <select class="form-control" id="filterType" name="type_id">
                 <option value="">Todos</option>
                 <?php foreach ($typeClasses as $typeClass): ?>
-                  <option value="<?= $typeClass->tipus_classe_id ?>"><?= $typeClass->nom ?></option>
+                  <option value="<?= $typeClass->tipus_classe_id ?>" <?= ($filterType == $typeClass->tipus_classe_id) ? 'selected' : '' ?>><?= $typeClass->nom ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -62,7 +89,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
               <select class="form-control" id="filterMonitor" name="monitor_id">
                 <option value="">Todos</option>
                 <?php foreach ($monitors as $monitor): ?>
-                  <option value="<?= $monitor->usuari_id ?>"><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
+                  <option value="<?= $monitor->usuari_id ?>" <?= ($filterMonitor == $monitor->usuari_id) ? 'selected' : '' ?>><?= $monitor->nom . ' ' . $monitor->cognoms ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -70,9 +97,9 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
               <button type="submit" class="btn btn-primary me-2">
                 <i class="fas fa-search me-2"></i>Buscar
               </button>
-              <button type="reset" class="btn btn-secondary">
+              <a href="<?= URLROOT ?>/Admin/classes" class="btn btn-secondary">
                 <i class="fas fa-undo me-2"></i>Limpiar
-              </button>
+              </a>
             </div>
           </form>
         </div>
@@ -103,26 +130,23 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
                 <?php if (empty($classes)): ?>
                   <!-- No generamos contenido aquí, DataTables se encargará de mostrar el mensaje vacío -->
                 <?php else: ?>
-                  <?php foreach ($classes as $class): 
-                    // Obtener información del tipo de clase y monitor
-                    $typeClass = $typeClassModel->getById($class->tipus_classe_id);
-                    $monitor = $userModel->findById($class->monitor_id);
-                    
-                    // Calcular porcentaje de ocupación para colorear la celda de capacidad
-                    $porcentajeOcupacion = ($class->capacitat_maxima > 0) ? 
-                                           ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
-                    $claseBadge = $porcentajeOcupacion < 50 ? 'bg-success' : 
-                                 ($porcentajeOcupacion < 80 ? 'bg-warning' : 'bg-danger');
-                  ?>
+                  <?php foreach ($classes as $class): ?>
                     <tr>
                       <td><?= $class->classe_id ?></td>
-                      <td><?= $typeClass ? $typeClass->nom : 'N/A' ?></td>
-                      <td><?= $monitor ? $monitor->nom . ' ' . $monitor->cognoms : 'N/A' ?></td>
+                      <td><?= $class->tipus_nom ?></td>
+                      <td><?= $class->monitor_nom ?></td>
                       <td><?= date('d/m/Y', strtotime($class->data)) ?></td>
                       <td><?= date('H:i', strtotime($class->hora)) ?></td>
                       <td><?= $class->duracio ?> min</td>
                       <td><?= $class->sala ?></td>
                       <td>
+                        <?php
+                          // Calcular porcentaje de ocupación para colorear la celda de capacidad
+                          $porcentajeOcupacion = ($class->capacitat_maxima > 0) ? 
+                                               ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
+                          $claseBadge = $porcentajeOcupacion < 50 ? 'bg-success' : 
+                                      ($porcentajeOcupacion < 80 ? 'bg-warning' : 'bg-danger');
+                        ?>
                         <div class="badge <?= $claseBadge ?> text-white">
                           <?= $class->capacitat_actual ?>/<?= $class->capacitat_maxima ?>
                         </div>
@@ -162,7 +186,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addClassForm" action="<?= URLROOT ?>/admin/addClass" method="post">
+        <form id="addClassForm" action="<?= URLROOT ?>/Admin/addClass" method="post">
           <div class="mb-3">
             <label for="classType" class="form-label">Tipo de Clase</label>
             <select class="form-control" id="classType" name="tipus_classe_id" required>
@@ -220,7 +244,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="editClassForm" action="<?= URLROOT ?>/admin/updateClass" method="post">
+        <form id="editClassForm" action="<?= URLROOT ?>/Admin/updateClass" method="post">
           <input type="hidden" id="editClassId" name="classe_id">
           <div class="mb-3">
             <label for="editClassType" class="form-label">Tipo de Clase</label>
@@ -286,7 +310,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form id="deleteClassForm" action="<?= URLROOT ?>/admin/deleteClass" method="post">
+        <form id="deleteClassForm" action="<?= URLROOT ?>/Admin/deleteClass" method="post">
           <input type="hidden" id="deleteClassId" name="classe_id">
           <button type="submit" class="btn btn-danger">Eliminar</button>
         </form>
@@ -332,7 +356,7 @@ $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye p
         const classId = this.getAttribute('data-class-id');
         
         // Aquí deberías hacer una solicitud AJAX para obtener los datos de la clase
-        fetch(`<?= URLROOT ?>/admin/getClassDetails/${classId}`)
+        fetch(`<?= URLROOT ?>/Admin/getClassDetails/${classId}`)
           .then(response => response.json())
           .then(data => {
             if (data.success) {

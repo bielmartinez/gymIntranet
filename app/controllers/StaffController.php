@@ -562,5 +562,50 @@ class StaffController {
             echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la reserva']);
         }
     }
+    
+    /**
+     * Filtrar clases según los criterios seleccionados
+     */
+    public function filterClasses() {
+        // Verificar si se envió el formulario
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            header('Location: ' . URLROOT . '/staff/classes');
+            exit;
+        }
+        
+        // Recoger datos del formulario
+        $filters = [
+            'date' => !empty($_POST['date']) ? trim($_POST['date']) : null,
+            'type_id' => !empty($_POST['type_id']) ? trim($_POST['type_id']) : null,
+            'monitor_id' => $_SESSION['user_role'] === 'admin' ? 
+                            (!empty($_POST['monitor_id']) ? trim($_POST['monitor_id']) : null) : 
+                            $_SESSION['user_id'] // Si no es admin, solo puede ver sus propias clases
+        ];
+        
+        // Filtrar las clases
+        $filteredClasses = $this->classModel->filterClasses($filters);
+        
+        // Cargar tipos de clases
+        require_once APPROOT . '/models/TypeClass.php';
+        $typeClassModel = new TypeClass();
+        $classTypes = $typeClassModel->getAll();
+        
+        // Cargar monitores disponibles (solo para admin)
+        $monitors = [];
+        if ($_SESSION['user_role'] === 'admin') {
+            $monitors = $this->userModel->getAllMonitors();
+        }
+        
+        $data = [
+            'title' => 'Gestión de Clases - Resultados filtrados',
+            'classes' => $filteredClasses,
+            'classTypes' => $classTypes,
+            'monitors' => $monitors,
+            'filters' => $filters
+        ];
+        
+        // Cargar la vista
+        $this->loadView('staff/class_management', $data);
+    }
 }
 ?>

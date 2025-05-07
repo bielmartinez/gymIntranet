@@ -46,15 +46,9 @@ include_once APPROOT . '/views/shared/header/main.php';
                 <a href="<?= URLROOT ?>/staffRoutine/searchExercises/<?= $data['routine']->rutina_id ?>" class="btn btn-success me-2">
                     <i class="fas fa-search me-1"></i> Buscar ejercicios
                 </a>
-                <?php if (!empty($data['routine']->ruta_pdf)): ?>
-                    <a href="<?= URLROOT ?>/staffRoutine/downloadPDF/<?= $data['routine']->rutina_id ?>" class="btn btn-primary me-2">
-                        <i class="fas fa-download me-1"></i> Descargar PDF
-                    </a>
-                <?php else: ?>
-                    <a href="<?= URLROOT ?>/staffRoutine/generatePDF/<?= $data['routine']->rutina_id ?>" class="btn btn-warning">
-                        <i class="fas fa-file-pdf me-1"></i> Generar PDF
-                    </a>
-                <?php endif; ?>
+                <a href="<?= URLROOT ?>/staffRoutine/downloadPDF/<?= $data['routine']->rutina_id ?>" class="btn btn-primary">
+                    <i class="fas fa-file-pdf me-1"></i> Descargar PDF
+                </a>
             </div>
         </div>
 
@@ -72,9 +66,6 @@ include_once APPROOT . '/views/shared/header/main.php';
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Información de la Rutina</h6>
-                <span class="badge <?= !empty($data['routine']->ruta_pdf) ? 'bg-success' : 'bg-danger' ?>">
-                    <?= !empty($data['routine']->ruta_pdf) ? 'PDF Generado' : 'Sin PDF' ?>
-                </span>
             </div>
             <div class="card-body">
                 <form action="<?= URLROOT ?>/staffRoutine/edit/<?= $data['routine']->rutina_id ?>" method="POST">

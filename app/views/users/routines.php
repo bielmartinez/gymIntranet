@@ -22,12 +22,6 @@ include_once APPROOT . '/views/shared/header/main.php';
         font-weight: normal;
         padding: 5px 10px;
     }
-    .badge-status.with-pdf {
-        background-color: #28a745;
-    }
-    .badge-status.without-pdf {
-        background-color: #dc3545;
-    }
 </style>
 
 <div class="container-fluid">
@@ -61,9 +55,6 @@ include_once APPROOT . '/views/shared/header/main.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h5 class="card-title"><?= htmlspecialchars($routine->nom) ?></h5>
-                                        <span class="badge <?= !empty($routine->ruta_pdf) ? 'bg-success' : 'bg-danger' ?>">
-                                            <?= !empty($routine->ruta_pdf) ? 'PDF Disponible' : 'Sin PDF' ?>
-                                        </span>
                                     </div>
                                     <p class="card-text text-muted small">
                                         <i class="fas fa-calendar-alt me-1"></i> Creada el <?= date('d/m/Y', strtotime($routine->creat_el)) ?>
@@ -76,11 +67,9 @@ include_once APPROOT . '/views/shared/header/main.php';
                                         <a href="<?= URLROOT ?>/userRoutine/view/<?= $routine->rutina_id ?>" class="btn btn-primary">
                                             <i class="fas fa-eye me-1"></i> Ver detalles
                                         </a>
-                                        <?php if (!empty($routine->ruta_pdf)): ?>
-                                            <a href="<?= URLROOT ?>/userRoutine/downloadPDF/<?= $routine->rutina_id ?>" class="btn btn-success">
-                                                <i class="fas fa-file-pdf me-1"></i> Descargar PDF
-                                            </a>
-                                        <?php endif; ?>
+                                        <a href="<?= URLROOT ?>/userRoutine/downloadPDF/<?= $routine->rutina_id ?>" class="btn btn-success">
+                                            <i class="fas fa-file-pdf me-1"></i> Descargar PDF
+                                        </a>
                                     </div>
                                 </div>
                             </div>

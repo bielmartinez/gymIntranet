@@ -4,22 +4,37 @@
  * Permite ver, crear y editar clases
  */
 
-// Cargar el modelo de clases
-require_once APPROOT . '/models/Class.php';
-$classModel = new Class_();
+// IMPORTANTE: Solo cargar las clases si no vienen ya de un filtrado
+// Si hay datos de filtrado pasados desde el controlador, usarlos
+if (!isset($data['classes'])) {
+    // Cargar el modelo de clases
+    require_once APPROOT . '/models/Class.php';
+    $classModel = new Class_();
+    
+    // Cargar la información de las clases
+    $classes = $classModel->getAllClasses();
+} else {
+    // Usar las clases ya filtradas
+    $classes = $data['classes'];
+}
 
-// Cargar la información de las clases
-$classes = $classModel->getAllClasses();
-
-// Cargar el modelo para tipos de clases
-require_once APPROOT . '/models/TypeClass.php';
-$typeClassModel = new TypeClass();
-$typeClasses = $typeClassModel->getAll();
+// Cargar el modelo para tipos de clases si no hay datos de filtrado
+if (!isset($data['classTypes'])) {
+    require_once APPROOT . '/models/TypeClass.php';
+    $typeClassModel = new TypeClass();
+    $typeClasses = $typeClassModel->getAll();
+} else {
+    $typeClasses = $data['classTypes'];
+}
 
 // Cargar el modelo de usuarios para los monitores
-require_once APPROOT . '/models/User.php';
-$userModel = new User();
-$monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye personal_id
+if (!isset($data['monitors'])) {
+    require_once APPROOT . '/models/User.php';
+    $userModel = new User();
+    $monitors = $userModel->getAllMonitors(); // Usar el nuevo método que incluye personal_id
+} else {
+    $monitors = $data['monitors'];
+}
 
 // Obtener el ID del usuario actual (monitor)
 $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
@@ -32,12 +47,22 @@ foreach ($classes as $class) {
         $userClasses[] = $class;
     }
 }
+
+// Valores por defecto para los filtros
+$filterDate = '';
+$filterType = '';
+
+// Si hay filtros aplicados, establecer los valores seleccionados
+if (isset($data['filters'])) {
+    $filterDate = !empty($data['filters']['date']) ? $data['filters']['date'] : '';
+    $filterType = !empty($data['filters']['type_id']) ? $data['filters']['type_id'] : '';
+}
 ?>
 
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0"><?php echo $data['title']; ?></h1>
+            <h1 class="h3 mb-0"><?php echo isset($data['title']) ? $data['title'] : 'Gestión de Clases'; ?></h1>
             <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#newClassModal">
                 <i class="fas fa-plus-circle me-2"></i>Nueva clase
             </button>
@@ -59,45 +84,27 @@ foreach ($classes as $class) {
                 <div class="col-md-12">
                     <div class="card bg-light">
                         <div class="card-body">
-                            <form class="row g-3" id="classFilter">
-                                <div class="col-md-3">
-                                    <label for="dateFilter" class="form-label">Fecha</label>
-                                    <input type="date" class="form-control" id="dateFilter" name="dateFilter">
+                            <form class="row g-3" id="classFilter" action="<?= URLROOT ?>/Staff/filterClasses" method="post">
+                                <div class="col-md-4">
+                                    <label for="date" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="date" name="date" value="<?= $filterDate ?>">
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="classTypeFilter" class="form-label">Tipo de clase</label>
-                                    <select class="form-select" id="classTypeFilter" name="classTypeFilter">
+                                <div class="col-md-4">
+                                    <label for="type_id" class="form-label">Tipo de clase</label>
+                                    <select class="form-select" id="type_id" name="type_id">
                                         <option value="">Todas</option>
                                         <?php foreach ($typeClasses as $typeClass): ?>
-                                            <option value="<?= $typeClass->tipus_classe_id ?>"><?= $typeClass->nom ?></option>
+                                            <option value="<?= $typeClass->tipus_classe_id ?>" <?= ($filterType == $typeClass->tipus_classe_id) ? 'selected' : '' ?>><?= $typeClass->nom ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="roomFilter" class="form-label">Sala</label>
-                                    <select class="form-select" id="roomFilter" name="roomFilter">
-                                        <option value="">Todas</option>
-                                        <?php 
-                                        // Obtener salas únicas de las clases existentes
-                                        $salas = [];
-                                        foreach ($classes as $class) {
-                                            if (!in_array($class->sala, $salas)) {
-                                                $salas[] = $class->sala;
-                                            }
-                                        }
-                                        foreach ($salas as $sala): 
-                                            if (!empty($sala)):
-                                        ?>
-                                            <option value="<?= $sala ?>"><?= $sala ?></option>
-                                        <?php 
-                                            endif;
-                                        endforeach; 
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
-                                    <button type="reset" class="btn btn-secondary">Limpiar</button>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-search me-1"></i> Filtrar
+                                    </button>
+                                    <a href="<?= URLROOT ?>/Staff/classes" class="btn btn-secondary">
+                                        <i class="fas fa-undo me-1"></i> Limpiar
+                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -124,29 +131,28 @@ foreach ($classes as $class) {
                         <?php if (empty($userClasses)): ?>
                             <!-- No generamos contenido aquí, DataTables se encargará de mostrar el mensaje -->
                         <?php else: ?>
-                            <?php foreach ($userClasses as $class): 
-                                // Obtener información del tipo de clase
-                                $typeClass = $typeClassModel->getById($class->tipus_classe_id);
-                                // Calcular porcentaje de ocupación para la barra de progreso
-                                $porcentajeOcupacion = ($class->capacitat_maxima > 0) ? 
-                                                      ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
-                                $barraColor = $porcentajeOcupacion < 50 ? 'bg-success' : 
-                                             ($porcentajeOcupacion < 80 ? 'bg-warning' : 'bg-danger');
-                            ?>
+                            <?php foreach ($userClasses as $class): ?>
                                 <tr>
                                     <td><?= $class->classe_id ?></td>
-                                    <td><?= $typeClass ? $typeClass->nom : 'N/A' ?></td>
+                                    <td><?= isset($class->tipus_nom) ? $class->tipus_nom : (isset($typeClassModel) ? ($typeClassModel->getById($class->tipus_classe_id)->nom ?? 'N/A') : 'N/A') ?></td>
                                     <td><?= date('d/m/Y', strtotime($class->data)) ?></td>
                                     <td><?= date('H:i', strtotime($class->hora)) ?></td>
                                     <td><?= $class->duracio ?> min</td>
                                     <td><?= $class->sala ?></td>
                                     <td>
+                                        <?php
+                                        // Calcular porcentaje de ocupación para la barra de progreso
+                                        $porcentajeOcupacion = ($class->capacitat_maxima > 0) ? 
+                                                            ($class->capacitat_actual / $class->capacitat_maxima) * 100 : 0;
+                                        $barraColor = $porcentajeOcupacion < 50 ? 'bg-success' : 
+                                                    ($porcentajeOcupacion < 80 ? 'bg-warning' : 'bg-danger');
+                                        ?>
                                         <div class="progress" style="height: 10px;">
                                             <div class="progress-bar <?= $barraColor ?>" role="progressbar" 
-                                                 style="width: <?= $porcentajeOcupacion ?>%;" 
-                                                 aria-valuenow="<?= $class->capacitat_actual ?>" 
-                                                 aria-valuemin="0" 
-                                                 aria-valuemax="<?= $class->capacitat_maxima ?>">
+                                                style="width: <?= $porcentajeOcupacion ?>%;" 
+                                                aria-valuenow="<?= $class->capacitat_actual ?>" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="<?= $class->capacitat_maxima ?>">
                                                 <?= $class->capacitat_actual ?>/<?= $class->capacitat_maxima ?>
                                             </div>
                                         </div>

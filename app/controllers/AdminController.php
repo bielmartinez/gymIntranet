@@ -188,135 +188,6 @@ class AdminController {
     }
     
     /**
-     * Muestra el formulario para editar un usuario
-     */
-    public function editUser($userId = null) {
-        // Si no se proporciona ID, redirigir a la lista de usuarios
-        if(!$userId) {
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        }
-        
-        // Obtener información del usuario
-        $user = $this->userModel->findById($userId);
-        
-        if(!$user) {
-            $_SESSION['admin_message'] = 'Usuario no encontrado';
-            $_SESSION['admin_message_type'] = 'danger';
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        }
-        
-        $data = [
-            'title' => 'Editar Usuario',
-            'user' => $user
-        ];
-        
-        // Si hay errores de edición previos, cargarlos
-        if(isset($_SESSION['edit_errors'])) {
-            $data['errors'] = $_SESSION['edit_errors'];
-            unset($_SESSION['edit_errors']);
-        }
-        
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/edit_user.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
-    
-    /**
-     * Actualiza los datos de un usuario
-     */
-    public function updateUser() {
-        // Verificar si se envió el formulario
-        if($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        }
-        
-        // Procesar datos del formulario
-        $userData = [
-            'id' => $_POST['userId'],
-            'fullName' => trim($_POST['fullName']),
-            'email' => trim($_POST['email']),
-            'role' => trim($_POST['role']),
-            'status' => trim($_POST['status']),
-            'membershipType' => isset($_POST['membershipType']) ? trim($_POST['membershipType']) : '',
-            'phone' => isset($_POST['phone']) ? trim($_POST['phone']) : '',
-            'birthDate' => isset($_POST['birthDate']) ? trim($_POST['birthDate']) : ''
-        ];
-        
-        // Actualizar usuario
-        if($this->userModel->updateUser($userData)) {
-            // Si el rol cambió a staff y no existe en la tabla staff, crear registro
-            if($userData['role'] === 'staff') {
-                $this->userModel->ensureStaffRecord($userData['id']);
-            }
-            
-            $_SESSION['admin_message'] = 'Usuario actualizado correctamente';
-            $_SESSION['admin_message_type'] = 'success';
-            $_SESSION['toast_message'] = 'Usuario actualizado correctamente';
-            $_SESSION['toast_type'] = 'success';
-        } else {
-            $_SESSION['admin_message'] = 'Error al actualizar usuario';
-            $_SESSION['admin_message_type'] = 'error';
-            $_SESSION['toast_message'] = 'Error al actualizar usuario';
-            $_SESSION['toast_type'] = 'error';
-        }
-        
-        header('Location: ' . URLROOT . '/admin/users');
-        exit;
-    }
-    
-    /**
-     * Activa o desactiva un usuario
-     */
-    public function toggleUserStatus($userId = null) {
-        // Si no se proporciona ID, redirigir a la lista de usuarios
-        if(!$userId) {
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        }
-        
-        // Obtener información del usuario
-        $user = $this->userModel->findById($userId);
-        
-        if(!$user) {
-            $_SESSION['admin_message'] = 'Usuario no encontrado';
-            $_SESSION['admin_message_type'] = 'danger';
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        }
-        
-        // Verificar si es un objeto o un array
-        $isActive = is_object($user) ? $user->isActive : $user['isActive'];
-        
-        // Cambiar estado del usuario
-        if($isActive) {
-            $result = $this->userModel->deactivate($userId);
-            $message = 'Usuario desactivado correctamente';
-        } else {
-            $result = $this->userModel->activate($userId);
-            $message = 'Usuario activado correctamente';
-        }
-        
-        if($result) {
-            $_SESSION['admin_message'] = $message;
-            $_SESSION['admin_message_type'] = 'success';
-        } else {
-            $_SESSION['admin_message'] = 'Error al cambiar el estado del usuario';
-            $_SESSION['admin_message_type'] = 'danger';
-        }
-        
-        header('Location: ' . URLROOT . '/admin/users');
-        exit;
-    }
-    
-    /**
      * Elimina un usuario
      */
     public function deleteUser($userId = null) {
@@ -335,6 +206,45 @@ class AdminController {
             $_SESSION['admin_message'] = 'Error al eliminar usuario';
             $_SESSION['admin_message_type'] = 'error';
             $_SESSION['toast_message'] = 'Error al eliminar usuario';
+            $_SESSION['toast_type'] = 'error';
+        }
+        
+        header('Location: ' . URLROOT . '/admin/users');
+        exit;
+    }
+    
+    /**
+     * Reactivar un usuario que ha sido previamente desactivado
+     * @param int|null $userId ID del usuario a reactivar
+     */
+    public function reactivateUser($userId = null) {
+        if(!$userId) {
+            header('Location: ' . URLROOT . '/admin/users');
+            exit;
+        }
+        
+        // Obtener información del usuario
+        $user = $this->userModel->findById($userId);
+        
+        if(!$user) {
+            $_SESSION['admin_message'] = 'Usuario no encontrado';
+            $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Usuario no encontrado';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/admin/users');
+            exit;
+        }
+        
+        // Reactivar el usuario
+        if($this->userModel->activate($userId)) {
+            $_SESSION['admin_message'] = 'Usuario reactivado correctamente';
+            $_SESSION['admin_message_type'] = 'success';
+            $_SESSION['toast_message'] = 'Usuario reactivado correctamente';
+            $_SESSION['toast_type'] = 'success';
+        } else {
+            $_SESSION['admin_message'] = 'Error al reactivar el usuario';
+            $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Error al reactivar el usuario';
             $_SESSION['toast_type'] = 'error';
         }
         
@@ -362,6 +272,52 @@ class AdminController {
             'classTypes' => $classTypes,
             'monitors' => $monitors,
             'classes' => $classes
+        ];
+        
+        // Cargar el header
+        include_once APPROOT . '/views/shared/header/main.php';
+        
+        // Cargar la vista
+        include_once APPROOT . '/views/admin/classes.php';
+        
+        // Cargar el footer
+        include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Filtrar clases según los criterios seleccionados
+     */
+    public function filterClasses() {
+        // Verificar si se envió el formulario
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            header('Location: ' . URLROOT . '/Admin/classes');
+            exit;
+        }
+        
+        // Recoger datos del formulario
+        $filters = [
+            'date' => !empty($_POST['date']) ? trim($_POST['date']) : null,
+            'type_id' => !empty($_POST['type_id']) ? trim($_POST['type_id']) : null,
+            'monitor_id' => !empty($_POST['monitor_id']) ? trim($_POST['monitor_id']) : null
+        ];
+        
+        // Filtrar las clases
+        $classes = $this->classModel->filterClasses($filters);
+        
+        // Cargar tipos de clases
+        $typeClassModel = new TypeClass();
+        $classTypes = $typeClassModel->getAllTypes();
+        
+        // Cargar monitores disponibles
+        $monitors = $this->userModel->getAllMonitors();
+        
+        $data = [
+            'title' => 'Gestión de Clases - Resultados filtrados',
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Administrador',
+            'classTypes' => $classTypes,
+            'monitors' => $monitors,
+            'classes' => $classes,
+            'filters' => $filters
         ];
         
         // Cargar el header

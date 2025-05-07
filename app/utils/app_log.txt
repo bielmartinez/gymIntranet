@@ -13319,3 +13319,2927 @@ Log iniciado: 2025-05-07 10:59:12
 [2025-05-07 10:59:12] [DEBUG] Método de solicitud: GET
 [2025-05-07 10:59:12] [INFO] Instanciando controlador: StaffRoutineController
 [2025-05-07 10:59:12] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:10:38
+--------------------------------------------------
+[2025-05-07 15:10:38] [INFO] Logger inicializado correctamente
+[2025-05-07 15:10:38] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:10:38] [INFO] URL solicitada: staffRoutine/edit/7
+[2025-05-07 15:10:38] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:10:38] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 15:10:38] [INFO] Ejecutando acción: StaffRoutineController->edit(7)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:34:36
+--------------------------------------------------
+[2025-05-07 15:34:36] [INFO] Logger inicializado correctamente
+[2025-05-07 15:34:36] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:34:36] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 15:34:36] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:34:36] [INFO] Instanciando controlador: AdminController
+[2025-05-07 15:34:36] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:28
+--------------------------------------------------
+[2025-05-07 15:35:28] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:28] [INFO] URL solicitada: auth/logout
+[2025-05-07 15:35:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:35:28] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:35:28] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:28
+--------------------------------------------------
+[2025-05-07 15:35:28] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:28] [INFO] URL solicitada: auth/login
+[2025-05-07 15:35:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:35:28] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:35:28] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:28
+--------------------------------------------------
+[2025-05-07 15:35:28] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:28] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 15:35:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:35:28] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:30
+--------------------------------------------------
+[2025-05-07 15:35:30] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:30] [INFO] URL solicitada: auth/login
+[2025-05-07 15:35:30] [DEBUG] Método de solicitud: POST
+[2025-05-07 15:35:30] [DEBUG] Datos POST: Array
+(
+    [email] => admin@admin.com
+    [password] => admin12345
+)
+
+[2025-05-07 15:35:30] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:35:30] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:30
+--------------------------------------------------
+[2025-05-07 15:35:30] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:30] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 15:35:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:35:30] [INFO] Instanciando controlador: AdminController
+[2025-05-07 15:35:30] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:35:31
+--------------------------------------------------
+[2025-05-07 15:35:31] [INFO] Logger inicializado correctamente
+[2025-05-07 15:35:31] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:35:31] [INFO] URL solicitada: staffRoutine
+[2025-05-07 15:35:31] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:35:31] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 15:35:32] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:04
+--------------------------------------------------
+[2025-05-07 15:45:04] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:04] [INFO] URL solicitada: admin/users
+[2025-05-07 15:45:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:04] [INFO] Instanciando controlador: AdminController
+[2025-05-07 15:45:04] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:05
+--------------------------------------------------
+[2025-05-07 15:45:05] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:05] [INFO] URL solicitada: auth/logout
+[2025-05-07 15:45:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:05] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:45:05] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:05
+--------------------------------------------------
+[2025-05-07 15:45:05] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:05] [INFO] URL solicitada: auth/login
+[2025-05-07 15:45:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:05] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:45:05] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:06
+--------------------------------------------------
+[2025-05-07 15:45:06] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:06] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 15:45:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:06] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:14
+--------------------------------------------------
+[2025-05-07 15:45:14] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:14] [INFO] URL solicitada: auth/login
+[2025-05-07 15:45:14] [DEBUG] Método de solicitud: POST
+[2025-05-07 15:45:14] [DEBUG] Datos POST: Array
+(
+    [email] => user@user.com
+    [password] => admin1234
+)
+
+[2025-05-07 15:45:14] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:45:14] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:14
+--------------------------------------------------
+[2025-05-07 15:45:14] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:14] [INFO] URL solicitada: auth/login
+[2025-05-07 15:45:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:14] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:45:14] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:14
+--------------------------------------------------
+[2025-05-07 15:45:14] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:14] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 15:45:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:14] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:26
+--------------------------------------------------
+[2025-05-07 15:45:26] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:26] [INFO] URL solicitada: auth/login
+[2025-05-07 15:45:26] [DEBUG] Método de solicitud: POST
+[2025-05-07 15:45:26] [DEBUG] Datos POST: Array
+(
+    [email] => user@user.com
+    [password] => admin12345
+)
+
+[2025-05-07 15:45:26] [INFO] Instanciando controlador: AuthController
+[2025-05-07 15:45:26] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:26
+--------------------------------------------------
+[2025-05-07 15:45:26] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:26] [INFO] URL solicitada: user/dashboard
+[2025-05-07 15:45:26] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:26] [INFO] Instanciando controlador: UserController
+[2025-05-07 15:45:26] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:45:29
+--------------------------------------------------
+[2025-05-07 15:45:29] [INFO] Logger inicializado correctamente
+[2025-05-07 15:45:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:45:29] [INFO] URL solicitada: user/routines
+[2025-05-07 15:45:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:45:29] [INFO] Instanciando controlador: UserController
+[2025-05-07 15:45:29] [ERROR] Método no encontrado: UserController->routines()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:53:58
+--------------------------------------------------
+[2025-05-07 15:53:58] [INFO] Logger inicializado correctamente
+[2025-05-07 15:53:58] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:53:58] [INFO] URL solicitada: user/dashboard
+[2025-05-07 15:53:58] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:53:58] [INFO] Instanciando controlador: UserController
+[2025-05-07 15:53:58] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:53:59
+--------------------------------------------------
+[2025-05-07 15:53:59] [INFO] Logger inicializado correctamente
+[2025-05-07 15:53:59] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:53:59] [INFO] URL solicitada: user/dashboard
+[2025-05-07 15:53:59] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:53:59] [INFO] Instanciando controlador: UserController
+[2025-05-07 15:53:59] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:54:00
+--------------------------------------------------
+[2025-05-07 15:54:00] [INFO] Logger inicializado correctamente
+[2025-05-07 15:54:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:54:00] [INFO] URL solicitada: userRoutine
+[2025-05-07 15:54:00] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:54:00] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 15:54:00] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:54:02
+--------------------------------------------------
+[2025-05-07 15:54:02] [INFO] Logger inicializado correctamente
+[2025-05-07 15:54:02] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:54:02] [INFO] URL solicitada: userRoutine/view/6
+[2025-05-07 15:54:02] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:54:02] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 15:54:02] [INFO] Ejecutando acción: UserRoutineController->view(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:54:04
+--------------------------------------------------
+[2025-05-07 15:54:04] [INFO] Logger inicializado correctamente
+[2025-05-07 15:54:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:54:04] [INFO] URL solicitada: userRoutine
+[2025-05-07 15:54:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:54:04] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 15:54:04] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:54:06
+--------------------------------------------------
+[2025-05-07 15:54:06] [INFO] Logger inicializado correctamente
+[2025-05-07 15:54:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:54:06] [INFO] URL solicitada: userRoutine/view/6
+[2025-05-07 15:54:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:54:06] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 15:54:06] [INFO] Ejecutando acción: UserRoutineController->view(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 15:55:48
+--------------------------------------------------
+[2025-05-07 15:55:48] [INFO] Logger inicializado correctamente
+[2025-05-07 15:55:48] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 15:55:48] [INFO] URL solicitada: userRoutine
+[2025-05-07 15:55:48] [DEBUG] Método de solicitud: GET
+[2025-05-07 15:55:48] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 15:55:48] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:03:40
+--------------------------------------------------
+[2025-05-07 16:03:40] [INFO] Logger inicializado correctamente
+[2025-05-07 16:03:40] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:03:40] [INFO] URL solicitada: userRoutine
+[2025-05-07 16:03:40] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:03:40] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:03:40] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:03:41
+--------------------------------------------------
+[2025-05-07 16:03:41] [INFO] Logger inicializado correctamente
+[2025-05-07 16:03:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:03:41] [INFO] URL solicitada: userRoutine/downloadPDF/6
+[2025-05-07 16:03:41] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:03:41] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:03:41] [INFO] Ejecutando acción: UserRoutineController->downloadPDF(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:11:32
+--------------------------------------------------
+[2025-05-07 16:11:32] [INFO] Logger inicializado correctamente
+[2025-05-07 16:11:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:11:32] [INFO] URL solicitada: userRoutine
+[2025-05-07 16:11:32] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:11:32] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:11:32] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:11:35
+--------------------------------------------------
+[2025-05-07 16:11:35] [INFO] Logger inicializado correctamente
+[2025-05-07 16:11:35] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:11:35] [INFO] URL solicitada: userRoutine/downloadPDF/6
+[2025-05-07 16:11:35] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:11:35] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:11:35] [INFO] Ejecutando acción: UserRoutineController->downloadPDF(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:10
+--------------------------------------------------
+[2025-05-07 16:19:10] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:10] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:10] [INFO] URL solicitada: userRoutine
+[2025-05-07 16:19:10] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:10] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:19:10] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:16
+--------------------------------------------------
+[2025-05-07 16:19:16] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:16] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:16] [INFO] URL solicitada: userRoutine/downloadPDF/6
+[2025-05-07 16:19:16] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:16] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 16:19:16] [INFO] Ejecutando acción: UserRoutineController->downloadPDF(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:30
+--------------------------------------------------
+[2025-05-07 16:19:30] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:30] [INFO] URL solicitada: auth/logout
+[2025-05-07 16:19:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:30] [INFO] Instanciando controlador: AuthController
+[2025-05-07 16:19:30] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:30
+--------------------------------------------------
+[2025-05-07 16:19:30] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:30] [INFO] URL solicitada: auth/login
+[2025-05-07 16:19:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:30] [INFO] Instanciando controlador: AuthController
+[2025-05-07 16:19:30] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:30
+--------------------------------------------------
+[2025-05-07 16:19:30] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:30] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 16:19:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:30] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:33
+--------------------------------------------------
+[2025-05-07 16:19:33] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:33] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:33] [INFO] URL solicitada: auth/login
+[2025-05-07 16:19:33] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:19:33] [DEBUG] Datos POST: Array
+(
+    [email] => admin@admin.com
+    [password] => admin12345
+)
+
+[2025-05-07 16:19:33] [INFO] Instanciando controlador: AuthController
+[2025-05-07 16:19:33] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:33
+--------------------------------------------------
+[2025-05-07 16:19:33] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:33] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:33] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 16:19:33] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:33] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:19:33] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:35
+--------------------------------------------------
+[2025-05-07 16:19:35] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:35] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:35] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:19:35] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:35] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:19:35] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:36
+--------------------------------------------------
+[2025-05-07 16:19:36] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:36] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:36] [INFO] URL solicitada: staffRoutine/create
+[2025-05-07 16:19:36] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:36] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:19:36] [INFO] Ejecutando acción: StaffRoutineController->create()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:47
+--------------------------------------------------
+[2025-05-07 16:19:47] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:47] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:47] [INFO] URL solicitada: staffRoutine/create
+[2025-05-07 16:19:47] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:19:47] [DEBUG] Datos POST: Array
+(
+    [nombre] => rutina dani
+    [usuario_id] => 6
+    [descripcion] => rutina pierna
+)
+
+[2025-05-07 16:19:47] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:19:47] [INFO] Ejecutando acción: StaffRoutineController->create()
+[2025-05-07 16:19:47] [DEBUG] Intentando crear rutina: {"name":"rutina dani","description":"rutina pierna","usuari_id":"6","exercises":[]}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:47
+--------------------------------------------------
+[2025-05-07 16:19:47] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:47] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:47] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:19:47] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:47] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:19:47] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:19:51
+--------------------------------------------------
+[2025-05-07 16:19:51] [INFO] Logger inicializado correctamente
+[2025-05-07 16:19:51] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:19:51] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:19:51] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:19:51] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:19:51] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:07
+--------------------------------------------------
+[2025-05-07 16:20:07] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:07] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:20:07] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:20:07] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => prensa hack
+    [exercise_description] => hack
+    [exercise_sets] => 4
+    [exercise_reps] => 8
+    [exercise_rest] => 60
+    [exercise_order] => 1
+)
+
+[2025-05-07 16:20:07] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:07] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:20:07] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"prensa hack","description":"hack","sets":4,"reps":8,"rest":60,"order":1,"additional_info":null}
+[2025-05-07 16:20:07] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"prensa hack","description":"hack","sets":4,"reps":8,"rest":60,"order":1,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:08
+--------------------------------------------------
+[2025-05-07 16:20:08] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:08] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:20:08] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:20:08] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:08] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:21
+--------------------------------------------------
+[2025-05-07 16:20:21] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:21] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:21] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:20:21] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:20:21] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => extensiones de quad
+    [exercise_description] => quad
+    [exercise_sets] => 4
+    [exercise_reps] => 14
+    [exercise_rest] => 60
+    [exercise_order] => 2
+)
+
+[2025-05-07 16:20:21] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:21] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:20:21] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"extensiones de quad","description":"quad","sets":4,"reps":14,"rest":60,"order":2,"additional_info":null}
+[2025-05-07 16:20:21] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"extensiones de quad","description":"quad","sets":4,"reps":14,"rest":60,"order":2,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:21
+--------------------------------------------------
+[2025-05-07 16:20:21] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:21] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:21] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:20:21] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:20:21] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:21] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:34
+--------------------------------------------------
+[2025-05-07 16:20:34] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:34] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:20:34] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:20:34] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => sentadilla
+    [exercise_description] => fafsd
+    [exercise_sets] => 4
+    [exercise_reps] => 10
+    [exercise_rest] => 60
+    [exercise_order] => 4
+)
+
+[2025-05-07 16:20:34] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:34] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:20:34] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"sentadilla","description":"fafsd","sets":4,"reps":10,"rest":60,"order":4,"additional_info":null}
+[2025-05-07 16:20:34] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"sentadilla","description":"fafsd","sets":4,"reps":10,"rest":60,"order":4,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:34
+--------------------------------------------------
+[2025-05-07 16:20:34] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:34] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:20:34] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:20:34] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:34] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:48
+--------------------------------------------------
+[2025-05-07 16:20:48] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:48] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:48] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:20:48] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:20:48] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => femoral
+    [exercise_description] => fa
+    [exercise_sets] => 3
+    [exercise_reps] => 12
+    [exercise_rest] => 60
+    [exercise_order] => 4
+)
+
+[2025-05-07 16:20:48] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:48] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:20:48] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"femoral","description":"fa","sets":3,"reps":12,"rest":60,"order":4,"additional_info":null}
+[2025-05-07 16:20:48] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"femoral","description":"fa","sets":3,"reps":12,"rest":60,"order":4,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:20:48
+--------------------------------------------------
+[2025-05-07 16:20:48] [INFO] Logger inicializado correctamente
+[2025-05-07 16:20:48] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:20:48] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:20:48] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:20:48] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:20:48] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:21:00
+--------------------------------------------------
+[2025-05-07 16:21:00] [INFO] Logger inicializado correctamente
+[2025-05-07 16:21:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:21:00] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:21:00] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:21:00] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => ultimo
+    [exercise_description] => fdsa
+    [exercise_sets] => 3
+    [exercise_reps] => 12
+    [exercise_rest] => 60
+    [exercise_order] => 3
+)
+
+[2025-05-07 16:21:00] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:21:00] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:21:00] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"ultimo","description":"fdsa","sets":3,"reps":12,"rest":60,"order":3,"additional_info":null}
+[2025-05-07 16:21:00] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"ultimo","description":"fdsa","sets":3,"reps":12,"rest":60,"order":3,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:21:00
+--------------------------------------------------
+[2025-05-07 16:21:00] [INFO] Logger inicializado correctamente
+[2025-05-07 16:21:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:21:00] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:21:00] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:21:00] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:21:00] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:21:03
+--------------------------------------------------
+[2025-05-07 16:21:03] [INFO] Logger inicializado correctamente
+[2025-05-07 16:21:03] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:21:03] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:21:03] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:21:03] [DEBUG] Datos POST: Array
+(
+    [name] => rutina dani
+    [user_id] => 6
+    [description] => rutina pierna
+)
+
+[2025-05-07 16:21:03] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:21:03] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+[2025-05-07 16:21:03] [DEBUG] Intentando editar rutina: {"id":"8","name":"rutina dani","description":"rutina pierna","usuari_id":"6"}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:21:04
+--------------------------------------------------
+[2025-05-07 16:21:04] [INFO] Logger inicializado correctamente
+[2025-05-07 16:21:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:21:04] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:21:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:21:04] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:21:04] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:21:06
+--------------------------------------------------
+[2025-05-07 16:21:06] [INFO] Logger inicializado correctamente
+[2025-05-07 16:21:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:21:06] [INFO] URL solicitada: staffRoutine/downloadPDF/8
+[2025-05-07 16:21:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:21:06] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:21:06] [INFO] Ejecutando acción: StaffRoutineController->downloadPDF(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:23
+--------------------------------------------------
+[2025-05-07 16:30:23] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:23] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:23] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:30:23] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:23] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:24] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:32
+--------------------------------------------------
+[2025-05-07 16:30:32] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:32] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:30:32] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:30:32] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => yyyy
+    [exercise_description] => 
+    [exercise_sets] => 3
+    [exercise_reps] => 12
+    [exercise_rest] => 60
+    [exercise_order] => 2
+)
+
+[2025-05-07 16:30:32] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:32] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:30:32] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"yyyy","description":"","sets":3,"reps":12,"rest":60,"order":2,"additional_info":null}
+[2025-05-07 16:30:32] [DEBUG] Reordenados ejercicios de rutina ID: 8 a partir del orden: 2
+[2025-05-07 16:30:32] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"yyyy","description":"","sets":3,"reps":12,"rest":60,"order":2,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:32
+--------------------------------------------------
+[2025-05-07 16:30:32] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:32] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:30:32] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:32] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:32] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:41
+--------------------------------------------------
+[2025-05-07 16:30:41] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:41] [INFO] URL solicitada: staffRoutine/addExercise/8
+[2025-05-07 16:30:41] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:30:41] [DEBUG] Datos POST: Array
+(
+    [exercise_name] => gggg
+    [exercise_description] => 
+    [exercise_sets] => 3
+    [exercise_reps] => 12
+    [exercise_rest] => 60
+    [exercise_order] => 2
+)
+
+[2025-05-07 16:30:41] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:41] [INFO] Ejecutando acción: StaffRoutineController->addExercise(8)
+[2025-05-07 16:30:41] [DEBUG] Intentando añadir ejercicio: {"routine_id":"8","name":"gggg","description":"","sets":3,"reps":12,"rest":60,"order":2,"additional_info":null}
+[2025-05-07 16:30:41] [DEBUG] Reordenados ejercicios de rutina ID: 8 a partir del orden: 2
+[2025-05-07 16:30:41] [DEBUG] Datos recibidos en addExercise: {"routine_id":"8","name":"gggg","description":"","sets":3,"reps":12,"rest":60,"order":2,"additional_info":null}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:41
+--------------------------------------------------
+[2025-05-07 16:30:41] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:41] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:30:41] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:41] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:41] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:44
+--------------------------------------------------
+[2025-05-07 16:30:44] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:44] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:44] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:30:44] [DEBUG] Método de solicitud: POST
+[2025-05-07 16:30:44] [DEBUG] Datos POST: Array
+(
+    [name] => rutina dani
+    [user_id] => 6
+    [description] => rutina pierna
+)
+
+[2025-05-07 16:30:44] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:44] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+[2025-05-07 16:30:44] [DEBUG] Intentando editar rutina: {"id":"8","name":"rutina dani","description":"rutina pierna","usuari_id":"6"}
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:44
+--------------------------------------------------
+[2025-05-07 16:30:44] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:44] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:44] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:30:44] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:44] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:44] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:45
+--------------------------------------------------
+[2025-05-07 16:30:45] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:45] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:30:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:45] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:45] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:30:59
+--------------------------------------------------
+[2025-05-07 16:30:59] [INFO] Logger inicializado correctamente
+[2025-05-07 16:30:59] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:30:59] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:30:59] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:30:59] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:30:59] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:00
+--------------------------------------------------
+[2025-05-07 16:31:00] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:00] [INFO] URL solicitada: staffRoutine/downloadPDF/8
+[2025-05-07 16:31:00] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:00] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:31:00] [INFO] Ejecutando acción: StaffRoutineController->downloadPDF(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:13
+--------------------------------------------------
+[2025-05-07 16:31:13] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:13] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:31:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:13] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:31:13] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:18
+--------------------------------------------------
+[2025-05-07 16:31:18] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:18] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:18] [INFO] URL solicitada: staffRoutine/searchExercises/8
+[2025-05-07 16:31:18] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:18] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:31:18] [INFO] Ejecutando acción: StaffRoutineController->searchExercises(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:19
+--------------------------------------------------
+[2025-05-07 16:31:19] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:19] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:19] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 16:31:19] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:19] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:19] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:25
+--------------------------------------------------
+[2025-05-07 16:31:25] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:25] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:25] [INFO] URL solicitada: admin/users
+[2025-05-07 16:31:25] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:25] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:25] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:26
+--------------------------------------------------
+[2025-05-07 16:31:26] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:26] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 16:31:26] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:26] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:26] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:26
+--------------------------------------------------
+[2025-05-07 16:31:26] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:26] [INFO] URL solicitada: admin/users
+[2025-05-07 16:31:26] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:26] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:26] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:27
+--------------------------------------------------
+[2025-05-07 16:31:27] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:27] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 16:31:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:27] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:27] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:28
+--------------------------------------------------
+[2025-05-07 16:31:28] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:28] [INFO] URL solicitada: admin/users
+[2025-05-07 16:31:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:28] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:28] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:29
+--------------------------------------------------
+[2025-05-07 16:31:29] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:29] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 16:31:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:29] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:29] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:31:29
+--------------------------------------------------
+[2025-05-07 16:31:29] [INFO] Logger inicializado correctamente
+[2025-05-07 16:31:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:31:29] [INFO] URL solicitada: admin/users
+[2025-05-07 16:31:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:31:29] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:31:29] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:35:14
+--------------------------------------------------
+[2025-05-07 16:35:14] [INFO] Logger inicializado correctamente
+[2025-05-07 16:35:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:35:14] [INFO] URL solicitada: admin/editUser/7
+[2025-05-07 16:35:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:35:14] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:35:14] [INFO] Ejecutando acción: AdminController->editUser(7)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:35:17
+--------------------------------------------------
+[2025-05-07 16:35:17] [INFO] Logger inicializado correctamente
+[2025-05-07 16:35:17] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:35:17] [INFO] URL solicitada: admin/users
+[2025-05-07 16:35:17] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:35:17] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:35:17] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:35:22
+--------------------------------------------------
+[2025-05-07 16:35:22] [INFO] Logger inicializado correctamente
+[2025-05-07 16:35:22] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:35:22] [INFO] URL solicitada: admin/users
+[2025-05-07 16:35:22] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:35:22] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:35:22] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:39:39
+--------------------------------------------------
+[2025-05-07 16:39:39] [INFO] Logger inicializado correctamente
+[2025-05-07 16:39:39] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:39:39] [INFO] URL solicitada: admin/users
+[2025-05-07 16:39:39] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:39:39] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:39:39] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:48:13
+--------------------------------------------------
+[2025-05-07 16:48:13] [INFO] Logger inicializado correctamente
+[2025-05-07 16:48:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:48:13] [INFO] URL solicitada: admin/deleteUser/3
+[2025-05-07 16:48:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:48:13] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:48:13] [INFO] Ejecutando acción: AdminController->deleteUser(3)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:48:13
+--------------------------------------------------
+[2025-05-07 16:48:13] [INFO] Logger inicializado correctamente
+[2025-05-07 16:48:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:48:13] [INFO] URL solicitada: admin/users
+[2025-05-07 16:48:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:48:13] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:48:13] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:52:00
+--------------------------------------------------
+[2025-05-07 16:52:00] [INFO] Logger inicializado correctamente
+[2025-05-07 16:52:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:52:00] [INFO] URL solicitada: admin/users
+[2025-05-07 16:52:00] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:52:01] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:52:01] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:52:06
+--------------------------------------------------
+[2025-05-07 16:52:06] [INFO] Logger inicializado correctamente
+[2025-05-07 16:52:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:52:06] [INFO] URL solicitada: admin/reactivateUser/3
+[2025-05-07 16:52:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:52:06] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:52:06] [INFO] Ejecutando acción: AdminController->reactivateUser(3)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:52:06
+--------------------------------------------------
+[2025-05-07 16:52:06] [INFO] Logger inicializado correctamente
+[2025-05-07 16:52:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:52:06] [INFO] URL solicitada: admin/users
+[2025-05-07 16:52:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:52:06] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:52:06] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:53:45
+--------------------------------------------------
+[2025-05-07 16:53:45] [INFO] Logger inicializado correctamente
+[2025-05-07 16:53:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:53:45] [INFO] URL solicitada: admin/users
+[2025-05-07 16:53:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:53:45] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:53:45] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:53:53
+--------------------------------------------------
+[2025-05-07 16:53:53] [INFO] Logger inicializado correctamente
+[2025-05-07 16:53:53] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:53:53] [INFO] URL solicitada: admin/registerForm
+[2025-05-07 16:53:53] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:53:53] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:53:53] [INFO] Ejecutando acción: AdminController->registerForm()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:27
+--------------------------------------------------
+[2025-05-07 16:57:27] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:27] [INFO] URL solicitada: admin/users
+[2025-05-07 16:57:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:27] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:57:27] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:29
+--------------------------------------------------
+[2025-05-07 16:57:29] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:29] [INFO] URL solicitada: admin/classes
+[2025-05-07 16:57:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:29] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:57:29] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:30
+--------------------------------------------------
+[2025-05-07 16:57:30] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:30] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:57:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:30] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:57:30] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:32
+--------------------------------------------------
+[2025-05-07 16:57:32] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:32] [INFO] URL solicitada: staffRoutine/edit/8
+[2025-05-07 16:57:32] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:32] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:57:32] [INFO] Ejecutando acción: StaffRoutineController->edit(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:34
+--------------------------------------------------
+[2025-05-07 16:57:34] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:34] [INFO] URL solicitada: admin/classes
+[2025-05-07 16:57:34] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:34] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:57:34] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:37
+--------------------------------------------------
+[2025-05-07 16:57:37] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:37] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:37] [INFO] URL solicitada: admin/users
+[2025-05-07 16:57:37] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:37] [INFO] Instanciando controlador: AdminController
+[2025-05-07 16:57:37] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:38
+--------------------------------------------------
+[2025-05-07 16:57:38] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:38] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:38] [INFO] URL solicitada: staffRoutine
+[2025-05-07 16:57:38] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:38] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:57:38] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 16:57:40
+--------------------------------------------------
+[2025-05-07 16:57:40] [INFO] Logger inicializado correctamente
+[2025-05-07 16:57:40] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 16:57:40] [INFO] URL solicitada: staffRoutine/downloadPDF/8
+[2025-05-07 16:57:40] [DEBUG] Método de solicitud: GET
+[2025-05-07 16:57:40] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 16:57:40] [INFO] Ejecutando acción: StaffRoutineController->downloadPDF(8)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:35:27
+--------------------------------------------------
+[2025-05-07 17:35:27] [INFO] Logger inicializado correctamente
+[2025-05-07 17:35:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:35:27] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 17:35:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:35:27] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:35:27] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:35:27
+--------------------------------------------------
+[2025-05-07 17:35:27] [INFO] Logger inicializado correctamente
+[2025-05-07 17:35:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:35:27] [INFO] URL solicitada: admin/users
+[2025-05-07 17:35:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:35:27] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:35:27] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:35:28
+--------------------------------------------------
+[2025-05-07 17:35:28] [INFO] Logger inicializado correctamente
+[2025-05-07 17:35:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:35:28] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 17:35:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:35:28] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:35:28] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:35:31
+--------------------------------------------------
+[2025-05-07 17:35:31] [INFO] Logger inicializado correctamente
+[2025-05-07 17:35:31] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:35:31] [INFO] URL solicitada: admin/classes
+[2025-05-07 17:35:31] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:35:31] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:35:31] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:05
+--------------------------------------------------
+[2025-05-07 17:53:05] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:05] [INFO] URL solicitada: admin/classes
+[2025-05-07 17:53:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:53:05] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:53:05] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:09
+--------------------------------------------------
+[2025-05-07 17:53:09] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:09] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:09] [INFO] URL solicitada: admin/filterClasses
+[2025-05-07 17:53:09] [DEBUG] Método de solicitud: POST
+[2025-05-07 17:53:09] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 4
+    [monitor_id] => 
+)
+
+[2025-05-07 17:53:09] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:53:09] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:10
+--------------------------------------------------
+[2025-05-07 17:53:10] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:10] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:10] [INFO] URL solicitada: 
+[2025-05-07 17:53:10] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:53:10] [INFO] Instanciando controlador: UserController
+[2025-05-07 17:53:10] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:13
+--------------------------------------------------
+[2025-05-07 17:53:13] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:13] [INFO] URL solicitada: admin/classes
+[2025-05-07 17:53:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:53:13] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:53:13] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:16
+--------------------------------------------------
+[2025-05-07 17:53:16] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:16] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:16] [INFO] URL solicitada: admin/filterClasses
+[2025-05-07 17:53:16] [DEBUG] Método de solicitud: POST
+[2025-05-07 17:53:16] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 7
+)
+
+[2025-05-07 17:53:16] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:53:16] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 17:53:18
+--------------------------------------------------
+[2025-05-07 17:53:18] [INFO] Logger inicializado correctamente
+[2025-05-07 17:53:18] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 17:53:18] [INFO] URL solicitada: admin/classes
+[2025-05-07 17:53:18] [DEBUG] Método de solicitud: GET
+[2025-05-07 17:53:18] [INFO] Instanciando controlador: AdminController
+[2025-05-07 17:53:18] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:43
+--------------------------------------------------
+[2025-05-07 18:07:43] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:43] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:43] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:07:43] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:07:43] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:07:43] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:46
+--------------------------------------------------
+[2025-05-07 18:07:46] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:46] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:46] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:07:46] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:07:46] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:07:46] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:47
+--------------------------------------------------
+[2025-05-07 18:07:47] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:47] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:47] [INFO] URL solicitada: admin/filterClasses
+[2025-05-07 18:07:47] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:07:47] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:07:47] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:07:47] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:48
+--------------------------------------------------
+[2025-05-07 18:07:48] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:48] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:48] [INFO] URL solicitada: 
+[2025-05-07 18:07:48] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:07:48] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:07:48] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:52
+--------------------------------------------------
+[2025-05-07 18:07:52] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:52] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:52] [INFO] URL solicitada: staffRoutine
+[2025-05-07 18:07:52] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:07:52] [INFO] Instanciando controlador: StaffRoutineController
+[2025-05-07 18:07:52] [INFO] Ejecutando acción: StaffRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:53
+--------------------------------------------------
+[2025-05-07 18:07:53] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:53] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:53] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:07:53] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:07:53] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:07:53] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:07:54
+--------------------------------------------------
+[2025-05-07 18:07:54] [INFO] Logger inicializado correctamente
+[2025-05-07 18:07:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:07:54] [INFO] URL solicitada: admin/filterClasses
+[2025-05-07 18:07:54] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:07:54] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:07:54] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:07:54] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:13:38
+--------------------------------------------------
+[2025-05-07 18:13:38] [INFO] Logger inicializado correctamente
+[2025-05-07 18:13:38] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:13:38] [INFO] URL solicitada: 
+[2025-05-07 18:13:38] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:13:38] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:13:38] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:13:40
+--------------------------------------------------
+[2025-05-07 18:13:40] [INFO] Logger inicializado correctamente
+[2025-05-07 18:13:40] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:13:40] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:13:40] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:13:40] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:13:40] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:13:42
+--------------------------------------------------
+[2025-05-07 18:13:42] [INFO] Logger inicializado correctamente
+[2025-05-07 18:13:42] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:13:42] [INFO] URL solicitada: admin/filterClasses
+[2025-05-07 18:13:42] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:13:42] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:13:42] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:13:42] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:13:46
+--------------------------------------------------
+[2025-05-07 18:13:46] [INFO] Logger inicializado correctamente
+[2025-05-07 18:13:46] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:13:46] [INFO] URL solicitada: 
+[2025-05-07 18:13:46] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:13:46] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:13:46] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:13:48
+--------------------------------------------------
+[2025-05-07 18:13:48] [INFO] Logger inicializado correctamente
+[2025-05-07 18:13:48] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:13:48] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:13:48] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:13:48] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:13:48] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:02
+--------------------------------------------------
+[2025-05-07 18:21:02] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:02] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:02] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:21:02] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:21:02] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:21:02] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:03
+--------------------------------------------------
+[2025-05-07 18:21:03] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:03] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:03] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:21:03] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:21:03] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:21:03] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:21:03] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:04
+--------------------------------------------------
+[2025-05-07 18:21:04] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:04] [INFO] URL solicitada: 
+[2025-05-07 18:21:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:21:04] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:21:04] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:13
+--------------------------------------------------
+[2025-05-07 18:21:13] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:13] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:21:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:21:13] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:21:13] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:22
+--------------------------------------------------
+[2025-05-07 18:21:22] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:22] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:22] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:21:22] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:21:22] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 3
+    [monitor_id] => 7
+)
+
+[2025-05-07 18:21:22] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:21:22] [ERROR] Método no encontrado: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:27
+--------------------------------------------------
+[2025-05-07 18:21:27] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:27] [INFO] URL solicitada: 
+[2025-05-07 18:21:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:21:27] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:21:27] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:21:45
+--------------------------------------------------
+[2025-05-07 18:21:45] [INFO] Logger inicializado correctamente
+[2025-05-07 18:21:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:21:45] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:21:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:21:45] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:21:45] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:28
+--------------------------------------------------
+[2025-05-07 18:25:28] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:28] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:25:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:25:28] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:28] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:29
+--------------------------------------------------
+[2025-05-07 18:25:29] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:29] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:25:29] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:25:29] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:25:29] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:29] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:30
+--------------------------------------------------
+[2025-05-07 18:25:30] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:30] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:25:30] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:25:30] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:25:30] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:30] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:31
+--------------------------------------------------
+[2025-05-07 18:25:31] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:31] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:31] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:25:31] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:25:31] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:25:31] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:31] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:36
+--------------------------------------------------
+[2025-05-07 18:25:36] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:36] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:36] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:25:36] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:25:36] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 3
+    [monitor_id] => 
+)
+
+[2025-05-07 18:25:36] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:36] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:25:37
+--------------------------------------------------
+[2025-05-07 18:25:37] [INFO] Logger inicializado correctamente
+[2025-05-07 18:25:37] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:25:37] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:25:37] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:25:37] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:25:37] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:25:37] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:45
+--------------------------------------------------
+[2025-05-07 18:26:45] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:45] [INFO] URL solicitada: auth/logout
+[2025-05-07 18:26:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:26:45] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:26:45] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:45
+--------------------------------------------------
+[2025-05-07 18:26:45] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:45] [INFO] URL solicitada: auth/login
+[2025-05-07 18:26:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:26:45] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:26:45] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:45
+--------------------------------------------------
+[2025-05-07 18:26:45] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:45] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 18:26:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:26:45] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:52
+--------------------------------------------------
+[2025-05-07 18:26:52] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:52] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:52] [INFO] URL solicitada: auth/login
+[2025-05-07 18:26:52] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:26:52] [DEBUG] Datos POST: Array
+(
+    [email] => user@user.com
+    [password] => admin12345
+)
+
+[2025-05-07 18:26:52] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:26:52] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:52
+--------------------------------------------------
+[2025-05-07 18:26:52] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:52] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:52] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:26:52] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:26:52] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:26:52] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:54
+--------------------------------------------------
+[2025-05-07 18:26:54] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:54] [INFO] URL solicitada: user/classes
+[2025-05-07 18:26:54] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:26:54] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:26:54] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:26:56
+--------------------------------------------------
+[2025-05-07 18:26:56] [INFO] Logger inicializado correctamente
+[2025-05-07 18:26:56] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:26:56] [INFO] URL solicitada: User/filterClasses
+[2025-05-07 18:26:56] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:26:56] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+)
+
+[2025-05-07 18:26:56] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:26:56] [INFO] Ejecutando acción: UserController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:00
+--------------------------------------------------
+[2025-05-07 18:27:00] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:00] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:00] [INFO] URL solicitada: User/filterClasses
+[2025-05-07 18:27:00] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:27:00] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+)
+
+[2025-05-07 18:27:00] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:27:00] [INFO] Ejecutando acción: UserController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:04
+--------------------------------------------------
+[2025-05-07 18:27:04] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:04] [INFO] URL solicitada: User/myReservations
+[2025-05-07 18:27:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:27:04] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:27:04] [INFO] Ejecutando acción: UserController->myReservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:07
+--------------------------------------------------
+[2025-05-07 18:27:07] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:07] [INFO] URL solicitada: userRoutine
+[2025-05-07 18:27:07] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:27:07] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 18:27:07] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:08
+--------------------------------------------------
+[2025-05-07 18:27:08] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:08] [INFO] URL solicitada: user/classes
+[2025-05-07 18:27:08] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:27:08] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:27:08] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:11
+--------------------------------------------------
+[2025-05-07 18:27:11] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:11] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:11] [INFO] URL solicitada: User/myReservations
+[2025-05-07 18:27:11] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:27:11] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:27:11] [INFO] Ejecutando acción: UserController->myReservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:27:14
+--------------------------------------------------
+[2025-05-07 18:27:14] [INFO] Logger inicializado correctamente
+[2025-05-07 18:27:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:27:14] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:27:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:27:14] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:27:14] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:05
+--------------------------------------------------
+[2025-05-07 18:30:05] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:05] [INFO] URL solicitada: user/classes
+[2025-05-07 18:30:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:05] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:05] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:08
+--------------------------------------------------
+[2025-05-07 18:30:08] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:08] [INFO] URL solicitada: User/filterClasses
+[2025-05-07 18:30:08] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:30:08] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+)
+
+[2025-05-07 18:30:08] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:08] [INFO] Ejecutando acción: UserController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:10
+--------------------------------------------------
+[2025-05-07 18:30:10] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:10] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:10] [INFO] URL solicitada: User/myReservations
+[2025-05-07 18:30:10] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:10] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:10] [INFO] Ejecutando acción: UserController->myReservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:11
+--------------------------------------------------
+[2025-05-07 18:30:11] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:11] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:11] [INFO] URL solicitada: user/notifications
+[2025-05-07 18:30:11] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:11] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:11] [INFO] Ejecutando acción: UserController->notifications()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:12
+--------------------------------------------------
+[2025-05-07 18:30:12] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:12] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:12] [INFO] URL solicitada: user/classes
+[2025-05-07 18:30:12] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:12] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:12] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:12
+--------------------------------------------------
+[2025-05-07 18:30:12] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:12] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:12] [INFO] URL solicitada: userRoutine
+[2025-05-07 18:30:12] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:12] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 18:30:12] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:13
+--------------------------------------------------
+[2025-05-07 18:30:13] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:13] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:13] [INFO] URL solicitada: user/tracking
+[2025-05-07 18:30:13] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:13] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:13] [INFO] Ejecutando acción: UserController->tracking()
+[2025-05-07 18:30:13] [INFO] Acceso a tracking.php
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:14
+--------------------------------------------------
+[2025-05-07 18:30:14] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:14] [INFO] URL solicitada: user/classes
+[2025-05-07 18:30:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:14] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:14] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:15
+--------------------------------------------------
+[2025-05-07 18:30:15] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:15] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:15] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:30:15] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:15] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:15] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:17
+--------------------------------------------------
+[2025-05-07 18:30:17] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:17] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:17] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:30:17] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:17] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:17] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:19
+--------------------------------------------------
+[2025-05-07 18:30:19] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:19] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:19] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:30:19] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:19] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:19] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:19
+--------------------------------------------------
+[2025-05-07 18:30:19] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:19] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:19] [INFO] URL solicitada: user/classes
+[2025-05-07 18:30:19] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:19] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:19] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:21
+--------------------------------------------------
+[2025-05-07 18:30:21] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:21] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:21] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:30:21] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:21] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:21] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:22
+--------------------------------------------------
+[2025-05-07 18:30:22] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:22] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:22] [INFO] URL solicitada: user/classes
+[2025-05-07 18:30:22] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:22] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:22] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:25
+--------------------------------------------------
+[2025-05-07 18:30:25] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:25] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:25] [INFO] URL solicitada: User/myReservations
+[2025-05-07 18:30:25] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:25] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:25] [INFO] Ejecutando acción: UserController->myReservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:29
+--------------------------------------------------
+[2025-05-07 18:30:29] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:29] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:30:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:29] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:29] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:30:32
+--------------------------------------------------
+[2025-05-07 18:30:32] [INFO] Logger inicializado correctamente
+[2025-05-07 18:30:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:30:32] [INFO] URL solicitada: user/tracking
+[2025-05-07 18:30:32] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:30:32] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:30:32] [INFO] Ejecutando acción: UserController->tracking()
+[2025-05-07 18:30:32] [INFO] Acceso a tracking.php
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:24
+--------------------------------------------------
+[2025-05-07 18:34:24] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:24] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:24] [INFO] URL solicitada: userRoutine
+[2025-05-07 18:34:24] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:24] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 18:34:24] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:26
+--------------------------------------------------
+[2025-05-07 18:34:26] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:26] [INFO] URL solicitada: user/tracking
+[2025-05-07 18:34:26] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:26] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:34:26] [INFO] Ejecutando acción: UserController->tracking()
+[2025-05-07 18:34:26] [INFO] Acceso a tracking.php
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:27
+--------------------------------------------------
+[2025-05-07 18:34:27] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:27] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:27] [INFO] URL solicitada: user/classes
+[2025-05-07 18:34:27] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:27] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:34:27] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:30
+--------------------------------------------------
+[2025-05-07 18:34:30] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:30] [INFO] URL solicitada: auth/logout
+[2025-05-07 18:34:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:30] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:34:30] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:30
+--------------------------------------------------
+[2025-05-07 18:34:30] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:30] [INFO] URL solicitada: auth/login
+[2025-05-07 18:34:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:30] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:34:30] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:31
+--------------------------------------------------
+[2025-05-07 18:34:31] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:31] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:31] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 18:34:31] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:31] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:32
+--------------------------------------------------
+[2025-05-07 18:34:32] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:32] [INFO] URL solicitada: auth/login
+[2025-05-07 18:34:32] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:34:32] [DEBUG] Datos POST: Array
+(
+    [email] => admin@admin.com
+    [password] => admin12345
+)
+
+[2025-05-07 18:34:32] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:34:32] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:33
+--------------------------------------------------
+[2025-05-07 18:34:33] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:33] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:33] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 18:34:33] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:33] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:34:33] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:33
+--------------------------------------------------
+[2025-05-07 18:34:33] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:33] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:33] [INFO] URL solicitada: admin/users
+[2025-05-07 18:34:33] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:33] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:34:33] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:34
+--------------------------------------------------
+[2025-05-07 18:34:34] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:34] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:34:34] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:34:34] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:34:34] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:34:35
+--------------------------------------------------
+[2025-05-07 18:34:35] [INFO] Logger inicializado correctamente
+[2025-05-07 18:34:35] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:34:35] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:34:35] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:34:35] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:34:35] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:34:35] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:16
+--------------------------------------------------
+[2025-05-07 18:37:16] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:16] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:16] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:37:16] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:16] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:37:16] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:16] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:22
+--------------------------------------------------
+[2025-05-07 18:37:22] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:22] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:22] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:37:22] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:22] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 3
+    [monitor_id] => 
+)
+
+[2025-05-07 18:37:22] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:22] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:25
+--------------------------------------------------
+[2025-05-07 18:37:25] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:25] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:25] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:37:25] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:25] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-06
+    [type_id] => 3
+    [monitor_id] => 
+)
+
+[2025-05-07 18:37:25] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:25] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:47
+--------------------------------------------------
+[2025-05-07 18:37:47] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:47] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:47] [INFO] URL solicitada: Admin/addClass
+[2025-05-07 18:37:47] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:47] [DEBUG] Datos POST: Array
+(
+    [tipus_classe_id] => 1
+    [monitor_id] => 7
+    [data] => 2025-05-07
+    [hora] => 20:00
+    [duracio] => 60
+    [sala] => 1
+    [capacitat_maxima] => 2
+)
+
+[2025-05-07 18:37:47] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:47] [INFO] Ejecutando acción: AdminController->addClass()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:47
+--------------------------------------------------
+[2025-05-07 18:37:47] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:47] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:47] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:37:47] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:37:47] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:47] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:51
+--------------------------------------------------
+[2025-05-07 18:37:51] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:51] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:51] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:37:51] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:51] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:37:51] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:51] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:56
+--------------------------------------------------
+[2025-05-07 18:37:56] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:56] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:56] [INFO] URL solicitada: user/dismissNotification/5
+[2025-05-07 18:37:56] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:56] [DEBUG] Datos POST: Array
+(
+)
+
+[2025-05-07 18:37:56] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:37:56] [INFO] Ejecutando acción: UserController->dismissNotification(5)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:37:59
+--------------------------------------------------
+[2025-05-07 18:37:59] [INFO] Logger inicializado correctamente
+[2025-05-07 18:37:59] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:37:59] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:37:59] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:37:59] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:37:59] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:37:59] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:38:03
+--------------------------------------------------
+[2025-05-07 18:38:03] [INFO] Logger inicializado correctamente
+[2025-05-07 18:38:03] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:38:03] [INFO] URL solicitada: user/notifications
+[2025-05-07 18:38:03] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:38:03] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:38:03] [INFO] Ejecutando acción: UserController->notifications()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:38:06
+--------------------------------------------------
+[2025-05-07 18:38:06] [INFO] Logger inicializado correctamente
+[2025-05-07 18:38:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:38:06] [INFO] URL solicitada: admin/classes
+[2025-05-07 18:38:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:38:06] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:38:06] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:50:06
+--------------------------------------------------
+[2025-05-07 18:50:06] [INFO] Logger inicializado correctamente
+[2025-05-07 18:50:06] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:50:06] [INFO] URL solicitada: Admin/classes
+[2025-05-07 18:50:06] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:50:06] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:50:06] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:50:07
+--------------------------------------------------
+[2025-05-07 18:50:07] [INFO] Logger inicializado correctamente
+[2025-05-07 18:50:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:50:07] [INFO] URL solicitada: Admin/filterClasses
+[2025-05-07 18:50:07] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:50:07] [DEBUG] Datos POST: Array
+(
+    [date] => 2025-05-07
+    [type_id] => 
+    [monitor_id] => 
+)
+
+[2025-05-07 18:50:07] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:50:07] [INFO] Ejecutando acción: AdminController->filterClasses()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:50:08
+--------------------------------------------------
+[2025-05-07 18:50:08] [INFO] Logger inicializado correctamente
+[2025-05-07 18:50:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:50:08] [INFO] URL solicitada: Admin/classes
+[2025-05-07 18:50:08] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:50:08] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:50:08] [INFO] Ejecutando acción: AdminController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:50:12
+--------------------------------------------------
+[2025-05-07 18:50:12] [INFO] Logger inicializado correctamente
+[2025-05-07 18:50:12] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:50:12] [INFO] URL solicitada: admin/users
+[2025-05-07 18:50:12] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:50:12] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:50:12] [INFO] Ejecutando acción: AdminController->users()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:50
+--------------------------------------------------
+[2025-05-07 18:52:50] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:50] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:50] [INFO] URL solicitada: admin/dashboard
+[2025-05-07 18:52:50] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:50] [INFO] Instanciando controlador: AdminController
+[2025-05-07 18:52:50] [INFO] Ejecutando acción: AdminController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:54
+--------------------------------------------------
+[2025-05-07 18:52:54] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:54] [INFO] URL solicitada: auth/logout
+[2025-05-07 18:52:54] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:54] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:52:54] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:54
+--------------------------------------------------
+[2025-05-07 18:52:54] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:54] [INFO] URL solicitada: auth/login
+[2025-05-07 18:52:54] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:54] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:52:54] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:54
+--------------------------------------------------
+[2025-05-07 18:52:54] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:54] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 18:52:54] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:54] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:55
+--------------------------------------------------
+[2025-05-07 18:52:55] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:55] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:55] [INFO] URL solicitada: auth/login
+[2025-05-07 18:52:55] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:55] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:52:55] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:52:55
+--------------------------------------------------
+[2025-05-07 18:52:55] [INFO] Logger inicializado correctamente
+[2025-05-07 18:52:55] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:52:55] [INFO] URL solicitada: public/images/logo.png
+[2025-05-07 18:52:55] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:52:55] [ERROR] Controlador no encontrado: PublicController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:53:02
+--------------------------------------------------
+[2025-05-07 18:53:02] [INFO] Logger inicializado correctamente
+[2025-05-07 18:53:02] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:53:02] [INFO] URL solicitada: auth/login
+[2025-05-07 18:53:02] [DEBUG] Método de solicitud: POST
+[2025-05-07 18:53:02] [DEBUG] Datos POST: Array
+(
+    [email] => user@user.com
+    [password] => admin12345
+)
+
+[2025-05-07 18:53:02] [INFO] Instanciando controlador: AuthController
+[2025-05-07 18:53:02] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 18:53:02
+--------------------------------------------------
+[2025-05-07 18:53:02] [INFO] Logger inicializado correctamente
+[2025-05-07 18:53:02] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 18:53:02] [INFO] URL solicitada: user/dashboard
+[2025-05-07 18:53:02] [DEBUG] Método de solicitud: GET
+[2025-05-07 18:53:02] [INFO] Instanciando controlador: UserController
+[2025-05-07 18:53:02] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:02:08
+--------------------------------------------------
+[2025-05-07 19:02:08] [INFO] Logger inicializado correctamente
+[2025-05-07 19:02:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:02:08] [INFO] URL solicitada: user/dashboard
+[2025-05-07 19:02:08] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:02:08] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:02:08] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:02:09
+--------------------------------------------------
+[2025-05-07 19:02:09] [INFO] Logger inicializado correctamente
+[2025-05-07 19:02:09] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:02:09] [INFO] URL solicitada: user/dashboard
+[2025-05-07 19:02:09] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:02:09] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:02:09] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:41
+--------------------------------------------------
+[2025-05-07 19:03:41] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:41] [INFO] URL solicitada: user/dashboard
+[2025-05-07 19:03:41] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:03:41] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:41] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:43
+--------------------------------------------------
+[2025-05-07 19:03:43] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:43] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:43] [INFO] URL solicitada: user/my_reservations
+[2025-05-07 19:03:43] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:03:43] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:43] [ERROR] Método no encontrado: UserController->my_reservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:45
+--------------------------------------------------
+[2025-05-07 19:03:45] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:45] [INFO] URL solicitada: user/dashboard
+[2025-05-07 19:03:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:03:45] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:45] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:51
+--------------------------------------------------
+[2025-05-07 19:03:51] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:51] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:51] [INFO] URL solicitada: user/reserveClass
+[2025-05-07 19:03:51] [DEBUG] Método de solicitud: POST
+[2025-05-07 19:03:51] [DEBUG] Datos POST: Array
+(
+    [class_id] => 3
+)
+
+[2025-05-07 19:03:51] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:51] [INFO] Ejecutando acción: UserController->reserveClass()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:51
+--------------------------------------------------
+[2025-05-07 19:03:51] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:51] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:51] [INFO] URL solicitada: user/classes
+[2025-05-07 19:03:51] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:03:51] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:51] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:03:54
+--------------------------------------------------
+[2025-05-07 19:03:54] [INFO] Logger inicializado correctamente
+[2025-05-07 19:03:54] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:03:54] [INFO] URL solicitada: user/dashboard
+[2025-05-07 19:03:54] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:03:54] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:03:54] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:20
+--------------------------------------------------
+[2025-05-07 19:04:20] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:20] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:20] [INFO] URL solicitada: user/my_reservations
+[2025-05-07 19:04:20] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:20] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:20] [ERROR] Método no encontrado: UserController->my_reservations()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:22
+--------------------------------------------------
+[2025-05-07 19:04:22] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:22] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:22] [INFO] URL solicitada: 
+[2025-05-07 19:04:22] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:22] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:22] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:25
+--------------------------------------------------
+[2025-05-07 19:04:25] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:25] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:25] [INFO] URL solicitada: user/classes
+[2025-05-07 19:04:25] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:25] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:25] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:28
+--------------------------------------------------
+[2025-05-07 19:04:28] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:28] [INFO] URL solicitada: 
+[2025-05-07 19:04:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:28] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:28] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:28
+--------------------------------------------------
+[2025-05-07 19:04:28] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:28] [INFO] URL solicitada: user/classes
+[2025-05-07 19:04:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:28] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:28] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:29
+--------------------------------------------------
+[2025-05-07 19:04:29] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:29] [INFO] URL solicitada: 
+[2025-05-07 19:04:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:29] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:29] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:44
+--------------------------------------------------
+[2025-05-07 19:04:44] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:44] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:44] [INFO] URL solicitada: user/tracking
+[2025-05-07 19:04:44] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:44] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:44] [INFO] Ejecutando acción: UserController->tracking()
+[2025-05-07 19:04:44] [INFO] Acceso a tracking.php
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:04:45
+--------------------------------------------------
+[2025-05-07 19:04:45] [INFO] Logger inicializado correctamente
+[2025-05-07 19:04:45] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:04:45] [INFO] URL solicitada: 
+[2025-05-07 19:04:45] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:04:45] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:04:45] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:25
+--------------------------------------------------
+[2025-05-07 19:14:25] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:25] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:25] [INFO] URL solicitada: 
+[2025-05-07 19:14:25] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:25] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:25] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:26
+--------------------------------------------------
+[2025-05-07 19:14:26] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:26] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:26] [INFO] URL solicitada: user/routines
+[2025-05-07 19:14:26] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:26] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:26] [ERROR] Método no encontrado: UserController->routines()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:28
+--------------------------------------------------
+[2025-05-07 19:14:28] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:28] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:28] [INFO] URL solicitada: 
+[2025-05-07 19:14:28] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:28] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:28] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:29
+--------------------------------------------------
+[2025-05-07 19:14:29] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:29] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:29] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:14:29] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:29] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:14:29] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:30
+--------------------------------------------------
+[2025-05-07 19:14:30] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:30] [INFO] URL solicitada: 
+[2025-05-07 19:14:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:30] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:30] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:30
+--------------------------------------------------
+[2025-05-07 19:14:30] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:30] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:30] [INFO] URL solicitada: user/routines
+[2025-05-07 19:14:30] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:30] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:30] [ERROR] Método no encontrado: UserController->routines()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:39
+--------------------------------------------------
+[2025-05-07 19:14:39] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:39] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:39] [INFO] URL solicitada: 
+[2025-05-07 19:14:39] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:39] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:14:39] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:14:40
+--------------------------------------------------
+[2025-05-07 19:14:40] [INFO] Logger inicializado correctamente
+[2025-05-07 19:14:40] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:14:40] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:14:40] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:14:40] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:14:40] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:03
+--------------------------------------------------
+[2025-05-07 19:17:03] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:03] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:03] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:17:03] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:03] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:17:03] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:04
+--------------------------------------------------
+[2025-05-07 19:17:04] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:04] [INFO] URL solicitada: 
+[2025-05-07 19:17:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:04] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:17:04] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:05
+--------------------------------------------------
+[2025-05-07 19:17:05] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:05] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:17:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:05] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:17:05] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:05
+--------------------------------------------------
+[2025-05-07 19:17:05] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:05] [INFO] URL solicitada: 
+[2025-05-07 19:17:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:05] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:17:05] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:07
+--------------------------------------------------
+[2025-05-07 19:17:07] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:07] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:17:07] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:07] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:17:07] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:07
+--------------------------------------------------
+[2025-05-07 19:17:07] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:07] [INFO] URL solicitada: 
+[2025-05-07 19:17:07] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:07] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:17:07] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:09
+--------------------------------------------------
+[2025-05-07 19:17:09] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:09] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:09] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:17:09] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:09] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:17:09] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:17:10
+--------------------------------------------------
+[2025-05-07 19:17:10] [INFO] Logger inicializado correctamente
+[2025-05-07 19:17:10] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:17:10] [INFO] URL solicitada: 
+[2025-05-07 19:17:10] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:17:10] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:17:10] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:19:14
+--------------------------------------------------
+[2025-05-07 19:19:14] [INFO] Logger inicializado correctamente
+[2025-05-07 19:19:14] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:19:14] [INFO] URL solicitada: 
+[2025-05-07 19:19:14] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:19:14] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:19:14] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:21:39
+--------------------------------------------------
+[2025-05-07 19:21:39] [INFO] Logger inicializado correctamente
+[2025-05-07 19:21:39] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:21:39] [INFO] URL solicitada: userRoutine
+[2025-05-07 19:21:39] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:21:39] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:21:39] [INFO] Ejecutando acción: UserRoutineController->index()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:21:41
+--------------------------------------------------
+[2025-05-07 19:21:41] [INFO] Logger inicializado correctamente
+[2025-05-07 19:21:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:21:41] [INFO] URL solicitada: userRoutine/view/6
+[2025-05-07 19:21:41] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:21:41] [INFO] Instanciando controlador: UserRoutineController
+[2025-05-07 19:21:41] [INFO] Ejecutando acción: UserRoutineController->view(6)
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 19:21:49
+--------------------------------------------------
+[2025-05-07 19:21:49] [INFO] Logger inicializado correctamente
+[2025-05-07 19:21:49] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 19:21:49] [INFO] URL solicitada: user/tracking
+[2025-05-07 19:21:49] [DEBUG] Método de solicitud: GET
+[2025-05-07 19:21:49] [INFO] Instanciando controlador: UserController
+[2025-05-07 19:21:49] [INFO] Ejecutando acción: UserController->tracking()
+[2025-05-07 19:21:49] [INFO] Acceso a tracking.php
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 20:58:50
+--------------------------------------------------
+[2025-05-07 20:58:50] [INFO] Logger inicializado correctamente
+[2025-05-07 20:58:50] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 20:58:50] [INFO] URL solicitada: user/dashboard
+[2025-05-07 20:58:50] [DEBUG] Método de solicitud: GET
+[2025-05-07 20:58:50] [INFO] Instanciando controlador: UserController
+[2025-05-07 20:58:50] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 20:59:02
+--------------------------------------------------
+[2025-05-07 20:59:02] [INFO] Logger inicializado correctamente
+[2025-05-07 20:59:02] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 20:59:02] [INFO] URL solicitada: user/notifications
+[2025-05-07 20:59:02] [DEBUG] Método de solicitud: GET
+[2025-05-07 20:59:02] [INFO] Instanciando controlador: UserController
+[2025-05-07 20:59:02] [INFO] Ejecutando acción: UserController->notifications()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 20:59:04
+--------------------------------------------------
+[2025-05-07 20:59:04] [INFO] Logger inicializado correctamente
+[2025-05-07 20:59:04] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 20:59:04] [INFO] URL solicitada: user/dashboard
+[2025-05-07 20:59:04] [DEBUG] Método de solicitud: GET
+[2025-05-07 20:59:04] [INFO] Instanciando controlador: UserController
+[2025-05-07 20:59:04] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:00:57
+--------------------------------------------------
+[2025-05-07 21:00:57] [INFO] Logger inicializado correctamente
+[2025-05-07 21:00:57] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:00:57] [INFO] URL solicitada: user/dashboard
+[2025-05-07 21:00:57] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:00:57] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:00:57] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:01:01
+--------------------------------------------------
+[2025-05-07 21:01:01] [INFO] Logger inicializado correctamente
+[2025-05-07 21:01:01] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:01:01] [INFO] URL solicitada: user/profile
+[2025-05-07 21:01:01] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:01:01] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:01:01] [INFO] Ejecutando acción: UserController->profile()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:01:07
+--------------------------------------------------
+[2025-05-07 21:01:07] [INFO] Logger inicializado correctamente
+[2025-05-07 21:01:07] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:01:07] [INFO] URL solicitada: user/settings
+[2025-05-07 21:01:07] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:01:07] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:01:07] [ERROR] Método no encontrado: UserController->settings()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:01:08
+--------------------------------------------------
+[2025-05-07 21:01:08] [INFO] Logger inicializado correctamente
+[2025-05-07 21:01:08] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:01:08] [INFO] URL solicitada: user/profile
+[2025-05-07 21:01:08] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:01:08] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:01:08] [INFO] Ejecutando acción: UserController->profile()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:02:33
+--------------------------------------------------
+[2025-05-07 21:02:33] [INFO] Logger inicializado correctamente
+[2025-05-07 21:02:33] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:02:33] [INFO] URL solicitada: user/profile
+[2025-05-07 21:02:33] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:02:33] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:02:33] [INFO] Ejecutando acción: UserController->profile()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:02:39
+--------------------------------------------------
+[2025-05-07 21:02:39] [INFO] Logger inicializado correctamente
+[2025-05-07 21:02:39] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:02:39] [INFO] URL solicitada: user/dashboard
+[2025-05-07 21:02:39] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:02:39] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:02:39] [INFO] Ejecutando acción: UserController->dashboard()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-07 21:05:05
+--------------------------------------------------
+[2025-05-07 21:05:05] [INFO] Logger inicializado correctamente
+[2025-05-07 21:05:05] [INFO] Iniciando aplicación desde index.php
+[2025-05-07 21:05:05] [INFO] URL solicitada: user/dashboard
+[2025-05-07 21:05:05] [DEBUG] Método de solicitud: GET
+[2025-05-07 21:05:05] [INFO] Instanciando controlador: UserController
+[2025-05-07 21:05:05] [INFO] Ejecutando acción: UserController->dashboard()

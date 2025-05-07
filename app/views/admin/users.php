@@ -76,16 +76,21 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="<?php echo URLROOT; ?>/admin/editUser/<?php echo $id; ?>" 
-                                                class="btn btn-outline-primary btn-sm" title="Editar">
-                                                <i class="fas fa-edit"></i>
+                                            <?php if($isActive): ?>
+                                            <!-- Si el usuario está activo, mostrar botón de eliminar -->
+                                            <a href="<?php echo URLROOT; ?>/admin/deleteUser/<?php echo $id; ?>" 
+                                                class="btn btn-outline-danger btn-sm" title="Eliminar"
+                                                onclick="return confirm('¿Está seguro de que desea desactivar este usuario? El usuario perderá acceso al sistema pero podrá ser reactivado más adelante.')">
+                                                <i class="fas fa-trash"></i>
                                             </a>
-                                            <a href="<?php echo URLROOT; ?>/admin/toggleUserStatus/<?php echo $id; ?>" 
-                                                class="btn btn-outline-<?php echo $isActive ? 'warning' : 'success'; ?> btn-sm" 
-                                                title="<?php echo $isActive ? 'Desactivar' : 'Activar'; ?>"
-                                                onclick="return confirm('¿Está seguro de que desea <?php echo $isActive ? 'desactivar' : 'activar'; ?> este usuario?')">
-                                                <i class="fas fa-<?php echo $isActive ? 'toggle-off' : 'toggle-on'; ?>"></i>
+                                            <?php else: ?>
+                                            <!-- Si el usuario está inactivo, mostrar botón de reactivar -->
+                                            <a href="<?php echo URLROOT; ?>/admin/reactivateUser/<?php echo $id; ?>" 
+                                                class="btn btn-outline-success btn-sm" title="Reactivar"
+                                                onclick="return confirm('¿Está seguro de que desea reactivar este usuario?')">
+                                                <i class="fas fa-user-check"></i>
                                             </a>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>

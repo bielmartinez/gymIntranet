@@ -95,10 +95,10 @@ class UserRoutineController {
         // Obtener la rutina
         $routine = $this->routineModel->getRoutineById($id);
         
-        // Verificar que la rutina exista y tenga un PDF
-        if (!$routine || empty($routine->ruta_pdf)) {
-            flash('routine_message', 'El PDF no está disponible para descargar', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'El PDF no está disponible para descargar';
+        // Verificar que la rutina exista
+        if (!$routine) {
+            flash('routine_message', 'La rutina no existe', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'La rutina no existe';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
@@ -113,22 +113,24 @@ class UserRoutineController {
             exit;
         }
         
-        // Construir la ruta completa al archivo PDF
-        $filePath = dirname(dirname(__DIR__)) . '/public/' . $routine->ruta_pdf;
+        // Obtener los ejercicios de la rutina
+        $exercises = $this->routineModel->getExercisesByRoutineId($id);
         
-        if (file_exists($filePath)) {
-            // Enviar el archivo al navegador
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-            header('Content-Length: ' . filesize($filePath));
-            readfile($filePath);
-            exit;
-        } else {
-            flash('routine_message', 'El archivo PDF no se encuentra en el servidor', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'El archivo PDF no se encuentra en el servidor';
+        // Generar y descargar el PDF directamente
+        require_once APPROOT . '/utils/PDFGenerator.php';
+        $pdfGenerator = new PDFGenerator();
+        $downloadName = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
+        
+        $result = $pdfGenerator->downloadRoutinePDF($routine, $exercises, $downloadName);
+        
+        if (!$result) {
+            flash('routine_message', 'Error al generar el PDF', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'Error al generar el PDF';
             $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/userRoutine');
+            header('Location: ' . URLROOT . '/userRoutine/view/' . $id);
             exit;
         }
+        
+        // La función downloadRoutinePDF ya finaliza la ejecución
     }
 }
