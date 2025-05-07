@@ -23,6 +23,16 @@ class TypeClass {
     }
 
     /**
+     * Get all class types (alias for getAll method)
+     * For compatibility with AdminController
+     * 
+     * @return array Array of class types
+     */
+    public function getAllTypes() {
+        return $this->getAll();
+    }
+
+    /**
      * Get class type by ID
      * 
      * @param int $id Class type ID

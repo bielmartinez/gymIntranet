@@ -20,6 +20,9 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
+  
+  <!-- Script de notificaciones toast -->
+  <script src="<?php echo URLROOT; ?>/public/js/notifications.js"></script>
 
   <!-- Script personalizado para inicializar tooltips y popovers de Bootstrap -->
   <script>
@@ -35,6 +38,20 @@
       popoverTriggerList.map(function(popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
       });
+
+      // Mostrar notificación toast si existe en la sesión
+      <?php if (isset($_SESSION['toast_message']) && !empty($_SESSION['toast_message'])): ?>
+        const toastMessage = "<?php echo htmlspecialchars($_SESSION['toast_message']); ?>";
+        const toastType = "<?php echo htmlspecialchars($_SESSION['toast_type'] ?? 'success'); ?>";
+        
+        showToast(toastMessage, toastType);
+        
+        <?php 
+        // Limpiar las variables de sesión después de mostrar la notificación
+        unset($_SESSION['toast_message']);
+        unset($_SESSION['toast_type']);
+        ?>
+      <?php endif; ?>
 
       // Obtener el ID del usuario actual para asociarlo con las cookies
       const currentUserId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'null'; ?>;

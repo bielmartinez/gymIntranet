@@ -2,9 +2,16 @@
 /**
  * Controlador para la gestión de funciones administrativas
  */
+// Incluir los modelos necesarios
+require_once dirname(__DIR__) . '/models/User.php';
+require_once dirname(__DIR__) . '/models/Class.php';
+require_once dirname(__DIR__) . '/models/TypeClass.php';
+require_once dirname(__DIR__) . '/models/Notification.php';
+
 class AdminController {
     private $userController;
     private $userModel;
+    private $classModel;
     
     public function __construct() {
         // Verificar que el usuario sea administrador
@@ -15,6 +22,7 @@ class AdminController {
         
         $this->userController = new UserController();
         $this->userModel = new User();
+        $this->classModel = new Class_();
     }
     
     /**
@@ -131,11 +139,17 @@ class AdminController {
             if($userData['role'] === 'staff') {
                 if($this->userModel->createStaffRecord($userId)) {
                     $_SESSION['admin_message'] = 'Monitor registrado correctamente y vinculado como personal';
+                    $_SESSION['toast_message'] = 'Monitor registrado correctamente y vinculado como personal';
+                    $_SESSION['toast_type'] = 'success';
                 } else {
                     $_SESSION['admin_message'] = 'Usuario creado correctamente, pero hubo un error al vincularlo como personal';
+                    $_SESSION['toast_message'] = 'Usuario creado correctamente, pero hubo un error al vincularlo como personal';
+                    $_SESSION['toast_type'] = 'warning';
                 }
             } else {
                 $_SESSION['admin_message'] = 'Usuario creado correctamente';
+                $_SESSION['toast_message'] = 'Usuario creado correctamente';
+                $_SESSION['toast_type'] = 'success';
             }
             
             $_SESSION['admin_message_type'] = 'success';
@@ -143,6 +157,8 @@ class AdminController {
             exit;
         } else {
             // Error - Volver al formulario
+            $_SESSION['toast_message'] = 'Error al crear el usuario. Por favor revise los datos ingresados.';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/admin/registerForm');
             exit;
         }
@@ -213,7 +229,7 @@ class AdminController {
     }
     
     /**
-     * Procesa la actualización de un usuario
+     * Actualiza los datos de un usuario
      */
     public function updateUser() {
         // Verificar si se envió el formulario
@@ -222,52 +238,38 @@ class AdminController {
             exit;
         }
         
-        $userId = $_POST['user_id'];
-        
         // Procesar datos del formulario
         $userData = [
+            'id' => $_POST['userId'],
             'fullName' => trim($_POST['fullName']),
             'email' => trim($_POST['email']),
             'role' => trim($_POST['role']),
+            'status' => trim($_POST['status']),
+            'membershipType' => isset($_POST['membershipType']) ? trim($_POST['membershipType']) : '',
             'phone' => isset($_POST['phone']) ? trim($_POST['phone']) : '',
             'birthDate' => isset($_POST['birthDate']) ? trim($_POST['birthDate']) : ''
         ];
         
-        // Si se proporciona una nueva contraseña, incluirla
-        if(!empty($_POST['password'])) {
-            // Validar que la contraseña tenga al menos 8 caracteres
-            if(strlen($_POST['password']) < 8) {
-                $_SESSION['edit_errors']['password_err'] = 'La contraseña debe tener al menos 8 caracteres';
-                header('Location: ' . URLROOT . '/admin/editUser/' . $userId);
-                exit;
-            }
-            
-            // Validar que las contraseñas coincidan
-            if($_POST['password'] !== $_POST['confirm_password']) {
-                $_SESSION['edit_errors']['confirm_password_err'] = 'Las contraseñas no coinciden';
-                header('Location: ' . URLROOT . '/admin/editUser/' . $userId);
-                exit;
-            }
-            
-            // Añadir contraseña hasheada a los datos
-            $userData['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        }
-        
-        // Actualizar estado activo/inactivo
-        $userData['isActive'] = isset($_POST['is_active']) ? 1 : 0;
-        
         // Actualizar usuario
-        if($this->userModel->update($userId, $userData)) {
+        if($this->userModel->updateUser($userData)) {
+            // Si el rol cambió a staff y no existe en la tabla staff, crear registro
+            if($userData['role'] === 'staff') {
+                $this->userModel->ensureStaffRecord($userData['id']);
+            }
+            
             $_SESSION['admin_message'] = 'Usuario actualizado correctamente';
             $_SESSION['admin_message_type'] = 'success';
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
+            $_SESSION['toast_message'] = 'Usuario actualizado correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['admin_message'] = 'Error al actualizar el usuario';
-            $_SESSION['admin_message_type'] = 'danger';
-            header('Location: ' . URLROOT . '/admin/editUser/' . $userId);
-            exit;
+            $_SESSION['admin_message'] = 'Error al actualizar usuario';
+            $_SESSION['admin_message_type'] = 'error';
+            $_SESSION['toast_message'] = 'Error al actualizar usuario';
+            $_SESSION['toast_type'] = 'error';
         }
+        
+        header('Location: ' . URLROOT . '/admin/users');
+        exit;
     }
     
     /**
@@ -315,12 +317,51 @@ class AdminController {
     }
     
     /**
+     * Elimina un usuario
+     */
+    public function deleteUser($userId = null) {
+        if(!$userId) {
+            header('Location: ' . URLROOT . '/admin/users');
+            exit;
+        }
+        
+        // Eliminar usuario
+        if($this->userModel->deleteUser($userId)) {
+            $_SESSION['admin_message'] = 'Usuario eliminado correctamente';
+            $_SESSION['admin_message_type'] = 'success';
+            $_SESSION['toast_message'] = 'Usuario eliminado correctamente';
+            $_SESSION['toast_type'] = 'success';
+        } else {
+            $_SESSION['admin_message'] = 'Error al eliminar usuario';
+            $_SESSION['admin_message_type'] = 'error';
+            $_SESSION['toast_message'] = 'Error al eliminar usuario';
+            $_SESSION['toast_type'] = 'error';
+        }
+        
+        header('Location: ' . URLROOT . '/admin/users');
+        exit;
+    }
+    
+    /**
      * Gestión de clases
      */
     public function classes() {
+        // Cargar tipos de clases
+        $typeClassModel = new TypeClass();
+        $classTypes = $typeClassModel->getAllTypes();
+        
+        // Cargar monitores disponibles
+        $monitors = $this->userModel->getAllMonitors();
+        
+        // Cargar todas las clases
+        $classes = $this->classModel->getAllClasses();
+        
         $data = [
             'title' => 'Gestión de Clases',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Administrador'
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Administrador',
+            'classTypes' => $classTypes,
+            'monitors' => $monitors,
+            'classes' => $classes
         ];
         
         // Cargar el header
@@ -343,16 +384,10 @@ class AdminController {
         // Obtener todas las notificaciones
         $notifications = $notificationModel->getAllNotifications();
         
-        // Intentar cargar modelo de clases si existe
+        // Cargar clases activas
         $classes = [];
-        if (class_exists('Class_')) {
-            $classModel = new Class_();
-            $classes = $classModel->getActiveClasses();
-        } else if (class_exists('CourseClass')) {
-            // Intento alternativo si tiene otro nombre
-            $classModel = new CourseClass();
-            $classes = $classModel->getActiveClasses();
-        }
+        $classModel = new Class_();
+        $classes = $classModel->getActiveClasses();
         
         // Cargar modelo de usuarios para el selector de destinatarios
         $users = $this->userModel->getAllUsers('user');
@@ -494,10 +529,6 @@ class AdminController {
             exit;
         }
         
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        
         // Recoger datos del formulario
         $data = [
             'tipus_classe_id' => trim($_POST['tipus_classe_id']),
@@ -510,20 +541,26 @@ class AdminController {
         ];
         
         // Verificar si hay conflictos de horario para el monitor
-        if ($classModel->hasScheduleConflict($data)) {
+        if ($this->classModel->hasScheduleConflict($data)) {
             $_SESSION['admin_message'] = 'El monitor ya tiene una clase programada en ese horario';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/admin/classes');
             exit;
         }
         
         // Crear la clase
-        if ($classModel->addClass($data)) {
+        if ($this->classModel->addClass($data)) {
             $_SESSION['admin_message'] = 'Clase añadida correctamente';
             $_SESSION['admin_message_type'] = 'success';
+            $_SESSION['toast_message'] = 'Clase añadida correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['admin_message'] = 'Error al añadir la clase';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Error al añadir la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/admin/classes');
@@ -541,12 +578,8 @@ class AdminController {
             return;
         }
         
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        
         // Obtener la clase
-        $class = $classModel->getClassById($classId);
+        $class = $this->classModel->getClassById($classId);
         
         if (!$class) {
             echo json_encode(['success' => false, 'error' => 'Clase no encontrada']);
@@ -562,7 +595,7 @@ class AdminController {
     }
     
     /**
-     * Actualizar una clase existente
+     * Actualiza una clase existente
      */
     public function updateClass() {
         // Verificar si se envió el formulario
@@ -571,13 +604,9 @@ class AdminController {
             exit;
         }
         
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        
         // Recoger datos del formulario
         $data = [
-            'classe_id' => trim($_POST['classe_id']),
+            'classe_id' => $_POST['classe_id'],
             'tipus_classe_id' => trim($_POST['tipus_classe_id']),
             'monitor_id' => trim($_POST['monitor_id']),
             'data' => trim($_POST['data']),
@@ -588,20 +617,26 @@ class AdminController {
         ];
         
         // Verificar si hay conflictos de horario para el monitor
-        if ($classModel->hasScheduleConflict($data, $data['classe_id'])) {
+        if ($this->classModel->hasScheduleConflict($data, $data['classe_id'])) {
             $_SESSION['admin_message'] = 'El monitor ya tiene una clase programada en ese horario';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/admin/classes');
             exit;
         }
         
         // Actualizar la clase
-        if ($classModel->updateClass($data)) {
+        if ($this->classModel->updateClass($data)) {
             $_SESSION['admin_message'] = 'Clase actualizada correctamente';
             $_SESSION['admin_message_type'] = 'success';
+            $_SESSION['toast_message'] = 'Clase actualizada correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['admin_message'] = 'Error al actualizar la clase';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Error al actualizar la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/admin/classes');
@@ -622,21 +657,23 @@ class AdminController {
         if (!isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
             $_SESSION['admin_message'] = 'ID de clase no válido';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'ID de clase no válido';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/admin/classes');
             exit;
         }
         
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        
         // Eliminar la clase
-        if ($classModel->deleteClass($_POST['classe_id'])) {
+        if ($this->classModel->deleteClass($_POST['classe_id'])) {
             $_SESSION['admin_message'] = 'Clase eliminada correctamente';
             $_SESSION['admin_message_type'] = 'success';
+            $_SESSION['toast_message'] = 'Clase eliminada correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['admin_message'] = 'Error al eliminar la clase';
             $_SESSION['admin_message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Error al eliminar la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/admin/classes');

@@ -1,7 +1,12 @@
 <?php
 /**
- * Modelo para la gestión de clases
+ * Modelo para gestión de clases
  */
+
+// Cargar configuración y base de datos
+require_once dirname(dirname(__FILE__)) . '/config/config.php';
+require_once dirname(dirname(__FILE__)) . '/libraries/Database.php';
+
 class Class_ {
     private $db;
     
@@ -10,230 +15,275 @@ class Class_ {
     }
     
     /**
-     * Obtener todas las clases
-     * @return array
+     * Obtiene una clase por su ID
+     * @param int $classId ID de la clase
+     * @return object|bool Objeto con datos de la clase o false si no existe
      */
-    public function getAllClasses() {
-        $sql = "SELECT * FROM classes ORDER BY data DESC, hora ASC";
-        $this->db->query($sql);
-        return $this->db->resultSet();
-    }
-    
-    /**
-     * Obtener clases activas (desde hoy en adelante)
-     * @return array
-     */
-    public function getActiveClasses() {
-        $sql = "SELECT * FROM classes WHERE data >= CURDATE() ORDER BY data ASC, hora ASC";
-        $this->db->query($sql);
-        return $this->db->resultSet();
-    }
-    
-    /**
-     * Obtener una clase por su ID
-     * @param int $id ID de la clase
-     * @return object
-     */
-    public function getClassById($id) {
-        $sql = "SELECT * FROM classes WHERE classe_id = :id";
-        $this->db->query($sql);
-        $this->db->bind(':id', $id);
-        return $this->db->single();
-    }
-    
-    /**
-     * Crear una nueva clase
-     * @param array $data Datos de la clase
-     * @return bool
-     */
-    public function addClass($data) {
-        $sql = "INSERT INTO classes (tipus_classe_id, monitor_id, data, hora, duracio, capacitat_maxima, capacitat_actual, sala) 
-                VALUES (:tipus_classe_id, :monitor_id, :data, :hora, :duracio, :capacitat_maxima, 0, :sala)";
-                
-        $this->db->query($sql);
-        $this->db->bind(':tipus_classe_id', $data['tipus_classe_id']);
-        $this->db->bind(':monitor_id', $data['monitor_id']);
-        $this->db->bind(':data', $data['data']);
-        $this->db->bind(':hora', $data['hora']);
-        $this->db->bind(':duracio', $data['duracio']);
-        $this->db->bind(':capacitat_maxima', $data['capacitat_maxima']);
-        $this->db->bind(':sala', $data['sala']);
+    public function getClassById($classId) {
+        $this->db->query('SELECT c.*, tc.nom as tipus_nom, tc.descripcio as tipus_descripcio, 
+                          CONCAT(u.nom, " ", u.cognoms) as monitor_nom
+                          FROM classes c
+                          JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
+                          JOIN usuaris u ON c.monitor_id = u.usuari_id
+                          WHERE c.classe_id = :id');
+        $this->db->bind(':id', $classId);
         
+        $row = $this->db->single();
+        
+        if($this->db->rowCount() > 0){
+            return $row;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Incrementa la capacidad actual de una clase
+     * @param int $classId ID de la clase
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function incrementCapacity($classId) {
+        $this->db->query('UPDATE classes SET capacitat_actual = capacitat_actual + 1 
+                         WHERE classe_id = :id');
+        $this->db->bind(':id', $classId);
         return $this->db->execute();
     }
     
     /**
-     * Actualizar una clase existente
-     * @param array $data Datos de la clase
-     * @return bool
+     * Actualiza la capacidad actual de una clase
+     * @param int $classId ID de la clase
+     * @param int $increment Incremento (1) o decremento (-1) de capacidad
+     * @return bool Éxito o fracaso de la operación
      */
-    public function updateClass($data) {
-        $sql = "UPDATE classes 
-                SET tipus_classe_id = :tipus_classe_id, 
-                    monitor_id = :monitor_id, 
-                    data = :data, 
-                    hora = :hora, 
-                    duracio = :duracio, 
-                    capacitat_maxima = :capacitat_maxima, 
-                    sala = :sala 
-                WHERE classe_id = :id";
-                
-        $this->db->query($sql);
+    public function updateCapacity($classId, $increment = -1) {
+        $this->db->query('UPDATE classes SET capacitat_actual = capacitat_actual + :increment 
+                         WHERE classe_id = :id AND (capacitat_actual + :safe_increment) >= 0');
+        $this->db->bind(':id', $classId);
+        $this->db->bind(':increment', $increment);
+        $this->db->bind(':safe_increment', $increment);
+        return $this->db->execute();
+    }
+    
+    /**
+     * Crea una nueva clase
+     * @param array $data Datos de la clase
+     * @return int|bool ID de la clase creada o false en caso de error
+     */
+    public function create($data) {
+        $this->db->query('INSERT INTO classes (tipus_classe_id, monitor_id, data, hora, duracio, 
+                          capacitat_maxima, capacitat_actual, sala) 
+                          VALUES (:tipus, :monitor, :data, :hora, :duracio, :capacitat, 0, :sala)');
+                          
+        $this->db->bind(':tipus', $data['tipus_classe_id']);
+        $this->db->bind(':monitor', $data['monitor_id']);
+        $this->db->bind(':data', $data['data']);
+        $this->db->bind(':hora', $data['hora']);
+        $this->db->bind(':duracio', $data['duracio']);
+        $this->db->bind(':capacitat', $data['capacitat_maxima']);
+        $this->db->bind(':sala', $data['sala']);
+        
+        if ($this->db->execute()) {
+            return $this->db->lastInsertId();
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Actualiza los datos de una clase
+     * @param array $data Datos actualizados de la clase
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function update($data) {
+        $this->db->query('UPDATE classes SET 
+                          tipus_classe_id = :tipus, 
+                          monitor_id = :monitor, 
+                          data = :data, 
+                          hora = :hora, 
+                          duracio = :duracio, 
+                          capacitat_maxima = :capacitat, 
+                          sala = :sala 
+                          WHERE classe_id = :id');
+                          
         $this->db->bind(':id', $data['classe_id']);
-        $this->db->bind(':tipus_classe_id', $data['tipus_classe_id']);
-        $this->db->bind(':monitor_id', $data['monitor_id']);
+        $this->db->bind(':tipus', $data['tipus_classe_id']);
+        $this->db->bind(':monitor', $data['monitor_id']);
         $this->db->bind(':data', $data['data']);
         $this->db->bind(':hora', $data['hora']);
         $this->db->bind(':duracio', $data['duracio']);
-        $this->db->bind(':capacitat_maxima', $data['capacitat_maxima']);
+        $this->db->bind(':capacitat', $data['capacitat_maxima']);
         $this->db->bind(':sala', $data['sala']);
         
         return $this->db->execute();
     }
     
     /**
-     * Eliminar una clase
-     * @param int $id ID de la clase
-     * @return bool
+     * Elimina una clase
+     * @param int $classId ID de la clase a eliminar
+     * @return bool Éxito o fracaso de la operación
      */
-    public function deleteClass($id) {
-        // Primero, eliminar todas las reservas asociadas a esta clase
-        $sqlReserves = "DELETE FROM reserves WHERE classe_id = :id";
-        $this->db->query($sqlReserves);
-        $this->db->bind(':id', $id);
-        $this->db->execute();
-        
-        // Luego eliminar la clase
-        $sql = "DELETE FROM classes WHERE classe_id = :id";
-        $this->db->query($sql);
-        $this->db->bind(':id', $id);
-        
+    public function delete($classId) {
+        $this->db->query('DELETE FROM classes WHERE classe_id = :id');
+        $this->db->bind(':id', $classId);
         return $this->db->execute();
     }
     
     /**
-     * Filtrar clases por diferentes parámetros
-     * @param array $filters Filtros aplicados
-     * @return array
+     * Elimina una clase (alias para delete)
+     * @param int $classId ID de la clase a eliminar
+     * @return bool Éxito o fracaso de la operación
      */
-    public function filterClasses($filters) {
-        $sql = "SELECT c.*, t.nom as tipus_nom, CONCAT(u.nom, ' ', u.cognoms) as monitor_nom 
-                FROM classes c 
-                JOIN tipus_classes t ON c.tipus_classe_id = t.tipus_classe_id
-                JOIN usuaris u ON c.monitor_id = u.usuari_id
-                WHERE 1=1";
-        
-        $params = [];
-        
-        if (!empty($filters['date'])) {
-            $sql .= " AND c.data = :date";
-            $params[':date'] = $filters['date'];
+    public function deleteClass($classId) {
+        return $this->delete($classId);
+    }
+    
+    /**
+     * Obtiene todas las clases programadas
+     * @param string $filterDate Fecha opcional para filtrar
+     * @param int $instructorId ID del monitor para filtrar
+     * @return array Lista de clases
+     */
+    public function getAllClasses($filterDate = null, $instructorId = null) {
+        $sql = 'SELECT c.*, tc.nom as tipus_nom, tc.descripcio as tipus_descripcio, 
+               CONCAT(u.nom, " ", u.cognoms) as monitor_nom 
+               FROM classes c
+               JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
+               JOIN usuaris u ON c.monitor_id = u.usuari_id
+               WHERE 1=1';
+               
+        if ($filterDate) {
+            $sql .= ' AND c.data = :data';
         }
         
-        if (!empty($filters['type_id'])) {
-            $sql .= " AND c.tipus_classe_id = :type_id";
-            $params[':type_id'] = $filters['type_id'];
+        if ($instructorId) {
+            $sql .= ' AND c.monitor_id = :instructor';
         }
         
-        if (!empty($filters['monitor_id'])) {
-            $sql .= " AND c.monitor_id = :monitor_id";
-            $params[':monitor_id'] = $filters['monitor_id'];
-        }
-        
-        $sql .= " ORDER BY c.data ASC, c.hora ASC";
+        $sql .= ' ORDER BY c.data ASC, c.hora ASC';
         
         $this->db->query($sql);
         
-        foreach ($params as $key => $value) {
-            $this->db->bind($key, $value);
+        if ($filterDate) {
+            $this->db->bind(':data', $filterDate);
+        }
+        
+        if ($instructorId) {
+            $this->db->bind(':instructor', $instructorId);
         }
         
         return $this->db->resultSet();
     }
     
     /**
-     * Verificar si hay conflictos de horario para un monitor
-     * @param array $data Datos de la clase
-     * @param int $excludeClassId ID de la clase a excluir (para edición)
-     * @return bool
+     * Obtiene las clases asignadas a un monitor específico
+     * @param int $monitorId ID del monitor
+     * @return array Lista de clases
+     */
+    public function getClassesByInstructor($monitorId) {
+        return $this->getAllClasses(null, $monitorId);
+    }
+    
+    /**
+     * Verifica si hay conflictos de horario para un monitor en una fecha y hora específicas
+     * @param array $data Datos de la clase (fecha, hora, monitor_id, duracio)
+     * @param int $excludeClassId ID de clase a excluir de la verificación (útil para actualizaciones)
+     * @return bool True si hay conflicto, False en caso contrario
      */
     public function hasScheduleConflict($data, $excludeClassId = null) {
-        // Calcular la hora de finalización
-        $endTime = date('H:i:s', strtotime($data['hora']) + $data['duracio'] * 60);
+        // Calcular el tiempo de finalización de la clase propuesta
+        $startTime = strtotime($data['data'] . ' ' . $data['hora']);
+        $endTime = $startTime + ($data['duracio'] * 60); // Convertir minutos a segundos
         
-        $sql = "SELECT COUNT(*) as conflict_count 
+        // Obtener todas las clases del monitor en la misma fecha
+        $sql = 'SELECT classe_id, data, hora, duracio 
                 FROM classes 
                 WHERE monitor_id = :monitor_id 
-                AND data = :data 
-                AND (
-                    (hora <= :start_time AND ADDTIME(hora, SEC_TO_TIME(duracio * 60)) > :start_time) OR 
-                    (hora < :end_time AND ADDTIME(hora, SEC_TO_TIME(duracio * 60)) >= :end_time) OR
-                    (hora >= :start_time AND ADDTIME(hora, SEC_TO_TIME(duracio * 60)) <= :end_time)
-                )";
+                AND data = :date';
         
         if ($excludeClassId) {
-            $sql .= " AND classe_id != :exclude_id";
+            $sql .= ' AND classe_id != :exclude_id';
         }
         
         $this->db->query($sql);
         $this->db->bind(':monitor_id', $data['monitor_id']);
-        $this->db->bind(':data', $data['data']);
-        $this->db->bind(':start_time', $data['hora']);
-        $this->db->bind(':end_time', $endTime);
+        $this->db->bind(':date', $data['data']);
         
         if ($excludeClassId) {
             $this->db->bind(':exclude_id', $excludeClassId);
         }
         
-        $result = $this->db->single();
+        $classes = $this->db->resultSet();
         
-        return $result->conflict_count > 0;
+        // Verificar si hay solapamiento de horarios con alguna clase
+        foreach ($classes as $class) {
+            $classStartTime = strtotime($class->data . ' ' . $class->hora);
+            $classEndTime = $classStartTime + ($class->duracio * 60); // Convertir minutos a segundos
+            
+            // Verificar solapamiento de horarios
+            if (($startTime < $classEndTime) && ($endTime > $classStartTime)) {
+                return true; // Hay conflicto
+            }
+        }
+        
+        return false; // No hay conflicto
     }
     
     /**
-     * Obtener el conteo de reservas para una clase
-     * @param int $classId ID de la clase
-     * @return int
+     * Obtiene las clases activas que son iguales o posteriores a la fecha actual
+     * @param string $filterDate Fecha opcional para filtrar (formato Y-m-d)
+     * @param int $instructorId ID del monitor para filtrar
+     * @return array Lista de clases activas
      */
-    public function getReservationCount($classId) {
-        $sql = "SELECT COUNT(*) as count FROM reserves WHERE classe_id = :class_id";
+    public function getActiveClasses($filterDate = null, $instructorId = null) {
+        $currentDate = date('Y-m-d');
+        
+        $sql = 'SELECT c.*, tc.nom as tipus_nom, tc.descripcio as tipus_descripcio, 
+               CONCAT(u.nom, " ", u.cognoms) as monitor_nom 
+               FROM classes c
+               JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
+               JOIN usuaris u ON c.monitor_id = u.usuari_id
+               WHERE c.data >= :current_date';
+        
+        if ($filterDate) {
+            $sql .= ' AND c.data = :filter_date';
+        }
+        
+        if ($instructorId) {
+            $sql .= ' AND c.monitor_id = :instructor';
+        }
+        
+        $sql .= ' ORDER BY c.data ASC, c.hora ASC';
+        
         $this->db->query($sql);
-        $this->db->bind(':class_id', $classId);
-        $result = $this->db->single();
+        $this->db->bind(':current_date', $currentDate);
         
-        return $result->count;
-    }
-    
-    /**
-     * Actualizar la capacidad actual de una clase
-     * @param int $classId ID de la clase
-     * @return bool
-     */
-    public function updateCapacity($classId) {
-        $reservationCount = $this->getReservationCount($classId);
+        if ($filterDate) {
+            $this->db->bind(':filter_date', $filterDate);
+        }
         
-        $sql = "UPDATE classes SET capacitat_actual = :count WHERE classe_id = :id";
-        $this->db->query($sql);
-        $this->db->bind(':count', $reservationCount);
-        $this->db->bind(':id', $classId);
+        if ($instructorId) {
+            $this->db->bind(':instructor', $instructorId);
+        }
         
-        return $this->db->execute();
-    }
-    
-    /**
-     * Obtiene todas las clases asignadas a un monitor específico
-     * @param int $staffId ID del monitor/staff
-     * @return array Array de clases
-     */
-    public function getClassesByStaff($staffId) {
-        $this->db->query('SELECT c.*, t.nom as tipus_nom, u.nom as monitor_nom
-                         FROM classes c 
-                         JOIN tipus_classes t ON c.tipus_classe_id = t.tipus_classe_id 
-                         JOIN usuaris u ON c.monitor_id = u.usuari_id 
-                         WHERE c.monitor_id = :staff_id 
-                         ORDER BY c.data, c.hora');
-        $this->db->bind(':staff_id', $staffId);
         return $this->db->resultSet();
+    }
+    
+    /**
+     * Añade una nueva clase (alias para create)
+     * @param array $data Datos de la clase
+     * @return int|bool ID de la clase creada o false en caso de error
+     */
+    public function addClass($data) {
+        return $this->create($data);
+    }
+    
+    /**
+     * Actualiza los datos de una clase
+     * @param array $data Datos actualizados de la clase
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function updateClass($data) {
+        return $this->update($data);
     }
 }
 ?>

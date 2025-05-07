@@ -19,20 +19,6 @@ include_once APPROOT . '/views/shared/header/main.php';
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
-    .exercise-image {
-        height: 200px;
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-color: #f8f9fa;
-    }
-    .exercise-icon {
-        height: 150px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-    }
     .order-badge {
         position: absolute;
         top: 10px;
@@ -94,16 +80,16 @@ include_once APPROOT . '/views/shared/header/main.php';
                 <form action="<?= URLROOT ?>/staffRoutine/edit/<?= $data['routine']->rutina_id ?>" method="POST">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="nombre" class="form-label">Nombre de la rutina *</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required 
+                            <label for="name" class="form-label">Nombre de la rutina *</label>
+                            <input type="text" class="form-control" id="name" name="name" required 
                                 value="<?= htmlspecialchars($data['routine']->nom) ?>">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="usuario_id" class="form-label">Usuario asignado *</label>
-                            <select class="form-select" id="usuario_id" name="usuario_id" required>
-                                <?php foreach ($data['usuarios'] as $usuario): ?>
-                                    <option value="<?= $usuario->id ?>" <?= $usuario->id == $data['routine']->usuari_id ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($usuario->fullName) ?> (<?= htmlspecialchars($usuario->email) ?>)
+                            <label for="user_id" class="form-label">Usuario asignado *</label>
+                            <select class="form-select" id="user_id" name="user_id" required>
+                                <?php foreach ($data['users'] as $usuario): ?>
+                                    <option value="<?= $usuario->usuari_id ?>" <?= ($usuario->usuari_id == $data['routine']->usuari_id ?? null) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($usuario->nom . ' ' . $usuario->cognoms) ?> (<?= htmlspecialchars($usuario->correu) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -111,8 +97,8 @@ include_once APPROOT . '/views/shared/header/main.php';
                     </div>
                     
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4"><?= htmlspecialchars($data['routine']->descripcio) ?></textarea>
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"><?= htmlspecialchars($data['routine']->descripcio) ?></textarea>
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -143,66 +129,46 @@ include_once APPROOT . '/views/shared/header/main.php';
                     <div class="row">
                         <?php foreach ($data['exercises'] as $exercise): ?>
                             <div class="col-lg-4 col-md-6 mb-4">
-                                <div class="card exercise-card position-relative">
-                                    <div class="order-badge"><?= $exercise->ordre ?></div>
-                                    
-                                    <?php if (!empty($exercise->imatge_url)): ?>
-                                        <div class="exercise-image" style="background-image: url('<?= htmlspecialchars($exercise->imatge_url) ?>')"></div>
-                                    <?php else: ?>
-                                        <div class="exercise-icon">
-                                            <i class="fas fa-dumbbell fa-4x text-secondary"></i>
-                                        </div>
-                                    <?php endif; ?>
+                                <div class="card exercise-card shadow-sm mb-3 position-relative">
+                                    <span class="position-absolute top-0 end-0 m-2 badge bg-primary">#<?= $exercise->ordre ?></span>
                                     
                                     <div class="card-body">
                                         <h5 class="card-title"><?= htmlspecialchars($exercise->nom) ?></h5>
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <span class="badge bg-primary">Series: <?= $exercise->series ?></span>
-                                            <span class="badge bg-info">Reps: <?= $exercise->repeticions ?></span>
-                                            <span class="badge bg-secondary">Descanso: <?= $exercise->descans ?>s</span>
+                                        
+                                        <div class="row text-muted small mb-3">
+                                            <div class="col-4 text-center border-end">
+                                                <strong><?= $exercise->series ?></strong> series
+                                            </div>
+                                            <div class="col-4 text-center border-end">
+                                                <strong><?= $exercise->repeticions ?></strong> reps
+                                            </div>
+                                            <div class="col-4 text-center">
+                                                <strong><?= $exercise->descans ?></strong> seg
+                                            </div>
                                         </div>
-                                        <p class="card-text small">
-                                            <?= nl2br(htmlspecialchars($exercise->descripcio)) ?>
+                                        
+                                        <p class="card-text small text-truncate">
+                                            <?= htmlspecialchars($exercise->descripcio) ?>
                                         </p>
-                                        <div class="d-flex justify-content-between mt-3">
-                                            <button type="button" class="btn btn-sm btn-outline-primary edit-exercise-btn" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editExerciseModal"
-                                                    data-id="<?= $exercise->exercici_id ?>"
-                                                    data-name="<?= htmlspecialchars($exercise->nom) ?>"
-                                                    data-description="<?= htmlspecialchars($exercise->descripcio) ?>"
-                                                    data-series="<?= $exercise->series ?>"
-                                                    data-reps="<?= $exercise->repeticions ?>"
-                                                    data-rest="<?= $exercise->descans ?>"
-                                                    data-image="<?= htmlspecialchars($exercise->imatge_url) ?>"
-                                                    data-order="<?= $exercise->ordre ?>">
-                                                <i class="fas fa-edit"></i>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                                data-bs-target="#editExerciseModal" 
+                                                data-id="<?= $exercise->exercici_id ?>" 
+                                                data-routine="<?= $data['routine']->rutina_id ?>" 
+                                                data-name="<?= htmlspecialchars($exercise->nom) ?>" 
+                                                data-description="<?= htmlspecialchars($exercise->descripcio) ?>" 
+                                                data-sets="<?= $exercise->series ?>" 
+                                                data-reps="<?= $exercise->repeticions ?>" 
+                                                data-rest="<?= $exercise->descans ?>" 
+                                                data-order="<?= $exercise->ordre ?>">
+                                                <i class="fas fa-edit fa-sm"></i> Editar
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteExerciseModal<?= $exercise->exercici_id ?>">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Modal de confirmación de eliminación -->
-                                <div class="modal fade" id="deleteExerciseModal<?= $exercise->exercici_id ?>" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">Confirmar eliminación</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>¿Estás seguro de que deseas eliminar el ejercicio <strong><?= htmlspecialchars($exercise->nom) ?></strong>?</p>
-                                                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <a href="<?= URLROOT ?>/staffRoutine/deleteExercise/<?= $exercise->exercici_id ?>" class="btn btn-danger">Eliminar</a>
-                                            </div>
+                                            <a href="<?= URLROOT ?>/staffRoutine/deleteExercise/<?= $exercise->exercici_id ?>" 
+                                               class="btn btn-sm btn-outline-danger" 
+                                               onclick="return confirm('¿Estás seguro de que quieres eliminar este ejercicio?');">
+                                                <i class="fas fa-trash fa-sm"></i> Eliminar
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -251,11 +217,6 @@ include_once APPROOT . '/views/shared/header/main.php';
                             <label for="exercise_rest" class="form-label">Descanso (segundos) *</label>
                             <input type="number" class="form-control" id="exercise_rest" name="exercise_rest" min="0" value="60" required>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="exercise_image" class="form-label">URL de imagen (opcional)</label>
-                        <input type="url" class="form-control" id="exercise_image" name="exercise_image" placeholder="https://ejemplo.com/imagen.jpg">
                     </div>
                     
                     <div class="mb-3">
@@ -313,11 +274,6 @@ include_once APPROOT . '/views/shared/header/main.php';
                     </div>
                     
                     <div class="mb-3">
-                        <label for="edit_exercise_image" class="form-label">URL de imagen (opcional)</label>
-                        <input type="url" class="form-control" id="edit_exercise_image" name="exercise_image">
-                    </div>
-                    
-                    <div class="mb-3">
                         <label for="edit_exercise_order" class="form-label">Orden en la rutina *</label>
                         <input type="number" class="form-control" id="edit_exercise_order" name="exercise_order" min="1" required>
                     </div>
@@ -334,26 +290,29 @@ include_once APPROOT . '/views/shared/header/main.php';
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Configurar los botones de edición
-        const editButtons = document.querySelectorAll('.edit-exercise-btn');
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const name = this.getAttribute('data-name');
-                const description = this.getAttribute('data-description');
-                const series = this.getAttribute('data-series');
-                const reps = this.getAttribute('data-reps');
-                const rest = this.getAttribute('data-rest');
-                const image = this.getAttribute('data-image');
-                const order = this.getAttribute('data-order');
+        // Configurar el modal de edición para cargar datos cuando se abre
+        const editExerciseModal = document.getElementById('editExerciseModal');
+        if (editExerciseModal) {
+            editExerciseModal.addEventListener('show.bs.modal', function(event) {
+                // Botón que activó el modal
+                const button = event.relatedTarget;
                 
+                // Extraer información de los atributos data-*
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const description = button.getAttribute('data-description');
+                const sets = button.getAttribute('data-sets');
+                const reps = button.getAttribute('data-reps');
+                const rest = button.getAttribute('data-rest');
+                const order = button.getAttribute('data-order');
+                
+                // Actualizar los campos del formulario
                 document.getElementById('edit_exercise_id').value = id;
                 document.getElementById('edit_exercise_name').value = name;
                 document.getElementById('edit_exercise_description').value = description;
-                document.getElementById('edit_exercise_sets').value = series;
+                document.getElementById('edit_exercise_sets').value = sets;
                 document.getElementById('edit_exercise_reps').value = reps;
                 document.getElementById('edit_exercise_rest').value = rest;
-                document.getElementById('edit_exercise_image').value = image;
                 document.getElementById('edit_exercise_order').value = order;
                 
                 // Configurar la acción del formulario
@@ -361,7 +320,7 @@ include_once APPROOT . '/views/shared/header/main.php';
                 document.getElementById('editExerciseForm').action = 
                     `<?= URLROOT ?>/staffRoutine/updateExercise/${id}`;
             });
-        });
+        }
     });
 </script>
 

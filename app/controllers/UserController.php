@@ -11,6 +11,8 @@ use PHPMailer\PHPMailer\Exception;
 
 class UserController {
     private $userModel;
+    private $reservationModel;
+    private $classModel;
     
     /**
      * Constructor del controlador
@@ -30,6 +32,17 @@ class UserController {
         */
         
         $this->userModel = new User();
+        
+        // Inicializar los otros modelos solo si son necesarios
+        if (file_exists(APPROOT . '/models/Reservation.php')) {
+            require_once APPROOT . '/models/Reservation.php';
+            $this->reservationModel = new Reservation();
+        }
+        
+        if (file_exists(APPROOT . '/models/Class.php')) {
+            require_once APPROOT . '/models/Class.php';
+            $this->classModel = new Class_();
+        }
     }
     
     /**
@@ -159,6 +172,9 @@ class UserController {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['message'] = 'Debes iniciar sesión para reservar una clase';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Debes iniciar sesión para reservar una clase';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/auth/login');
             exit;
         }
@@ -167,6 +183,9 @@ class UserController {
         if (!isset($_POST['class_id']) || empty($_POST['class_id'])) {
             $_SESSION['message'] = 'No se ha seleccionado ninguna clase';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'No se ha seleccionado ninguna clase';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
             exit;
         }
@@ -182,6 +201,9 @@ class UserController {
         if ($reservationModel->userHasReservation($userId, $classId)) {
             $_SESSION['message'] = 'Ya tienes una reserva para esta clase';
             $_SESSION['message_type'] = 'warning';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Ya tienes una reserva para esta clase';
+            $_SESSION['toast_type'] = 'warning';
             header('Location: ' . URLROOT . '/user/classes');
             exit;
         }
@@ -190,6 +212,9 @@ class UserController {
         if (!$reservationModel->isClassAvailable($classId)) {
             $_SESSION['message'] = 'Esta clase no tiene plazas disponibles';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Esta clase no tiene plazas disponibles';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
             exit;
         }
@@ -202,9 +227,15 @@ class UserController {
         if ($reservationModel->create()) {
             $_SESSION['message'] = 'Reserva realizada con éxito';
             $_SESSION['message_type'] = 'success';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Reserva realizada con éxito';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['message'] = 'Error al realizar la reserva';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Error al realizar la reserva';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/user/classes');
@@ -219,6 +250,9 @@ class UserController {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['message'] = 'Debes iniciar sesión para cancelar una reserva';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Debes iniciar sesión para cancelar una reserva';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/auth/login');
             exit;
         }
@@ -227,6 +261,9 @@ class UserController {
         if (!isset($_POST['reservation_id']) || empty($_POST['reservation_id'])) {
             $_SESSION['message'] = 'No se ha seleccionado ninguna reserva';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'No se ha seleccionado ninguna reserva';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
             exit;
         }
@@ -243,6 +280,9 @@ class UserController {
         if ($reservationModel->getUserId() != $_SESSION['user_id']) {
             $_SESSION['message'] = 'No tienes permiso para cancelar esta reserva';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'No tienes permiso para cancelar esta reserva';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
             exit;
         }
@@ -252,9 +292,15 @@ class UserController {
         if ($reservationModel->cancel()) {
             $_SESSION['message'] = 'Reserva cancelada con éxito';
             $_SESSION['message_type'] = 'success';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Reserva cancelada con éxito';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['message'] = 'Error al cancelar la reserva';
             $_SESSION['message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Error al cancelar la reserva';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/user/classes');
@@ -573,10 +619,179 @@ class UserController {
     /**
      * Actualiza la información del perfil
      */
-    public function updateProfile($userId, $profileData) {
-        // Validación
-        // Actualización
-        // Retorno de resultados
+    public function updateProfile() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Sanitizar los datos del formulario
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            // Procesar datos del formulario
+            $data = [
+                'id' => $_SESSION['user_id'],
+                'name' => trim($_POST['name']),
+                'lastname' => trim($_POST['lastname']),
+                'email' => trim($_POST['email']),
+                'phone' => trim($_POST['phone']),
+                'birthdate' => trim($_POST['birthdate'])
+            ];
+            
+            // Validación de datos
+            if (empty($data['name']) || empty($data['lastname']) || empty($data['email'])) {
+                flash('profile_message', 'Por favor, rellene todos los campos obligatorios', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Por favor, rellene todos los campos obligatorios';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/profile');
+                exit;
+            }
+            
+            // Actualizar perfil
+            if ($this->userModel->updateProfile($data)) {
+                // Actualizar los datos de la sesión
+                $_SESSION['user_name'] = $data['name'];
+                $_SESSION['user_lastname'] = $data['lastname'];
+                $_SESSION['user_email'] = $data['email'];
+                
+                flash('profile_message', 'Perfil actualizado con éxito', 'alert alert-success');
+                $_SESSION['toast_message'] = 'Perfil actualizado correctamente';
+                $_SESSION['toast_type'] = 'success';
+            } else {
+                flash('profile_message', 'Error al actualizar el perfil', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Error al actualizar el perfil';
+                $_SESSION['toast_type'] = 'error';
+            }
+            
+            header('Location: ' . URLROOT . '/users/profile');
+            exit;
+        }
+    }
+    
+    /**
+     * Cambiar contraseña
+     */
+    public function changePassword() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Sanitizar los datos del formulario
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            // Procesar datos del formulario
+            $data = [
+                'id' => $_SESSION['user_id'],
+                'current_password' => trim($_POST['current_password']),
+                'new_password' => trim($_POST['new_password']),
+                'confirm_password' => trim($_POST['confirm_password'])
+            ];
+            
+            // Validación de datos
+            if (empty($data['current_password']) || empty($data['new_password']) || empty($data['confirm_password'])) {
+                flash('password_message', 'Por favor, rellene todos los campos', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Por favor, rellene todos los campos';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/profile');
+                exit;
+            }
+            
+            if ($data['new_password'] !== $data['confirm_password']) {
+                flash('password_message', 'Las contraseñas no coinciden', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Las contraseñas no coinciden';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/profile');
+                exit;
+            }
+            
+            if (strlen($data['new_password']) < 6) {
+                flash('password_message', 'La contraseña debe tener al menos 6 caracteres', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'La contraseña debe tener al menos 6 caracteres';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/profile');
+                exit;
+            }
+            
+            // Verificar la contraseña actual
+            $user = $this->userModel->getUserById($data['id']);
+            if (!$user || !password_verify($data['current_password'], $user->contrasenya)) {
+                flash('password_message', 'Contraseña actual incorrecta', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Contraseña actual incorrecta';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/profile');
+                exit;
+            }
+            
+            // Cambiar contraseña
+            if ($this->userModel->changePassword($data['id'], $data['new_password'])) {
+                flash('password_message', 'Contraseña cambiada con éxito', 'alert alert-success');
+                $_SESSION['toast_message'] = 'Contraseña cambiada correctamente';
+                $_SESSION['toast_type'] = 'success';
+            } else {
+                flash('password_message', 'Error al cambiar la contraseña', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Error al cambiar la contraseña';
+                $_SESSION['toast_type'] = 'error';
+            }
+            
+            header('Location: ' . URLROOT . '/users/profile');
+            exit;
+        }
+    }
+    
+    /**
+     * Procesar reserva de clase
+     */
+    public function processReservation() {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Sanitizar los datos del formulario
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            $classId = isset($_POST['class_id']) ? (int)$_POST['class_id'] : 0;
+            $userId = $_SESSION['user_id'];
+            
+            if (empty($classId)) {
+                flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Error al procesar la reserva';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/classes');
+                exit;
+            }
+            
+            // Verificar si la clase existe y tiene capacidad disponible
+            $class = $this->classModel->getClassById($classId);
+            if (!$class || $class->capacitat_actual >= $class->capacitat_maxima) {
+                flash('reservation_message', 'No hay plazas disponibles para esta clase', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'No hay plazas disponibles para esta clase';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/users/classes');
+                exit;
+            }
+            
+            // Verificar si el usuario ya tiene una reserva para esta clase
+            if ($this->reservationModel->hasUserReservation($userId, $classId)) {
+                flash('reservation_message', 'Ya tienes una reserva para esta clase', 'alert alert-warning');
+                $_SESSION['toast_message'] = 'Ya tienes una reserva para esta clase';
+                $_SESSION['toast_type'] = 'warning';
+                header('Location: ' . URLROOT . '/users/classes');
+                exit;
+            }
+            
+            // Procesar la reserva
+            if ($this->reservationModel->addReservation($userId, $classId)) {
+                // Incrementar el contador de capacidad actual
+                if ($this->classModel->incrementCapacity($classId)) {
+                    flash('reservation_message', 'Reserva realizada con éxito', 'alert alert-success');
+                    $_SESSION['toast_message'] = 'Reserva realizada correctamente';
+                    $_SESSION['toast_type'] = 'success';
+                } else {
+                    // Rollback: eliminar la reserva si no se pudo actualizar la capacidad
+                    $this->reservationModel->deleteReservation($userId, $classId);
+                    flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
+                    $_SESSION['toast_message'] = 'Error al procesar la reserva';
+                    $_SESSION['toast_type'] = 'error';
+                }
+            } else {
+                flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
+                $_SESSION['toast_message'] = 'Error al procesar la reserva';
+                $_SESSION['toast_type'] = 'error';
+            }
+            
+            header('Location: ' . URLROOT . '/users/classes');
+            exit;
+        }
     }
     
     /**

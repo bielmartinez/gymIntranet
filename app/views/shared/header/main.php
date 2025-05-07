@@ -406,3 +406,24 @@
 
     <!-- Contenido principal con espaciado para la navbar -->
     <div style="padding-top: 56px;"><?php // Este div se cierra en el footer ?>
+        
+    <!-- Script para notificaciones toast -->
+    <script src="<?php echo URLROOT; ?>/public/js/notifications.js"></script>
+    
+    <!-- Código para pasar variables de sesión toast a JavaScript -->
+    <?php if(isset($_SESSION['toast_message'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pasar variables de sesión a JavaScript
+            var sessionToastMessage = "<?php echo htmlspecialchars($_SESSION['toast_message']); ?>";
+            var sessionToastType = "<?php echo isset($_SESSION['toast_type']) ? htmlspecialchars($_SESSION['toast_type']) : 'success'; ?>";
+            
+            // La función showToast está definida en notifications.js
+            showToast(sessionToastMessage, sessionToastType);
+        });
+    </script>
+    <?php 
+        // Limpiar las variables de sesión después de usarlas
+        unset($_SESSION['toast_message']);
+        unset($_SESSION['toast_type']);
+    endif; ?>

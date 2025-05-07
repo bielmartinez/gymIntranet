@@ -19,13 +19,6 @@ include_once APPROOT . '/views/shared/header/main.php';
         transform: translateY(-3px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-    .exercise-image {
-        height: 200px;
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-color: #f8f9fa;
-    }
     .exercise-icon {
         height: 150px;
         display: flex;
@@ -120,31 +113,31 @@ include_once APPROOT . '/views/shared/header/main.php';
                                     <div class="card exercise-card position-relative h-100">
                                         <div class="order-badge"><?= $exercise->ordre ?></div>
                                         
-                                        <?php if (!empty($exercise->imatge_url)): ?>
-                                            <div class="exercise-image" style="background-image: url('<?= htmlspecialchars($exercise->imatge_url) ?>')"></div>
-                                        <?php else: ?>
-                                            <div class="exercise-icon">
-                                                <i class="fas fa-dumbbell fa-4x text-secondary"></i>
-                                            </div>
-                                        <?php endif; ?>
+                                        <div class="exercise-icon">
+                                            <i class="fas fa-dumbbell fa-4x text-secondary"></i>
+                                        </div>
                                         
                                         <div class="card-body">
                                             <h5 class="card-title"><?= htmlspecialchars($exercise->nom) ?></h5>
-                                            <div class="d-flex justify-content-between mb-3">
-                                                <span class="badge bg-primary">Series: <?= $exercise->series ?></span>
-                                                <span class="badge bg-info">Reps: <?= $exercise->repeticions ?></span>
-                                                <span class="badge bg-secondary">Descanso: <?= $exercise->descans ?>s</span>
+                                            <div class="card-text small text-muted mb-3">
+                                                <div class="row">
+                                                    <div class="col-4 text-center border-end">
+                                                        <strong><?= $exercise->series ?></strong>
+                                                        <div>Series</div>
+                                                    </div>
+                                                    <div class="col-4 text-center border-end">
+                                                        <strong><?= $exercise->repeticions ?></strong>
+                                                        <div>Reps</div>
+                                                    </div>
+                                                    <div class="col-4 text-center">
+                                                        <strong><?= $exercise->descans ?>s</strong>
+                                                        <div>Descanso</div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p class="card-text">
+                                            <p class="card-text exercise-description-truncate">
                                                 <?= nl2br(htmlspecialchars($exercise->descripcio)) ?>
                                             </p>
-                                            <div class="mt-auto">
-                                                <a href="#" class="btn btn-sm btn-outline-primary" 
-                                                   data-bs-toggle="modal" 
-                                                   data-bs-target="#exerciseDetailModal<?= $exercise->exercici_id ?>">
-                                                    <i class="fas fa-info-circle me-1"></i> Detalles
-                                                </a>
-                                            </div>
                                         </div>
                                     </div>
                                     
@@ -159,13 +152,9 @@ include_once APPROOT . '/views/shared/header/main.php';
                                                 <div class="modal-body">
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                            <?php if (!empty($exercise->imatge_url)): ?>
-                                                                <img src="<?= htmlspecialchars($exercise->imatge_url) ?>" class="img-fluid rounded mb-3" alt="<?= htmlspecialchars($exercise->nom) ?>">
-                                                            <?php else: ?>
-                                                                <div class="text-center p-5 bg-light rounded mb-3">
-                                                                    <i class="fas fa-dumbbell fa-5x text-secondary"></i>
-                                                                </div>
-                                                            <?php endif; ?>
+                                                            <div class="text-center p-5 bg-light rounded mb-3">
+                                                                <i class="fas fa-dumbbell fa-5x text-secondary"></i>
+                                                            </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <h6>Detalles del ejercicio:</h6>

@@ -247,4 +247,183 @@ class ExerciseApiService {
             'expert' => 'Avanzado'
         ];
     }
+    
+    /**
+     * Busca ejercicios por nombre o grupo muscular para la interfaz de búsqueda
+     * 
+     * @param string $searchTerm Término de búsqueda para el nombre del ejercicio
+     * @param string $muscle Grupo muscular a filtrar (un solo grupo)
+     * @return array Array de objetos de ejercicios formateados para la interfaz
+     */
+    public function searchExercises($searchTerm = '', $muscle = '') {
+        $results = [];
+        
+        // Si tenemos un término de búsqueda, buscar por nombre
+        if (!empty($searchTerm)) {
+            $nameResults = $this->searchByName($searchTerm);
+            $results = array_merge($results, $nameResults);
+        }
+        
+        // Si tenemos un grupo muscular, buscar por ese músculo
+        if (!empty($muscle)) {
+            // Mapear el nombre en español al valor en inglés que espera la API
+            $mappedMuscle = $this->mapSpanishToEnglishMuscle($muscle);
+            if (!empty($mappedMuscle)) {
+                $muscleResults = $this->searchByMuscle($mappedMuscle);
+                $results = array_merge($results, $muscleResults);
+            }
+        }
+        
+        // Eliminar duplicados basados en el nombre del ejercicio
+        $uniqueResults = [];
+        $seenNames = [];
+        
+        foreach ($results as $exercise) {
+            if (!in_array($exercise['name'], $seenNames)) {
+                $seenNames[] = $exercise['name'];
+                
+                // Convertir a objeto para la interfaz
+                $exerciseObj = new stdClass();
+                $exerciseObj->name = $exercise['name'];
+                $exerciseObj->description = $exercise['instructions'] ?? '';
+                $exerciseObj->muscles = $exercise['muscle'] ?? '';
+                
+                $uniqueResults[] = $exerciseObj;
+            }
+        }
+        
+        return $uniqueResults;
+    }
+    
+    /**
+     * Búsqueda avanzada que combina múltiples criterios incluyendo tipo de ejercicio
+     * 
+     * @param string $searchTerm Término de búsqueda para el nombre del ejercicio
+     * @param array $muscles Lista de grupos musculares a filtrar
+     * @param array $types Lista de tipos de ejercicio a filtrar
+     * @return array Array de objetos de ejercicios formateados para la interfaz
+     */
+    public function advancedSearchExercises($searchTerm = '', $muscles = [], $types = []) {
+        $results = [];
+        
+        // Si tenemos un término de búsqueda, buscar por nombre
+        if (!empty($searchTerm)) {
+            $nameResults = $this->searchByName($searchTerm);
+            $results = array_merge($results, $nameResults);
+        }
+        
+        // Si tenemos grupos musculares, buscar por cada músculo
+        if (!empty($muscles)) {
+            foreach ($muscles as $muscle) {
+                // Mapear los nombres en español a los valores en inglés que espera la API
+                $mappedMuscle = $this->mapSpanishToEnglishMuscle($muscle);
+                if (!empty($mappedMuscle)) {
+                    $muscleResults = $this->searchByMuscle($mappedMuscle);
+                    $results = array_merge($results, $muscleResults);
+                }
+            }
+        }
+        
+        // Si tenemos tipos de ejercicio, buscar por cada tipo
+        if (!empty($types)) {
+            foreach ($types as $type) {
+                $typeResults = $this->searchByType($type);
+                $results = array_merge($results, $typeResults);
+            }
+        }
+        
+        // Eliminar duplicados y formatear resultados
+        return $this->formatResults($results);
+    }
+    
+    /**
+     * Formatea los resultados eliminando duplicados y convirtiendo a objetos
+     * 
+     * @param array $results Array de resultados de la API
+     * @return array Array de objetos formateados
+     */
+    private function formatResults($results) {
+        // Eliminar duplicados basados en el nombre del ejercicio
+        $uniqueResults = [];
+        $seenNames = [];
+        
+        foreach ($results as $exercise) {
+            if (!in_array($exercise['name'], $seenNames)) {
+                $seenNames[] = $exercise['name'];
+                
+                // Convertir a objeto para la interfaz
+                $exerciseObj = new stdClass();
+                $exerciseObj->name = $exercise['name'];
+                $exerciseObj->description = $exercise['instructions'] ?? '';
+                $exerciseObj->muscles = $exercise['muscle'] ?? '';
+                $exerciseObj->type = $exercise['type'] ?? '';
+                $exerciseObj->equipment = $exercise['equipment'] ?? '';
+                $exerciseObj->difficulty = $exercise['difficulty'] ?? '';
+                
+                // En un caso real, aquí podrías asignar una URL de imagen basada en el ejercicio
+                // Por ahora usaremos imágenes de placeholder específicas según tipo de ejercicio
+                $exerciseObj->image_url = $this->getExerciseImageUrl($exercise);
+                
+                $uniqueResults[] = $exerciseObj;
+            }
+        }
+        
+        return $uniqueResults;
+    }
+    
+    /**
+     * Genera URLs de imágenes de ejemplo basadas en el tipo y grupo muscular del ejercicio
+     * 
+     * @param array $exercise Datos del ejercicio
+     * @return string URL de la imagen
+     */
+    private function getExerciseImageUrl($exercise) {
+        // Este método simula asignar imágenes a los ejercicios basadas en su grupo muscular o tipo
+        // En una implementación real, esto podría extraerse de una base de datos o API externa
+        
+        $placeholderImages = [
+            'abdominals' => 'https://images.pexels.com/photos/3775566/pexels-photo-3775566.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'biceps' => 'https://images.pexels.com/photos/3837781/pexels-photo-3837781.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+            'chest' => 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+            'quadriceps' => 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1349&q=80',
+            'cardio' => 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80',
+            'strength' => 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+            'stretching' => 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1355&q=80'
+        ];
+        
+        $defaultImage = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80';
+        
+        // Intentar asignar una imagen según el grupo muscular
+        if (isset($exercise['muscle']) && isset($placeholderImages[$exercise['muscle']])) {
+            return $placeholderImages[$exercise['muscle']];
+        } 
+        // Si no, intentar según el tipo de ejercicio
+        elseif (isset($exercise['type']) && isset($placeholderImages[$exercise['type']])) {
+            return $placeholderImages[$exercise['type']];
+        }
+        // Si todo falla, usar imagen por defecto
+        else {
+            return $defaultImage;
+        }
+    }
+    
+    /**
+     * Mapea nombres de músculos en español a los valores en inglés que espera la API
+     * 
+     * @param string $spanishMuscle Nombre del músculo en español
+     * @return string Nombre del músculo en inglés para la API
+     */
+    private function mapSpanishToEnglishMuscle($spanishMuscle) {
+        $mapping = [
+            'abdomen' => 'abdominals',
+            'pecho' => 'chest',
+            'espalda' => 'middle_back',
+            'hombros' => 'traps',
+            'brazos' => 'biceps', // Simplificado, podría ser biceps o triceps
+            'piernas' => 'quadriceps', // Simplificado, podría ser varios grupos
+            'gluteos' => 'glutes'
+        ];
+        
+        return $mapping[strtolower($spanishMuscle)] ?? '';
+    }
 }

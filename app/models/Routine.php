@@ -117,50 +117,76 @@ class Routine {
         $this->db->bind(':rutina_id', $routineId);
         return $this->db->resultSet();
     }
+    
+    // Alias para getExercisesByRoutine para mantener compatibilidad con el controlador
+    public function getExercisesByRoutineId($routineId) {
+        return $this->getExercisesByRoutine($routineId);
+    }
 
-    // Añadir un ejercicio a una rutina
-    public function addExercise($data) {
-        // Prepara la consulta base
-        $query = 'INSERT INTO exercicis (rutina_id, nom, descripcio, series, repeticions, descans, imatge_url, ordre';
+    /**
+     * Añade un ejercicio a una rutina
+     * @param array $data Datos del ejercicio
+     * @return bool True si se añadió correctamente, False si no
+     */
+    public function addExercise($data)
+    {
+        // Mapear claves para compatibilidad entre controlador y modelo
+        $rutina_id = $data['routine_id'] ?? null;
+        $nom = $data['name'] ?? null;
+        $descripcio = $data['description'] ?? '';
+        $series = $data['sets'] ?? 3;
+        $repeticions = $data['reps'] ?? 10;
+        $descans = $data['rest'] ?? 60;
+        $ordre = $data['order'] ?? $this->getNextExerciseOrder($rutina_id);
+        $info_adicional = $data['additional_info'] ?? null;
         
-        // Si hay información adicional, añadir el campo a la consulta
-        if (isset($data['info_adicional'])) {
-            $query .= ', info_adicional';
+        // Registrar los datos para depuración
+        if (class_exists('Logger')) {
+            Logger::log('DEBUG', 'Datos recibidos en addExercise: ' . json_encode($data));
         }
         
-        $query .= ') VALUES (:rutina_id, :nom, :descripcio, :series, :repeticions, :descans, :imatge_url, :ordre';
-        
-        // Si hay información adicional, añadir el parámetro
-        if (isset($data['info_adicional'])) {
-            $query .= ', :info_adicional';
+        // Verificar datos críticos
+        if (empty($rutina_id) || empty($nom)) {
+            if (class_exists('Logger')) {
+                Logger::log('ERROR', 'Error en addExercise: ID de rutina o nombre del ejercicio faltantes');
+            }
+            return false;
         }
-        
-        $query .= ')';
-        
+
+        // Verificar si tenemos información adicional
+        if (!empty($info_adicional)) {
+            $query = 'INSERT INTO exercicis (rutina_id, nom, descripcio, series, repeticions, descans, ordre, info_adicional) 
+                      VALUES (:rutina_id, :nom, :descripcio, :series, :repeticions, :descans, :ordre, :info_adicional)';
+        } else {
+            $query = 'INSERT INTO exercicis (rutina_id, nom, descripcio, series, repeticions, descans, ordre) 
+                      VALUES (:rutina_id, :nom, :descripcio, :series, :repeticions, :descans, :ordre)';
+        }
+
         $this->db->query($query);
         
-        // Vincular valores básicos
-        $this->db->bind(':rutina_id', $data['rutina_id']);
-        $this->db->bind(':nom', $data['nom']);
-        $this->db->bind(':descripcio', $data['descripcio']);
-        $this->db->bind(':series', $data['series']);
-        $this->db->bind(':repeticions', $data['repeticions']);
-        $this->db->bind(':descans', $data['descans']);
-        $this->db->bind(':imatge_url', $data['imatge_url']);
-        
-        // Si no se especifica un orden, obtener el siguiente
-        if (!isset($data['ordre']) || empty($data['ordre'])) {
-            $data['ordre'] = $this->getNextExerciseOrder($data['rutina_id']);
-        }
-        $this->db->bind(':ordre', $data['ordre']);
+        // Vincular parámetros
+        $this->db->bind(':rutina_id', $rutina_id);
+        $this->db->bind(':nom', $nom);
+        $this->db->bind(':descripcio', $descripcio);
+        $this->db->bind(':series', $series);
+        $this->db->bind(':repeticions', $repeticions);
+        $this->db->bind(':descans', $descans);
+        $this->db->bind(':ordre', $ordre);
         
         // Si hay información adicional, vincularla
-        if (isset($data['info_adicional'])) {
-            $this->db->bind(':info_adicional', $data['info_adicional']);
+        if (!empty($info_adicional)) {
+            $this->db->bind(':info_adicional', $info_adicional);
         }
-
+        
         // Ejecutar
-        return $this->db->execute();
+        if ($this->db->execute()) {
+            return $this->db->lastInsertId();
+        } else {
+            if (class_exists('Logger')) {
+                Logger::log('ERROR', 'Error en addExercise: ' . json_encode($this->db->getError()));
+            }
+            return false;
+        }
     }
 
     // Eliminar un ejercicio
@@ -182,6 +208,24 @@ class Routine {
 
     // Actualizar un ejercicio existente
     public function updateExercise($data) {
+        // Mapear claves para compatibilidad entre controlador y modelo
+        $exercici_id = $data['id'] ?? null;
+        $nom = $data['name'] ?? null;
+        $descripcio = $data['description'] ?? '';
+        $series = $data['sets'] ?? null;
+        $repeticions = $data['reps'] ?? null;
+        $descans = $data['rest'] ?? null;
+        $ordre = $data['order'] ?? null;
+        $info_adicional = $data['additional_info'] ?? null;
+
+        // Verificar datos críticos
+        if (empty($exercici_id) || empty($nom)) {
+            if (class_exists('Logger')) {
+                Logger::log('ERROR', 'Error en updateExercise: ID de ejercicio o nombre faltantes');
+            }
+            return false;
+        }
+        
         // Preparar la consulta base
         $query = 'UPDATE exercicis SET 
                   nom = :nom, 
@@ -191,45 +235,50 @@ class Routine {
                   descans = :descans';
         
         // Añadir campos opcionales si están presentes
-        if (isset($data['imatge_url'])) {
-            $query .= ', imatge_url = :imatge_url';
-        }
-        
-        if (isset($data['ordre'])) {
+        if (!empty($ordre)) {
             $query .= ', ordre = :ordre';
         }
         
-        if (isset($data['info_adicional'])) {
+        if (!empty($info_adicional)) {
             $query .= ', info_adicional = :info_adicional';
         }
         
         $query .= ' WHERE exercici_id = :exercici_id';
         
+        // Registrar la consulta para depuración
+        if (class_exists('Logger')) {
+            Logger::log('DEBUG', 'Query updateExercise: ' . $query);
+            Logger::log('DEBUG', 'Datos recibidos en updateExercise: ' . json_encode($data));
+        }
+        
         $this->db->query($query);
         
         // Vincular valores obligatorios
-        $this->db->bind(':exercici_id', $data['exercici_id']);
-        $this->db->bind(':nom', $data['nom']);
-        $this->db->bind(':descripcio', $data['descripcio']);
-        $this->db->bind(':series', $data['series']);
-        $this->db->bind(':repeticions', $data['repeticions']);
-        $this->db->bind(':descans', $data['descans']);
+        $this->db->bind(':exercici_id', $exercici_id);
+        $this->db->bind(':nom', $nom);
+        $this->db->bind(':descripcio', $descripcio);
+        $this->db->bind(':series', $series);
+        $this->db->bind(':repeticions', $repeticions);
+        $this->db->bind(':descans', $descans);
         
         // Vincular valores opcionales
-        if (isset($data['imatge_url'])) {
-            $this->db->bind(':imatge_url', $data['imatge_url']);
+        if (!empty($ordre)) {
+            $this->db->bind(':ordre', $ordre);
         }
         
-        if (isset($data['ordre'])) {
-            $this->db->bind(':ordre', $data['ordre']);
-        }
-        
-        if (isset($data['info_adicional'])) {
-            $this->db->bind(':info_adicional', $data['info_adicional']);
+        if (!empty($info_adicional)) {
+            $this->db->bind(':info_adicional', $info_adicional);
         }
         
         // Ejecutar la consulta
-        return $this->db->execute();
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            if (class_exists('Logger')) {
+                Logger::log('ERROR', 'Error en updateExercise: ' . json_encode($this->db->getError()));
+            }
+            return false;
+        }
     }
 
     // Obtener un ejercicio por su ID
@@ -237,5 +286,13 @@ class Routine {
         $this->db->query('SELECT * FROM exercicis WHERE exercici_id = :exercici_id');
         $this->db->bind(':exercici_id', $id);
         return $this->db->single();
+    }
+    
+    /**
+     * Obtener el último error de la base de datos
+     * @return mixed Información del error
+     */
+    public function getLastError() {
+        return $this->db->getError();
     }
 }

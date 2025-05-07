@@ -103,28 +103,50 @@ class PDFGenerator {
                     $count++;
                     $backgroundAlt = !$backgroundAlt;
                     
-                    // Si hay una descripción larga, añadirla después
-                    if (strlen($exercise->descripcio) > 50) {
-                        $pdf->SetFont('helvetica', 'I', 10);
-                        $pdf->writeHTML('<p><strong>' . $exercise->nom . ':</strong> ' . $exercise->descripcio . '</p>', true, false, true, false, '');
-                        $pdf->SetFont('helvetica', '', 11);
-                        $pdf->Ln(2);
-                    }
+                    // Descripción del ejercicio
+                    $pdf->Ln(5);
+                    $pdf->SetFont('freesans', '', 10);
                     
-                    // Si hay una imagen, añadirla
-                    if (!empty($exercise->imatge_url)) {
-                        if (filter_var($exercise->imatge_url, FILTER_VALIDATE_URL)) {
-                            // Intentar añadir imagen desde URL
-                            $pdf->Ln(2);
-                            $pdf->Image($exercise->imatge_url, null, null, 50, 0, '', '', 'T', false, 300, '', false, false, 0, false, false, false);
-                            $pdf->Ln(35); // Espacio para la imagen
-                        } else if (file_exists($exercise->imatge_url)) {
-                            // Intentar añadir imagen desde ruta local
-                            $pdf->Ln(2);
-                            $pdf->Image($exercise->imatge_url, null, null, 50, 0, '', '', 'T', false, 300, '', false, false, 0, false, false, false);
-                            $pdf->Ln(35); // Espacio para la imagen
+                    // Convertir saltos de línea en la descripción
+                    $description = str_replace("\n", "<br>", htmlspecialchars($exercise->descripcio));
+                    $pdf->writeHTML("<strong>Descripción:</strong><br>" . $description, true, false, true, false, '');
+                    
+                    // Detalles del ejercicio (series, repeticiones, descanso)
+                    $pdf->Ln(5);
+                    $pdf->SetFont('freesans', 'B', 10);
+                    $pdf->Cell(0, 10, 'Detalles:', 0, 1);
+                    
+                    $pdf->SetFont('freesans', '', 10);
+                    $pdf->Cell(60, 7, 'Series: ' . $exercise->series, 0, 0);
+                    $pdf->Cell(60, 7, 'Repeticiones: ' . $exercise->repeticions, 0, 0);
+                    $pdf->Cell(60, 7, 'Descanso: ' . $exercise->descans . ' segundos', 0, 1);
+                    
+                    // Información adicional si existe
+                    if (isset($exercise->info_adicional) && !empty($exercise->info_adicional)) {
+                        $info = json_decode($exercise->info_adicional);
+                        if ($info) {
+                            $pdf->Ln(3);
+                            $pdf->SetFont('freesans', 'B', 10);
+                            $pdf->Cell(0, 7, 'Información adicional:', 0, 1);
+                            
+                            $pdf->SetFont('freesans', '', 10);
+                            if (!empty($info->muscle)) {
+                                $pdf->Cell(0, 7, 'Grupo muscular: ' . $info->muscle, 0, 1);
+                            }
+                            if (!empty($info->equipment)) {
+                                $pdf->Cell(0, 7, 'Equipamiento: ' . $info->equipment, 0, 1);
+                            }
+                            if (!empty($info->difficulty)) {
+                                $pdf->Cell(0, 7, 'Dificultad: ' . $info->difficulty, 0, 1);
+                            }
                         }
                     }
+                    
+                    $pdf->Ln(10);
+                    
+                    // Separador
+                    $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+                    $pdf->Ln(10);
                 }
             }
             

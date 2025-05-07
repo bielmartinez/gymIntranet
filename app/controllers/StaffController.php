@@ -118,6 +118,9 @@ class StaffController {
         if ($this->classModel->hasScheduleConflict($data)) {
             $_SESSION['staff_message'] = 'El monitor ya tiene una clase programada en ese horario';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staff/classManagement');
             exit;
         }
@@ -126,9 +129,15 @@ class StaffController {
         if ($this->classModel->addClass($data)) {
             $_SESSION['staff_message'] = 'Clase añadida correctamente';
             $_SESSION['staff_message_type'] = 'success';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Clase añadida correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['staff_message'] = 'Error al añadir la clase';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Error al añadir la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/staff/classManagement');
@@ -203,6 +212,9 @@ class StaffController {
         if ($currentClass && $data['capacitat_maxima'] < $currentClass->capacitat_actual) {
             $_SESSION['staff_message'] = 'La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staff/classManagement');
             exit;
         }
@@ -211,6 +223,9 @@ class StaffController {
         if ($this->classModel->hasScheduleConflict($data, $data['classe_id'])) {
             $_SESSION['staff_message'] = 'El monitor ya tiene una clase programada en ese horario';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staff/classManagement');
             exit;
         }
@@ -219,9 +234,15 @@ class StaffController {
         if ($this->classModel->updateClass($data)) {
             $_SESSION['staff_message'] = 'Clase actualizada correctamente';
             $_SESSION['staff_message_type'] = 'success';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Clase actualizada correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['staff_message'] = 'Error al actualizar la clase';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Error al actualizar la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/staff/classManagement');
@@ -242,6 +263,9 @@ class StaffController {
         if (!isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
             $_SESSION['staff_message'] = 'ID de clase no válido';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'ID de clase no válido';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staff/classManagement');
             exit;
         }
@@ -250,9 +274,15 @@ class StaffController {
         if ($this->classModel->deleteClass($_POST['classe_id'])) {
             $_SESSION['staff_message'] = 'Clase eliminada correctamente';
             $_SESSION['staff_message_type'] = 'success';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Clase eliminada correctamente';
+            $_SESSION['toast_type'] = 'success';
         } else {
             $_SESSION['staff_message'] = 'Error al eliminar la clase';
             $_SESSION['staff_message_type'] = 'danger';
+            // Añadir notificación toast
+            $_SESSION['toast_message'] = 'Error al eliminar la clase';
+            $_SESSION['toast_type'] = 'error';
         }
         
         header('Location: ' . URLROOT . '/staff/classManagement');

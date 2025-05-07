@@ -302,5 +302,51 @@ class Reservation {
         $this->id = $reservationId; // Establecer el ID para usar el método cancel
         return $this->cancel();
     }
+
+    /**
+     * Comprobar si el usuario ya tiene una reserva para esta clase
+     * @param int $userId ID del usuario
+     * @param int $classId ID de la clase
+     * @return boolean
+     */
+    public function hasUserReservation($userId, $classId) {
+        $sql = "SELECT COUNT(*) as count FROM reserves 
+                WHERE usuari_id = :user_id AND classe_id = :class_id";
+        
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':class_id', $classId);
+        
+        $result = $this->db->single();
+        
+        return $result->count > 0;
+    }
+
+    /**
+     * Añade una reserva sin usar el método create
+     * @param int $userId ID del usuario
+     * @param int $classId ID de la clase
+     * @return boolean Éxito o fracaso de la operación
+     */
+    public function addReservation($userId, $classId) {
+        $this->setUserId($userId);
+        $this->setClassId($classId);
+        $this->setAttendance(0);
+        return $this->create();
+    }
+
+    /**
+     * Elimina una reserva para un usuario y clase específicos
+     * @param int $userId ID del usuario
+     * @param int $classId ID de la clase
+     * @return boolean Éxito o fracaso de la operación
+     */
+    public function deleteReservation($userId, $classId) {
+        $sql = "DELETE FROM reserves WHERE usuari_id = :user_id AND classe_id = :class_id";
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':class_id', $classId);
+        return $this->db->execute();
+    }
 }
 ?>

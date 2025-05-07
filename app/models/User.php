@@ -74,6 +74,26 @@ class User {
     }
 
     /**
+     * Obtiene un usuario por su ID (alias para findById con retorno compatible)
+     * @param int $id ID del usuario
+     * @return object|bool Objeto con datos del usuario o false si no existe
+     */
+    public function getUserById($id) {
+        return $this->findById($id);
+    }
+    
+    /**
+     * Cambia la contraseña de un usuario
+     * @param int $userId ID del usuario
+     * @param string $newPassword Nueva contraseña (sin encriptar)
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function changePassword($userId, $newPassword) {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        return $this->updatePassword($userId, $hashedPassword);
+    }
+
+    /**
      * Guarda un token de restablecimiento de contraseña
      */
     public function savePasswordResetToken($userId, $token) {
@@ -196,9 +216,9 @@ class User {
      * @return array Lista de usuarios
      */
     public function getAllUsers($roleFilter = null) {
-        $sql = 'SELECT usuari_id as id, correu as email, 
-                CONCAT(nom, " ", cognoms) as fullName,
-                role, actiu as isActive, phone, data_naixement as birthDate,
+        $sql = 'SELECT usuari_id, usuari_id as id, correu, correu as email, 
+                nom, cognoms, CONCAT(nom, " ", cognoms) as fullName,
+                role, actiu as isActive, actiu, phone, data_naixement as birthDate,
                 creat_el as createdAt, ultim_acces as lastAccess
                 FROM usuaris';
         
@@ -365,5 +385,164 @@ class User {
      */
     public function getUsersByRole($role) {
         return $this->getAllUsers($role);
+    }
+
+    /**
+     * Elimina un usuario del sistema
+     * Implementa una eliminación "soft delete" cambiando el estado a inactivo
+     * 
+     * @param int $userId ID del usuario a eliminar
+     * @return bool True si se eliminó correctamente, False en caso contrario
+     */
+    public function deleteUser($userId) {
+        try {
+            // Verificamos primero si el usuario existe
+            $user = $this->findById($userId);
+            if (!$user) {
+                return false;
+            }
+            
+            // En lugar de eliminar físicamente, marcamos como inactivo
+            return $this->deactivate($userId);
+            
+            // Si realmente quisieras eliminar físicamente:
+            /*
+            $this->db->query('DELETE FROM usuaris WHERE usuari_id = :id');
+            $this->db->bind(':id', $userId);
+            return $this->db->execute();
+            */
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Error al eliminar usuario: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Crea un registro de personal/monitor para un usuario
+     * Usado cuando un usuario es ascendido a rol de staff
+     * 
+     * @param int $userId ID del usuario
+     * @return bool True si se creó correctamente, False en caso contrario
+     */
+    public function createStaffRecord($userId) {
+        try {
+            // Verificar si el usuario existe y tiene el rol correcto
+            $user = $this->findById($userId);
+            
+            if (!$user || $user->role !== 'staff') {
+                return false;
+            }
+            
+            // Verificar si ya existe un registro en la tabla de asignación de monitores
+            $this->db->query('SELECT COUNT(*) as count FROM assignacio_monitors WHERE usuari_id = :userId OR monitor_id = :monitorId');
+            $this->db->bind(':userId', $userId);
+            $this->db->bind(':monitorId', $userId);
+            
+            $result = $this->db->single();
+            
+            if ($result->count > 0) {
+                // Ya existe un registro, no es necesario crear otro
+                return true;
+            }
+            
+            // Crear registro en la tabla de asignación de monitores
+            $this->db->query('INSERT INTO assignacio_monitors (usuari_id, monitor_id, data_assignacio) VALUES (:userId, :userId, NOW())');
+            $this->db->bind(':userId', $userId);
+            
+            return $this->db->execute();
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Error al crear registro de staff: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Asegura que un usuario con rol 'staff' tenga un registro en la tabla de personal
+     * Si no existe, lo crea
+     * 
+     * @param int $userId ID del usuario
+     * @return bool True si existe o se creó correctamente, False en caso contrario
+     */
+    public function ensureStaffRecord($userId) {
+        // Verificar si el usuario tiene rol de staff
+        $user = $this->findById($userId);
+        
+        if (!$user || $user->role !== 'staff') {
+            return false;
+        }
+        
+        // Verificar si ya existe un registro en la tabla de asignación
+        $this->db->query('SELECT COUNT(*) as count FROM assignacio_monitors WHERE usuari_id = :userId OR monitor_id = :monitorId');
+        $this->db->bind(':userId', $userId);
+        $this->db->bind(':monitorId', $userId);
+        
+        $result = $this->db->single();
+        
+        if ($result->count > 0) {
+            // Ya existe un registro
+            return true;
+        }
+        
+        // Si no existe, crear uno nuevo
+        return $this->createStaffRecord($userId);
+    }
+
+    /**
+     * Actualiza un usuario con datos provenientes del formulario con nombres en inglés
+     * Este método es un wrapper que adapta la estructura de datos del formulario a los campos de la BDD
+     * 
+     * @param array $userData Datos del usuario con nombres en inglés
+     * @return bool True si se actualizó correctamente, False en caso contrario
+     */
+    public function updateUser($userData) {
+        try {
+            // Adaptar la estructura de datos a los nombres de campos de la BDD
+            $adaptedData = [
+                'nom' => null,
+                'cognoms' => null,
+                'correu' => isset($userData['email']) ? $userData['email'] : null,
+                'role' => isset($userData['role']) ? $userData['role'] : null,
+                'actiu' => isset($userData['status']) ? ($userData['status'] === 'active' ? 1 : 0) : null,
+                'phone' => isset($userData['phone']) ? $userData['phone'] : null,
+                'data_naixement' => isset($userData['birthDate']) ? $userData['birthDate'] : null
+            ];
+            
+            // Procesar el nombre completo si está disponible
+            if (isset($userData['fullName'])) {
+                $nameParts = explode(' ', $userData['fullName'], 2);
+                $adaptedData['nom'] = $nameParts[0];
+                $adaptedData['cognoms'] = isset($nameParts[1]) ? $nameParts[1] : '';
+            }
+            
+            // Llamar al método update con los datos adaptados
+            return $this->update($userData['id'], $adaptedData);
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Error en updateUser: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza el perfil del usuario (método específico para la actualización de perfil)
+     * @param array $data Datos del perfil a actualizar
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function updateProfile($data) {
+        try {
+            // Crear un array con los datos a actualizar en el formato correcto para el método update
+            $userData = [
+                'nom' => $data['name'],
+                'cognoms' => $data['lastname'],
+                'correu' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'data_naixement' => $data['birthdate'] ?? null
+            ];
+            
+            // Utilizar el método update existente para actualizar los datos
+            return $this->update($data['id'], $userData);
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Error en updateProfile: ' . $e->getMessage());
+            return false;
+        }
     }
 }

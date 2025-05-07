@@ -52,6 +52,8 @@ class UserRoutineController {
         // Verificar que la rutina exista
         if (!$routine) {
             flash('routine_message', 'La rutina no existe', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'La rutina no existe';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
         }
@@ -59,6 +61,8 @@ class UserRoutineController {
         // Verificar que la rutina pertenezca al usuario o que sea administrador
         if ($routine->usuari_id != $userId && $_SESSION['user_role'] !== 'admin') {
             flash('routine_message', 'No tienes permiso para ver esta rutina', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'No tienes permiso para ver esta rutina';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
         }
@@ -94,6 +98,8 @@ class UserRoutineController {
         // Verificar que la rutina exista y tenga un PDF
         if (!$routine || empty($routine->ruta_pdf)) {
             flash('routine_message', 'El PDF no está disponible para descargar', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'El PDF no está disponible para descargar';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
         }
@@ -101,6 +107,8 @@ class UserRoutineController {
         // Verificar que la rutina pertenezca al usuario o que sea administrador
         if ($routine->usuari_id != $userId && $_SESSION['user_role'] !== 'admin') {
             flash('routine_message', 'No tienes permiso para descargar esta rutina', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'No tienes permiso para descargar esta rutina';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
         }
@@ -117,6 +125,8 @@ class UserRoutineController {
             exit;
         } else {
             flash('routine_message', 'El archivo PDF no se encuentra en el servidor', 'alert alert-danger');
+            $_SESSION['toast_message'] = 'El archivo PDF no se encuentra en el servidor';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/userRoutine');
             exit;
         }
