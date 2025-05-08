@@ -171,8 +171,7 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Buscar Ejercicios';
             <h6 class="m-0 font-weight-bold"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h6>
         </div>
         <div class="card-body">
-            <form action="<?= URLROOT ?>/staffRoutine/searchExercises/<?= $data['routine']->rutina_id ?>" method="POST" class="filters-container" id="searchForm">
-                <div class="row g-3">
+            <form action="<?= URLROOT ?>/staffRoutine/searchExercises/<?= $data['routine']->rutina_id ?>" method="POST" class="filters-container" id="searchForm">                <div class="row g-3">
                     <div class="col-md-8">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="search_term" name="search_term" 
@@ -186,19 +185,25 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Buscar Ejercicios';
                             <i class="fas fa-search me-1"></i> Buscar Ejercicios
                         </button>
                     </div>
-                </div>
-                
-                <!-- Selector de grupos musculares con etiquetas -->
+                </div><!-- Selector de grupos musculares con etiquetas -->
                 <div class="filter-group">
-                    <h6 class="filter-title"><i class="fas fa-dumbbell me-2"></i>Grupo Muscular:</h6>
-                    <div class="muscle-labels">
+                    <h6 class="filter-title"><i class="fas fa-dumbbell me-2"></i>Grupo Muscular:</h6>                    <div class="muscle-labels">
+                        <span class="muscle-label" data-muscle="abdominales"><i class="fas fa-dot-circle me-1"></i>Abdominales</span>
+                        <span class="muscle-label" data-muscle="abductores"><i class="fas fa-dot-circle me-1"></i>Abductores</span>
+                        <span class="muscle-label" data-muscle="aductores"><i class="fas fa-dot-circle me-1"></i>Aductores</span>
+                        <span class="muscle-label" data-muscle="biceps"><i class="fas fa-dot-circle me-1"></i>Biceps</span>
+                        <span class="muscle-label" data-muscle="pantorrillas"><i class="fas fa-dot-circle me-1"></i>Pantorrillas</span>
                         <span class="muscle-label" data-muscle="pecho"><i class="fas fa-dot-circle me-1"></i>Pecho</span>
-                        <span class="muscle-label" data-muscle="espalda"><i class="fas fa-dot-circle me-1"></i>Espalda</span>
-                        <span class="muscle-label" data-muscle="hombros"><i class="fas fa-dot-circle me-1"></i>Hombros</span>
-                        <span class="muscle-label" data-muscle="brazos"><i class="fas fa-dot-circle me-1"></i>Brazos</span>
-                        <span class="muscle-label" data-muscle="piernas"><i class="fas fa-dot-circle me-1"></i>Piernas</span>
-                        <span class="muscle-label" data-muscle="abdomen"><i class="fas fa-dot-circle me-1"></i>Abdomen</span>
+                        <span class="muscle-label" data-muscle="antebrazos"><i class="fas fa-dot-circle me-1"></i>Antebrazos</span>
                         <span class="muscle-label" data-muscle="gluteos"><i class="fas fa-dot-circle me-1"></i>Glúteos</span>
+                        <span class="muscle-label" data-muscle="isquiotibiales"><i class="fas fa-dot-circle me-1"></i>Isquiotibiales</span>
+                        <span class="muscle-label" data-muscle="dorsales"><i class="fas fa-dot-circle me-1"></i>Dorsales</span>
+                        <span class="muscle-label" data-muscle="lumbar"><i class="fas fa-dot-circle me-1"></i>Lumbar</span>
+                        <span class="muscle-label" data-muscle="espalda_media"><i class="fas fa-dot-circle me-1"></i>Espalda Media</span>
+                        <span class="muscle-label" data-muscle="cuello"><i class="fas fa-dot-circle me-1"></i>Cuello</span>
+                        <span class="muscle-label" data-muscle="cuadriceps"><i class="fas fa-dot-circle me-1"></i>Cuádriceps</span>
+                        <span class="muscle-label" data-muscle="trapecios"><i class="fas fa-dot-circle me-1"></i>Trapecios</span>
+                        <span class="muscle-label" data-muscle="triceps"><i class="fas fa-dot-circle me-1"></i>Tríceps</span>
                     </div>
                     
                     <div id="selectedMuscleLabels" class="mt-2">
@@ -259,12 +264,15 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Buscar Ejercicios';
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="mt-auto">
-                                        <button type="button" class="btn btn-outline-primary add-exercise-btn" 
+                                    <div class="mt-auto">                                        <button type="button" class="btn btn-outline-primary add-exercise-btn" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#addExerciseModal"
                                                 data-name="<?= htmlspecialchars($exercise->name) ?>"
                                                 data-description="<?= htmlspecialchars($exercise->description) ?>"
+                                                data-muscle="<?= htmlspecialchars($exercise->muscles) ?>"
+                                                data-difficulty="<?= htmlspecialchars($exercise->difficulty) ?>"
+                                                data-equipment="<?= htmlspecialchars($exercise->equipment ?? '') ?>"
+                                                data-type="<?= htmlspecialchars($exercise->type ?? '') ?>"
                                                 data-index="<?= $index ?>">
                                             <i class="fas fa-plus-circle me-1"></i> Añadir a la rutina
                                         </button>
@@ -297,18 +305,18 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Buscar Ejercicios';
             </div>
             <form action="<?= URLROOT ?>/staffRoutine/addExercise" method="POST">
                 <input type="hidden" name="routine_id" value="<?= $data['routine']->rutina_id ?>">
-                
-                <div class="modal-body">
+                  <div class="modal-body">
+                    <!-- Campo oculto para datos adicionales de API -->
+                    <input type="hidden" name="api_data" id="api_data" value="">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="exercise_name" class="form-label fw-bold"><i class="fas fa-tag me-1"></i>Nombre del ejercicio *</label>
-                                <input type="text" class="form-control" id="exercise_name" name="exercise_name" required>
+                            <div class="mb-3"><label for="exercise_name" class="form-label fw-bold"><i class="fas fa-tag me-1"></i>Nombre del ejercicio *</label>
+                                <input type="text" class="form-control" id="exercise_name" name="name" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="exercise_description" class="form-label fw-bold"><i class="fas fa-align-left me-1"></i>Descripción/Instrucciones</label>
-                                <textarea class="form-control" id="exercise_description" name="exercise_description" rows="5"></textarea>
+                                <textarea class="form-control" id="exercise_description" name="description" rows="5"></textarea>
                                 <div class="form-text">Describe cómo realizar correctamente el ejercicio</div>
                             </div>
                         </div>
@@ -317,23 +325,23 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Buscar Ejercicios';
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label for="exercise_sets" class="form-label fw-bold"><i class="fas fa-layer-group me-1"></i>Series *</label>
-                                    <input type="number" class="form-control" id="exercise_sets" name="exercise_sets" min="1" value="3" required>
+                                    <input type="number" class="form-control" id="exercise_sets" name="sets" min="1" value="3" required>
                                 </div>
                                 
                                 <div class="col-md-4">
                                     <label for="exercise_reps" class="form-label fw-bold"><i class="fas fa-redo me-1"></i>Repeticiones *</label>
-                                    <input type="number" class="form-control" id="exercise_reps" name="exercise_reps" min="1" value="12" required>
+                                    <input type="number" class="form-control" id="exercise_reps" name="reps" min="1" value="12" required>
                                 </div>
                                 
                                 <div class="col-md-4">
                                     <label for="exercise_rest" class="form-label fw-bold"><i class="fas fa-hourglass-half me-1"></i>Descanso (seg) *</label>
-                                    <input type="number" class="form-control" id="exercise_rest" name="exercise_rest" min="0" value="60" required>
+                                    <input type="number" class="form-control" id="exercise_rest" name="rest" min="0" value="60" required>
                                 </div>
                             </div>
                             
                             <div class="mt-3">
                                 <label for="exercise_order" class="form-label fw-bold"><i class="fas fa-sort-numeric-down me-1"></i>Orden en la rutina *</label>
-                                <input type="number" class="form-control" id="exercise_order" name="exercise_order" min="1" value="1" required>
+                                <input type="number" class="form-control" id="exercise_order" name="order" min="1" value="1" required>
                                 <div class="form-text">Posición del ejercicio en la rutina</div>
                             </div>
 
@@ -382,8 +390,7 @@ function getBadgeClass($difficulty) {
 }
 ?>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+<script>    document.addEventListener('DOMContentLoaded', function() {
         // Gestionar el selector de etiquetas de músculos
         const muscleLabels = document.querySelectorAll('.muscle-label');
         const selectedMuscleLabels = document.getElementById('selectedMuscleLabels');
@@ -403,6 +410,8 @@ function getBadgeClass($difficulty) {
             label.addEventListener('click', function() {
                 const muscle = this.dataset.muscle;
                 toggleMuscleSelection(muscle);
+                // Autoenviar el formulario cuando se selecciona un músculo
+                document.getElementById('searchForm').submit();
             });
         });
         
@@ -434,10 +443,12 @@ function getBadgeClass($difficulty) {
             
             // Actualizar visualización de músculo seleccionado
             if (selectedMuscle) {
-                const muscleName = selectedMuscle.charAt(0).toUpperCase() + selectedMuscle.slice(1);
+                // Convertir nombres de músculos a formato más amigable
+                let displayName = getDisplayNameForMuscle(selectedMuscle);
+                
                 selectedMuscleLabels.innerHTML = `
                     <span class="badge bg-primary rounded-pill me-2 mb-2">
-                        ${muscleName} <i class="fas fa-times ms-1" onclick="removeMuscle()"></i>
+                        ${displayName} <i class="fas fa-times ms-1" onclick="removeMuscle(event)"></i>
                     </span>
                 `;
             } else {
@@ -448,10 +459,37 @@ function getBadgeClass($difficulty) {
             hiddenMuscleInput.value = selectedMuscle || '';
         }
         
+        // Obtener nombre de visualización amigable
+        function getDisplayNameForMuscle(muscle) {
+            const muscleNames = {
+                'abdominales': 'Abdominales',
+                'abductores': 'Abductores',
+                'aductores': 'Aductores',
+                'biceps': 'Bíceps',
+                'pantorrillas': 'Pantorrillas',
+                'pecho': 'Pecho',
+                'antebrazos': 'Antebrazos',
+                'gluteos': 'Glúteos',
+                'isquiotibiales': 'Isquiotibiales',
+                'dorsales': 'Dorsales',
+                'lumbar': 'Lumbar',
+                'espalda_media': 'Espalda Media',
+                'cuello': 'Cuello',
+                'cuadriceps': 'Cuádriceps',
+                'trapecios': 'Trapecios',
+                'triceps': 'Tríceps'
+            };
+            
+            return muscleNames[muscle] || muscle.charAt(0).toUpperCase() + muscle.slice(1);
+        }
+        
         // Función global para eliminar selección (llamada desde el icono X)
-        window.removeMuscle = function() {
+        window.removeMuscle = function(event) {
+            event.preventDefault(); // Evitar que el clic se propague
             selectedMuscle = null;
             updateMuscleSelectionUI();
+            // Volver a enviar el formulario para actualizar resultados
+            document.getElementById('searchForm').submit();
         };
         
         // Configurar el modal de añadir ejercicio
@@ -461,15 +499,31 @@ function getBadgeClass($difficulty) {
             addExerciseModal.addEventListener('show.bs.modal', function(event) {
                 // Botón que activó el modal
                 const button = event.relatedTarget;
-                
-                // Extraer información de los atributos data-*
+                  // Extraer información de los atributos data-*
                 const name = button.getAttribute('data-name');
                 const description = button.getAttribute('data-description');
                 const index = button.getAttribute('data-index');
+                const muscle = button.getAttribute('data-muscle') || '';
+                const difficulty = button.getAttribute('data-difficulty') || '';
+                const equipment = button.getAttribute('data-equipment') || '';
+                const type = button.getAttribute('data-type') || '';
+                
+                // Crear objeto con datos de API
+                const apiData = {
+                    name: name,
+                    instructions: description,
+                    muscle: muscle,
+                    difficulty: difficulty,
+                    equipment: equipment,
+                    type: type
+                };
+                
+                // Guardar datos API en campo oculto
+                document.getElementById('api_data').value = JSON.stringify(apiData);
                 
                 // Actualizar los campos del formulario
-                document.getElementById('exercise_name').value = name;
-                document.getElementById('exercise_description').value = description;
+                document.getElementById('exercise_name').value = name || '';
+                document.getElementById('exercise_description').value = description || '';
                 
                 // Calcular valor sugerido para el orden
                 document.getElementById('exercise_order').value = parseInt(index || 0) + 1;

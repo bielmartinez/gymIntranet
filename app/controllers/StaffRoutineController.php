@@ -22,6 +22,8 @@ class StaffRoutineController
             exit;
         } elseif ($_SESSION['user_role'] !== 'staff' && $_SESSION['user_role'] !== 'admin') {
             // Solo el personal y administradores pueden acceder
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/users/dashboard');
             exit;
         }
@@ -54,587 +56,628 @@ class StaffRoutineController
         include_once APPROOT . '/views/shared/footer/main.php';
     }
 
-    // Crear una nueva rutina
-    public function create()
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
+    /**
+     * Crea una nueva rutina
+     */
+    public function createRoutine() {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT);
             exit;
         }
-
+        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Sanitizar input
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            // Procesar el formulario
+            $postData = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             
-            // Datos para modelo (corregidos para usar los nombres de campos del formulario)
-            $data = [
-                'name' => trim($_POST['nombre'] ?? ''),
-                'description' => trim($_POST['descripcion'] ?? ''),
-                'usuari_id' => isset($_POST['usuario_id']) ? $_POST['usuario_id'] : null,
-                'exercises' => isset($_POST['exercises']) ? $_POST['exercises'] : []
-            ];
-
-            // Registrar datos para depuración
-            if (class_exists('Logger')) {
-                Logger::log('DEBUG', 'Intentando crear rutina: ' . json_encode($data));
-            }
-
-            // Validar entrada
-            if (empty($data['name'])) {
-                flash('routine_message', 'Por favor, introduce un nombre para la rutina', 'alert alert-danger');
+            // Validar los datos
+            if (empty($postData['nombre'])) {
                 $_SESSION['toast_message'] = 'Por favor, introduce un nombre para la rutina';
                 $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine/create');
-                exit;
+                $this->loadView('staff/create_routine', ['formData' => $postData]);
+                return;
             }
-
-            // Crear rutina
+            
+            // Preparar los datos de la rutina con los nombres de campos correctos para el modelo
             $routineData = [
-                'nom' => $data['name'],
-                'descripcio' => $data['description'],
-                'usuari_id' => $data['usuari_id']
+                'nom' => $postData['nombre'],
+                'descripcio' => $postData['descripcion'] ?? '',
+                'usuari_id' => $postData['usuari_id'] ?? null,
+                'creat_el' => date('Y-m-d H:i:s')
             ];
-
-            $routineId = $this->routineModel->addRoutine($routineData);
-
-            if ($routineId) {
-                // Generar PDF si se solicita
-                if (isset($_POST['generate_pdf']) && $_POST['generate_pdf'] == 'yes') {
-                    $this->generatePDF($routineId);
-                }
-
-                flash('routine_message', 'Rutina creada con éxito', 'alert alert-success');
+            
+            // Si no se especificó un usuario, se considera una rutina "plantilla" o para el propio staff
+            if (empty($routineData['usuari_id'])) {
+                $routineData['usuari_id'] = null;
+            }
+            
+            // Registrar los datos para depuración
+            if (class_exists('Logger')) {
+                Logger::log('DEBUG', 'Datos enviados a addRoutine: ' . json_encode($routineData));
+            }
+            
+            // Crear la rutina
+            $newRoutineId = $this->routineModel->addRoutine($routineData);
+            if ($newRoutineId) {
                 $_SESSION['toast_message'] = 'Rutina creada con éxito';
                 $_SESSION['toast_type'] = 'success';
                 header('Location: ' . URLROOT . '/staffRoutine');
+                exit;
             } else {
-                flash('routine_message', 'Error al crear la rutina', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al crear la rutina';
                 $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine/create');
+                // Registrar el error
+                if (class_exists('Logger')) {
+                    Logger::log('ERROR', 'Error al crear rutina: ' . json_encode($this->routineModel->getLastError()));
+                }
+                $this->loadView('staff/create_routine', ['formData' => $postData]);
+                return;
             }
-            exit;
+        } else {
+            // Cargar formulario vacío
+            // Obtener la lista de usuarios para el selector
+            $users = $this->userModel->getAllUsers();
+            
+            $this->loadView('staff/create_routine', [
+                'users' => $users
+            ]);
         }
-
-        // Obtener usuarios para asignar rutina
-        $users = $this->userModel->getAllUsers();
-
-        $data = [
-            'users' => $users
-        ];
-
-        $this->view('staff/create_routine', $data);
     }
-
-    // Editar una rutina
-    public function edit($id)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
+    
+    /**
+     * Método alias para la creación de rutinas
+     * Redirecciona al método createRoutine()
+     */
+    public function create() {
+        // Simplemente redirigir al método createRoutine
+        $this->createRoutine();
+    }
+    
+    /**
+     * Editar una rutina existente
+     * @param int $id ID de la rutina a editar
+     */
+    public function editRoutine($id = null) {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT);
             exit;
         }
-
-        // Obtener datos de la rutina
-        $routine = $this->routineModel->getRoutineById($id);
         
-        if (!$routine) {
-            flash('routine_message', 'Rutina no encontrada', 'alert alert-danger');
+        // Verificar que se proporcionó un ID
+        if (!$id) {
             $_SESSION['toast_message'] = 'Rutina no encontrada';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staffRoutine');
             exit;
         }
-
+        
+        // Obtener la rutina
+        $routine = $this->routineModel->getRoutineById($id);
+        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Sanitizar input
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-            // Datos para modelo (compatible con nombres en inglés y español)
-            $data = [
-                'id' => $id,
-                'name' => trim($_POST['name'] ?? $_POST['nombre'] ?? ''),
-                'description' => trim($_POST['description'] ?? $_POST['descripcion'] ?? ''),
-                'usuari_id' => isset($_POST['user_id']) ? $_POST['user_id'] : (isset($_POST['usuario_id']) ? $_POST['usuario_id'] : $routine->usuari_id)
-            ];
+            // Procesar el formulario
+            $postData = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             
-            // Registrar datos para depuración
-            if (class_exists('Logger')) {
-                Logger::log('DEBUG', 'Intentando editar rutina: ' . json_encode($data));
-            }
-
-            // Validar entrada
-            if (empty($data['name'])) {
-                flash('routine_message', 'Por favor, introduce un nombre para la rutina', 'alert alert-danger');
+            // Validar los datos
+            if (empty($postData['nombre'])) {
                 $_SESSION['toast_message'] = 'Por favor, introduce un nombre para la rutina';
                 $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
-                exit;
+                $this->loadView('staff/edit_routine', [
+                    'routine' => $routine,
+                    'formData' => $postData
+                ]);
+                return;
             }
-
-            // Actualizar rutina
-            if ($this->routineModel->updateRoutine($data)) {
-                // Generar PDF si se solicita
-                if (isset($_POST['generate_pdf']) && $_POST['generate_pdf'] == 'yes') {
-                    $this->generatePDF($id);
-                }
-
-                flash('routine_message', 'Rutina actualizada con éxito', 'alert alert-success');
+            
+            // Preparar los datos de la rutina
+            $routineData = [
+                'id' => $id,
+                'nombre' => $postData['nombre'],
+                'descripcion' => $postData['descripcion'] ?? '',
+                'nivel' => $postData['nivel'] ?? 'Principiante',
+                'objectiu' => $postData['objectiu'] ?? '',
+                'usuari_id' => $postData['usuari_id'] ?? null
+            ];
+            
+            // Actualizar la rutina
+            if ($this->routineModel->updateRoutine($routineData)) {
                 $_SESSION['toast_message'] = 'Rutina actualizada con éxito';
                 $_SESSION['toast_type'] = 'success';
                 header('Location: ' . URLROOT . '/staffRoutine');
+                exit;
             } else {
-                flash('routine_message', 'Error al actualizar la rutina', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al actualizar la rutina';
                 $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
+                $this->loadView('staff/edit_routine', [
+                    'routine' => $routine,
+                    'formData' => $postData
+                ]);
+                return;
             }
-            exit;
-        }
-
-        // Obtener ejercicios de la rutina
-        $exercises = $this->routineModel->getExercisesByRoutineId($id);
-        
-        // Obtener usuarios para asignar rutina
-        $users = $this->userModel->getAllUsers();
-
-        $data = [
-            'routine' => $routine,
-            'exercises' => $exercises,
-            'users' => $users
-        ];
-
-        $this->view('staff/edit_routine', $data);
-    }
-
-    // Eliminar una rutina
-    public function delete($id)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
-
-        // Verificar si existe la rutina
-        $routine = $this->routineModel->getRoutineById($id);
-        
-        if (!$routine) {
-            flash('routine_message', 'Rutina no encontrada', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'Rutina no encontrada';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if ($this->routineModel->deleteRoutine($id)) {
-                flash('routine_message', 'Rutina eliminada con éxito', 'alert alert-success');
-                $_SESSION['toast_message'] = 'Rutina eliminada con éxito';
-                $_SESSION['toast_type'] = 'success';
-            } else {
-                flash('routine_message', 'Error al eliminar la rutina', 'alert alert-danger');
-                $_SESSION['toast_message'] = 'Error al eliminar la rutina';
-                $_SESSION['toast_type'] = 'error';
-            }
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        // Mostrar confirmación de eliminación
-        $data = [
-            'routine' => $routine
-        ];
-
-        $this->view('staff/delete_routine', $data);
-    }
-
-    // Añadir un ejercicio a una rutina
-    public function addExercise($routineId = null)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Sanitizar input
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-            // Extraemos el ID de rutina (con varias fuentes posibles)
-            $routineId = $_POST['routine_id'] ?? $routineId ?? null;
-
-            // Verificar que tenemos un ID válido
-            if (!$routineId) {
-                flash('exercise_message', 'ID de rutina no proporcionado', 'alert alert-danger');
-                $_SESSION['toast_message'] = 'ID de rutina no proporcionado';
-                $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine');
-                exit;
-            }
-
-            // Verificar si existe la rutina
-            $routine = $this->routineModel->getRoutineById($routineId);
+        } else {
+            // Verificar que la rutina exista
             if (!$routine) {
-                flash('exercise_message', 'Rutina no encontrada', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Rutina no encontrada';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/staffRoutine');
                 exit;
             }
+            
+            // Cargar formulario con datos de la rutina
+            // Obtener los ejercicios de esta rutina
+            $exercises = $this->routineModel->getExercisesByRoutineId($id);
+            
+            // Obtener la lista de usuarios para el selector
+            $users = $this->userModel->getAllUsers();
+            
+            $this->loadView('staff/edit_routine', [
+                'routine' => $routine,
+                'exercises' => $exercises,
+                'users' => $users
+            ]);
+        }
+    }
 
-            // Datos para modelo - Unificamos nombres de campos para mayor compatibilidad
+    /**
+     * Método alias para editar una rutina
+     * Redirecciona al método editRoutine()
+     * @param int $id ID de la rutina a editar
+     */
+    public function edit($id = null) {
+        // Simplemente redirigir al método editRoutine
+        $this->editRoutine($id);
+    }
+    
+    /**
+     * Eliminar una rutina
+     * @param int $id ID de la rutina a eliminar
+     */
+    public function deleteRoutine($id = null) {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT);
+            exit;
+        }
+        
+        // Verificar que se proporcionó un ID
+        if (!$id) {
+            $_SESSION['toast_message'] = 'Rutina no encontrada';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+        
+        // Obtener la rutina
+        $routine = $this->routineModel->getRoutineById($id);
+        
+        // Verificar que la rutina exista y pertenezca al staff o sea un admin
+        if (!$routine || ($routine->staff_id != $_SESSION['user_id'] && $_SESSION['user_role'] !== 'admin')) {
+            $_SESSION['toast_message'] = 'No tienes permiso para eliminar esta rutina';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+        
+        // Eliminar la rutina
+        if ($this->routineModel->deleteRoutine($id)) {
+            $_SESSION['toast_message'] = 'Rutina eliminada con éxito';
+            $_SESSION['toast_type'] = 'success';
+        } else {
+            $_SESSION['toast_message'] = 'Error al eliminar la rutina';
+            $_SESSION['toast_type'] = 'error';
+        }
+        
+        header('Location: ' . URLROOT . '/staffRoutine');
+        exit;
+    }
+    
+    /**
+     * Añadir un ejercicio a una rutina
+     */
+    public function addExercise() {
+        // Verificar si es una solicitud POST
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Sanitizar los datos de entrada
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            // Obtener los datos del formulario
+            $routineId = $_POST['routine_id'] ?? null;
+            $name = $_POST['name'] ?? null;
+            $description = $_POST['description'] ?? '';
+            $sets = $_POST['sets'] ?? 3;
+            $reps = $_POST['reps'] ?? 10;
+            $rest = $_POST['rest'] ?? 60;
+            $order = $_POST['order'] ?? 1;
+            $additionalInfo = $_POST['additional_info'] ?? '';
+            $addMore = isset($_POST['add_more']) ? (bool)$_POST['add_more'] : false;
+            
+            // Datos adicionales de la API si están disponibles
+            $apiDetails = [];
+            
+            // Verificar si es un ejercicio de la API y guardar todos los detalles
+            if (isset($_POST['api_data']) && !empty($_POST['api_data'])) {
+                $apiDetails = json_decode($_POST['api_data'], true);
+            }
+            
+            // Preparar los datos para el modelo
             $data = [
                 'routine_id' => $routineId,
-                'name' => trim($_POST['exercise_name'] ?? $_POST['name'] ?? ''),
-                'description' => trim($_POST['exercise_description'] ?? $_POST['description'] ?? ''),
-                'sets' => isset($_POST['exercise_sets']) ? (int)$_POST['exercise_sets'] : (isset($_POST['sets']) ? (int)$_POST['sets'] : 3),
-                'reps' => isset($_POST['exercise_reps']) ? (int)$_POST['exercise_reps'] : (isset($_POST['reps']) ? (int)$_POST['reps'] : 12),
-                'rest' => isset($_POST['exercise_rest']) ? (int)$_POST['exercise_rest'] : (isset($_POST['rest']) ? (int)$_POST['rest'] : 60),
-                'order' => isset($_POST['exercise_order']) ? (int)$_POST['exercise_order'] : (isset($_POST['order']) ? (int)$_POST['order'] : 0),
-                'additional_info' => isset($_POST['additional_info']) ? $_POST['additional_info'] : null
+                'name' => $name,
+                'description' => $description,
+                'sets' => $sets,
+                'reps' => $reps,
+                'rest' => $rest,
+                'order' => $order,
+                'additional_info' => $additionalInfo,
+                'api_details' => $apiDetails
             ];
-
-            // Registrar datos para depuración
+              // Registro para debugging
             if (class_exists('Logger')) {
-                Logger::log('DEBUG', 'Intentando añadir ejercicio: ' . json_encode($data));
+                Logger::log('DEBUG', 'Intentando añadir ejercicio con datos: ' . json_encode($data, JSON_PRETTY_PRINT));
             }
+            
+            // Añadir el ejercicio a la rutina
+            $result = $this->routineModel->addExercise($data);
+            
+            if ($result) {
+                $_SESSION['toast_message'] = 'Ejercicio añadido correctamente a la rutina';
+                $_SESSION['toast_type'] = 'success';
+                
+                // Si se seleccionó "Continuar añadiendo ejercicios", redirigir de vuelta a la página de búsqueda
+                if ($addMore) {
+                    header('Location: ' . URLROOT . '/staffRoutine/searchExercises/' . $routineId);
+                    exit;
+                }
+            } else {
+                // Mejorar mensaje de error con más detalles
+                $errorMsg = 'Error al añadir el ejercicio a la rutina';
+                if (method_exists($this->routineModel, 'getLastError')) {
+                    $lastError = $this->routineModel->getLastError();
+                    if ($lastError) {
+                        $errorMsg .= ': ' . $lastError;
+                    }
+                }
+                $_SESSION['toast_message'] = $errorMsg;
+                $_SESSION['toast_type'] = 'error';
+                
+                // Registrar el error detallado
+                if (class_exists('Logger')) {
+                    Logger::log('ERROR', 'Error al añadir ejercicio: ' . ($this->routineModel->getLastError() ?? 'Desconocido'));
+                }
+            }
+            
+            // Redirigir a la página de edición de la rutina si no se seleccionó "Continuar añadiendo ejercicios"
+            if (!$addMore) {
+                header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
+                exit;
+            }
+        } else {
+            // Redirigir si no es una solicitud POST
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+    }
 
-            // Validar entrada
-            if (empty($data['name'])) {
-                flash('exercise_message', 'Por favor, introduce un nombre para el ejercicio', 'alert alert-danger');
+    /**
+     * Actualiza un ejercicio existente
+     * @param int $exerciseId ID del ejercicio a actualizar
+     * @param int $routineId ID de la rutina a la que pertenece el ejercicio
+     */
+    public function updateExercise($exerciseId = null, $routineId = null) {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT);
+            exit;
+        }
+        
+        // Verificar que se proporcionaron los IDs necesarios
+        if (!$exerciseId || !$routineId) {
+            $_SESSION['toast_message'] = 'Falta información necesaria para actualizar el ejercicio';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+        
+        // Obtener la rutina
+        $routine = $this->routineModel->getRoutineById($routineId);
+        
+        // Verificar que la rutina exista y pertenezca al staff o sea un admin
+        if (!$routine || ($routine->staff_id != $_SESSION['user_id'] && $_SESSION['user_role'] !== 'admin')) {
+            $_SESSION['toast_message'] = 'No tienes permiso para editar esta rutina';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Procesar el formulario
+            $postData = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            
+            // Validar los datos
+            if (empty($postData['nombre'])) {
                 $_SESSION['toast_message'] = 'Por favor, introduce un nombre para el ejercicio';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
                 exit;
             }
             
-            // Verificar y corregir el orden del ejercicio si es necesario
-            if ($data['order'] > 0) {
-                $data['order'] = $this->routineModel->verifyAndFixExerciseOrder($routineId, $data['order']);
-            } else {
-                $data['order'] = $this->routineModel->getNextExerciseOrder($routineId);
-            }
-            
-            // Añadir ejercicio
-            $result = $this->routineModel->addExercise($data);
-            if ($result) {
-                flash('exercise_message', 'Ejercicio añadido con éxito', 'alert alert-success');
-                $_SESSION['toast_message'] = 'Ejercicio añadido con éxito';
-                $_SESSION['toast_type'] = 'success';
-                
-                // Si se ha marcado "añadir otro", redirigir a la búsqueda de ejercicios
-                if (isset($_POST['add_more']) && $_POST['add_more'] == 1) {
-                    header('Location: ' . URLROOT . '/staffRoutine/searchExercises/' . $routineId);
-                    exit;
-                }
-            } else {
-                $errorMsg = 'Error al añadir el ejercicio';
-                
-                // Intentar obtener información adicional del error
-                $dbError = $this->routineModel->getLastError();
-                if ($dbError) {
-                    $errorMsg .= ' - ' . json_encode($dbError);
-                }
-                
-                flash('exercise_message', $errorMsg, 'alert alert-danger');
-                $_SESSION['toast_message'] = $errorMsg;
-                $_SESSION['toast_type'] = 'error';
-                
-                // Registrar error
-                if (class_exists('Logger')) {
-                    Logger::log('ERROR', 'Error al añadir ejercicio. Error DB: ' . json_encode($dbError));
-                }
-            }
-            
-            // Redireccionar de vuelta a la página de edición de la rutina
-            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
-            exit;
-        } else if ($routineId) {
-            // Si hay ID de rutina en la URL pero no es POST, mostrar formulario
-            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
-            exit;
-        } else {
-            // Si alguien intenta acceder directamente sin POST ni ID, redireccionar al índice
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-    }
-
-    // Editar un ejercicio existente
-    public function editExercise($id)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
-
-        // Obtener datos del ejercicio
-        $exercise = $this->routineModel->getExerciseById($id);
-        
-        if (!$exercise) {
-            flash('exercise_message', 'Ejercicio no encontrado', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'Ejercicio no encontrado';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Sanitizar input
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-            // Datos para modelo (compatible con nombres en inglés y español)
-            $data = [
-                'id' => $id,
-                'name' => trim($_POST['name'] ?? $_POST['exercise_name'] ?? $_POST['nombre'] ?? $_POST['nombre_ejercicio'] ?? ''),
-                'description' => trim($_POST['description'] ?? $_POST['exercise_description'] ?? $_POST['descripcion'] ?? $_POST['descripcion_ejercicio'] ?? ''),
-                'sets' => isset($_POST['sets']) ? (int)$_POST['sets'] : 
-                         (isset($_POST['exercise_sets']) ? (int)$_POST['exercise_sets'] : 
-                         (isset($_POST['series']) ? (int)$_POST['series'] : $exercise->series)),
-                'reps' => isset($_POST['reps']) ? (int)$_POST['reps'] : 
-                         (isset($_POST['exercise_reps']) ? (int)$_POST['exercise_reps'] : 
-                         (isset($_POST['repeticiones']) ? (int)$_POST['repeticiones'] : $exercise->repeticions)),
-                'rest' => isset($_POST['rest']) ? (int)$_POST['rest'] : 
-                         (isset($_POST['exercise_rest']) ? (int)$_POST['exercise_rest'] : 
-                         (isset($_POST['descanso']) ? (int)$_POST['descanso'] : $exercise->descans)),
-                'order' => isset($_POST['order']) ? (int)$_POST['order'] : 
-                          (isset($_POST['exercise_order']) ? (int)$_POST['exercise_order'] : 
-                          (isset($_POST['orden']) ? (int)$_POST['orden'] : $exercise->ordre)),
-                'additional_info' => isset($_POST['additional_info']) ? $_POST['additional_info'] : 
-                                    (isset($_POST['info_adicional']) ? $_POST['info_adicional'] : $exercise->info_adicional)
+            // Preparar los datos del ejercicio
+            $exerciseData = [
+                'id' => $exerciseId,
+                'name' => $postData['nombre'],
+                'description' => $postData['descripcion'] ?? '',
+                'sets' => $postData['series'] ?? 0,
+                'reps' => $postData['repeticiones'] ?? 0,
+                'rest' => $postData['tiempo_descanso'] ?? 0,
+                'order' => $postData['orden'] ?? 0,
+                'additional_info' => $postData['info_adicional'] ?? ''
             ];
-
-            // Registrar datos para depuración
-            if (class_exists('Logger')) {
-                Logger::log('DEBUG', 'Intentando actualizar ejercicio: ' . json_encode($data));
-            }
-
-            // Validar entrada
-            if (empty($data['name'])) {
-                flash('exercise_message', 'Por favor, introduce un nombre para el ejercicio', 'alert alert-danger');
-                $_SESSION['toast_message'] = 'Por favor, introduce un nombre para el ejercicio';
-                $_SESSION['toast_type'] = 'error';
-                header('Location: ' . URLROOT . '/staffRoutine/editExercise/' . $id);
-                exit;
-            }
             
-            // Si se ha modificado el orden del ejercicio, verificar y arreglar conflictos
-            if ($data['order'] != $exercise->ordre) {
-                $data['order'] = $this->routineModel->verifyAndFixExerciseOrder($exercise->rutina_id, $data['order'], $id);
-            }
-
-            // Actualizar ejercicio
-            if ($this->routineModel->updateExercise($data)) {
-                flash('exercise_message', 'Ejercicio actualizado con éxito', 'alert alert-success');
+            // Actualizar el ejercicio
+            if ($this->routineModel->updateExercise($exerciseData)) {
                 $_SESSION['toast_message'] = 'Ejercicio actualizado con éxito';
                 $_SESSION['toast_type'] = 'success';
-                header('Location: ' . URLROOT . '/staffRoutine/edit/' . $exercise->rutina_id);
             } else {
-                flash('exercise_message', 'Error al actualizar el ejercicio', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al actualizar el ejercicio';
                 $_SESSION['toast_type'] = 'error';
-                
-                // Registrar error
-                if (class_exists('Logger')) {
-                    Logger::log('ERROR', 'Error al actualizar ejercicio. Error DB: ' . json_encode($this->routineModel->getLastError()));
-                }
-                
-                header('Location: ' . URLROOT . '/staffRoutine/editExercise/' . $id);
             }
+            
+            // Redireccionar de vuelta a la página de edición de rutina
+            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
             exit;
-        }
-
-        $data = [
-            'exercise' => $exercise
-        ];
-
-        $this->view('staff/edit_exercise', $data);
-    }
-
-    // Eliminar un ejercicio
-    public function deleteExercise($id)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
-
-        // Verificar si existe el ejercicio
-        $exercise = $this->routineModel->getExerciseById($id);
-        
-        if (!$exercise) {
-            flash('exercise_message', 'Ejercicio no encontrado', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'Ejercicio no encontrado';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        $routineId = $exercise->rutina_id;
-
-        if ($this->routineModel->deleteExercise($id)) {
-            flash('exercise_message', 'Ejercicio eliminado con éxito', 'alert alert-success');
-            $_SESSION['toast_message'] = 'Ejercicio eliminado con éxito';
-            $_SESSION['toast_type'] = 'success';
         } else {
-            flash('exercise_message', 'Error al eliminar el ejercicio', 'alert alert-danger');
-            $_SESSION['toast_message'] = 'Error al eliminar el ejercicio';
-            $_SESSION['toast_type'] = 'error';
+            // Si se accede directamente sin POST, redirigir a la página de edición
+            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
+            exit;
         }
-
-        header('Location: ' . URLROOT . '/staffRoutine/edit/' . $routineId);
-        exit;
     }
 
-    // Generar PDF de rutina
-    public function generatePDF($id)
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            $_SESSION['toast_message'] = 'No tienes permisos para realizar esta acción';
+    /**
+     * Buscar ejercicios para añadir a una rutina
+     * @param int $routineId ID de la rutina a la que añadir ejercicios
+     */
+    public function searchExercises($routineId = null) {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permiso para acceder a esta función';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT);
             exit;
         }
-
-        // Obtener datos de la rutina
-        $routine = $this->routineModel->getRoutineById($id);
         
-        if (!$routine) {
-            $_SESSION['toast_message'] = 'Rutina no encontrada';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        // Obtener ejercicios de la rutina
-        $exercises = $this->routineModel->getExercisesByRoutineId($id);
-
-        // Generar PDF con la clase PDFGenerator y enviarlo directamente para descarga
-        $downloadName = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
-        $result = $this->pdfGenerator->downloadRoutinePDF($routine, $exercises, $downloadName);
-        
-        if (!$result) {
-            $_SESSION['toast_message'] = 'Error al generar el PDF';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
-            exit;
-        }
-        
-        // No necesitamos redireccionar ya que la salida del PDF termina la ejecución del script
-    }
-
-    // Método para descargar PDF de rutina
-    public function downloadPDF($id) 
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            $_SESSION['toast_message'] = 'No tienes permisos para realizar esta acción';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT);
-            exit;
-        }
-
-        // Obtener datos de la rutina
-        $routine = $this->routineModel->getRoutineById($id);
-        
-        if (!$routine) {
-            $_SESSION['toast_message'] = 'Rutina no encontrada';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine');
-            exit;
-        }
-
-        // Obtener ejercicios de la rutina
-        $exercises = $this->routineModel->getExercisesByRoutineId($id);
-        
-        // Generar PDF con la clase PDFGenerator y enviarlo directamente para descarga
-        $downloadName = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
-        $result = $this->pdfGenerator->downloadRoutinePDF($routine, $exercises, $downloadName);
-        
-        if (!$result) {
-            $_SESSION['toast_message'] = 'Error al generar el PDF';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staffRoutine/edit/' . $id);
-            exit;
-        }
-        
-        // No necesitamos redireccionar ya que la salida del PDF termina la ejecución del script
-    }
-
-    // Buscar ejercicios en API externa
-    public function searchExercises($routineId = null) 
-    {
-        // Verificar permisos
-        if (!isStaff() && !isAdmin()) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
-        
-        // Verificar que tenemos un ID de rutina
+        // Verificar que se proporcionó un ID de rutina
         if (!$routineId) {
-            flash('routine_message', 'ID de rutina no proporcionado', 'alert alert-danger');
             $_SESSION['toast_message'] = 'ID de rutina no proporcionado';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staffRoutine');
             exit;
         }
         
-        // Verificar si existe la rutina
+        // Obtener la rutina
         $routine = $this->routineModel->getRoutineById($routineId);
         
+        // Verificar que la rutina exista
         if (!$routine) {
-            flash('routine_message', 'Rutina no encontrada', 'alert alert-danger');
             $_SESSION['toast_message'] = 'Rutina no encontrada';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/staffRoutine');
             exit;
         }
         
+        // Variables para los resultados de búsqueda
         $exercises = [];
+        $searchPerformed = false;
         $searchTerm = '';
-        $muscle = '';
+        $muscles = [];
+        $filters = [];
+        
+        // Obtener lista de grupos musculares disponibles para el dropdown
+        $availableMuscles = $this->exerciseApiService->getMuscleGroups();
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Procesar búsqueda
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            // Procesar el formulario de búsqueda
+            $postData = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             
-            $searchTerm = trim($_POST['search_term'] ?? '');
+            // Extraer términos de búsqueda y filtros
+            $searchTerm = $postData['search_term'] ?? '';
             
-            // Procesar el grupo muscular seleccionado (puede venir como array o como string)
-            if (isset($_POST['muscles'])) {
-                if (is_array($_POST['muscles']) && !empty($_POST['muscles'][0])) {
-                    $muscle = $_POST['muscles'][0]; // Tomar solo el primer valor si es array
-                } else if (!is_array($_POST['muscles']) && !empty($_POST['muscles'])) {
-                    // Si viene como string
-                    $muscle = $_POST['muscles'];
+            // Procesar el grupo muscular
+            if (isset($postData['muscles']) && !empty($postData['muscles'])) {
+                // Si es array, tomamos solo el primer valor (para compatibilidad)
+                if (is_array($postData['muscles'])) {
+                    $muscles = $postData['muscles'];
+                    $muscleFilter = !empty($muscles[0]) ? $muscles[0] : '';
+                } else {
+                    // Si es un string, lo usamos directamente
+                    $muscleFilter = $postData['muscles'];
+                    $muscles = [$muscleFilter];
+                }
+                
+                // Si hay un grupo muscular seleccionado, lo agregamos a los filtros
+                if (!empty($muscleFilter)) {
+                    $filters['muscle'] = $muscleFilter;
                 }
             }
             
-            // Si tenemos algún criterio de búsqueda, llamar a la API
-            if (!empty($searchTerm) || !empty($muscle)) {
-                $exercises = $this->exerciseApiService->searchExercises($searchTerm, $muscle);
+            // Registrar información detallada para depuración
+            if (class_exists('Logger')) {
+                Logger::log('INFO', 'Realizando búsqueda de ejercicios: Término="' . $searchTerm . '", Filtros=' . json_encode($filters));
+                Logger::log('DEBUG', 'Músculos elegidos: ' . json_encode($muscles));
+                Logger::log('DEBUG', 'Filtros finales: ' . json_encode($filters));
+            }
+            
+            // Realizar la búsqueda
+            $exercises = $this->exerciseApiService->searchExercises($searchTerm, $filters);
+            
+            // Registrar la respuesta completa para diagnóstico
+            if (class_exists('Logger') && !empty($exercises)) {
+                Logger::log('DEBUG', 'Respuesta de la API (primeros 2 ejercicios): ' . 
+                    json_encode(array_slice($exercises, 0, 2), JSON_PRETTY_PRINT));
+            }
+            
+            // Convertir arrays a objetos para que la vista funcione correctamente
+            $exercisesObjects = [];
+            foreach ($exercises as $exercise) {
+                // Convertir el array asociativo a un objeto estándar
+                $exerciseObj = new stdClass();
+                
+                // Asegurarnos de que todas las propiedades sean strings para evitar warnings con htmlspecialchars()
+                $exerciseObj->name = isset($exercise['name']) ? (string)$exercise['name'] : '';
+                $exerciseObj->description = isset($exercise['instructions']) ? (string)$exercise['instructions'] : '';
+                $exerciseObj->difficulty = isset($exercise['difficulty']) ? (string)$exercise['difficulty'] : '';
+                $exerciseObj->muscles = isset($exercise['muscle']) ? (string)$exercise['muscle'] : '';
+                $exerciseObj->type = isset($exercise['type']) ? (string)$exercise['type'] : '';
+                $exerciseObj->equipment = isset($exercise['equipment']) ? (string)$exercise['equipment'] : '';
+                
+                // Registrar cada objeto creado para depuración si está vacío
+                if (empty($exerciseObj->name) && class_exists('Logger')) {
+                    Logger::log('WARNING', 'Ejercicio con nombre vacío: ' . json_encode($exercise));
+                }
+                
+                $exercisesObjects[] = $exerciseObj;
+            }
+            $exercises = $exercisesObjects;
+            
+            $searchPerformed = true;
+            
+            // Registrar para depuración
+            if (class_exists('Logger')) {
+                Logger::log('DEBUG', 'Resultados procesados: ' . count($exercises) . ' ejercicios encontrados');
+                if (empty($exercises)) {
+                    if ($this->exerciseApiService->getLastError()) {
+                        Logger::log('ERROR', 'Error en la API: ' . $this->exerciseApiService->getLastError());
+                    } else {
+                        Logger::log('INFO', 'No se encontraron ejercicios con los criterios especificados');
+                    }
+                }
             }
         }
         
+        // Preparar datos para la vista
         $data = [
             'title' => 'Buscar Ejercicios',
             'routine' => $routine,
             'exercises' => $exercises,
+            'searchPerformed' => $searchPerformed,
             'searchTerm' => $searchTerm,
-            'muscles' => !empty($muscle) ? [$muscle] : []
+            'muscles' => $muscles,
+            'filters' => $filters,
+            'availableMuscles' => $availableMuscles
         ];
         
-        $this->view('staff/search_exercises', $data);
+        // Cargar la vista
+        $this->loadView('staff/search_exercises', $data);
     }
     
+    /**
+     * Método para buscar ejercicios en la API externa desde JavaScript
+     * Responde con JSON para peticiones AJAX
+     */
+    public function apiSearchExercises() {
+        // Verificar si el usuario está autorizado
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            echo json_encode(['error' => 'No tienes permiso para acceder a esta función']);
+            exit;
+        }
+        
+        // Verificar que sea una petición AJAX
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            echo json_encode(['error' => 'Solo se permiten peticiones AJAX']);
+            exit;
+        }
+        
+        // Obtener los parámetros de búsqueda
+        $searchTerm = $_GET['term'] ?? '';
+        
+        // Filtros
+        $filters = [];
+        if (isset($_GET['muscle']) && !empty($_GET['muscle'])) $filters['muscle'] = $_GET['muscle'];
+        if (isset($_GET['equipment']) && !empty($_GET['equipment'])) $filters['equipment'] = $_GET['equipment'];
+        if (isset($_GET['difficulty']) && !empty($_GET['difficulty'])) $filters['difficulty'] = $_GET['difficulty'];
+        if (isset($_GET['type']) && !empty($_GET['type'])) $filters['type'] = $_GET['type'];
+        
+        // Realizar la búsqueda
+        $exercises = $this->exerciseApiService->searchExercises($searchTerm, $filters);
+        
+        // Devolver los resultados en formato JSON
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'results' => $exercises,
+            'count' => count($exercises)
+        ]);
+        exit;
+    }
+
+    /**
+     * Descarga una rutina en formato PDF directamente al navegador del cliente
+     * @param int $id ID de la rutina a descargar
+     */
+    public function downloadPDF($id = null) {
+        // Verificar que el usuario esté logueado y tenga los permisos adecuados
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['toast_message'] = 'Debes iniciar sesión para descargar rutinas';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        } elseif (!in_array($_SESSION['user_role'], ['staff', 'admin'])) {
+            $_SESSION['toast_message'] = 'No tienes permisos para acceder a esta función';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/users/dashboard');
+            exit;
+        }
+
+        if (!$id) {
+            $_SESSION['toast_message'] = 'La rutina no existe';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+
+        // Obtener la rutina
+        $routine = $this->routineModel->getRoutineById($id);
+
+        // Verificar que la rutina exista
+        if (!$routine) {
+            $_SESSION['toast_message'] = 'La rutina no existe';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+
+        // Obtener los ejercicios de la rutina
+        $exercises = $this->routineModel->getExercisesByRoutine($id);
+        
+        // Registrar la acción en el log
+        if (class_exists('Logger')) {
+            Logger::log('INFO', "Usuario {$_SESSION['user_id']} ({$_SESSION['user_role']}) descargando PDF de rutina {$id}");
+        }
+
+        // Generar y descargar el PDF directamente al cliente
+        $filename = 'Rutina_' . $routine->nom . '_' . date('Y-m-d') . '.pdf';
+        if ($this->pdfGenerator->downloadRoutinePDF($routine, $exercises, $filename)) {
+            // El PDF fue enviado al cliente, no necesitamos hacer nada más
+            exit;
+        } else {
+            // Si hay un error, informar al usuario
+            $_SESSION['toast_message'] = 'Error al generar el PDF';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/staffRoutine');
+            exit;
+        }
+    }
+
     // Método para cargar una vista
-    protected function view($view, $data = [])
+    protected function loadView($view, $data = [])
     {
         // Cargar el header
         include_once APPROOT . '/views/shared/header/main.php';

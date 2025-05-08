@@ -275,8 +275,7 @@
                     <!-- Menú de Administrador -->
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/admin/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
+                    </li>                    <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/admin/users">Gestionar Usuarios</a>
                     </li>
                     <li class="nav-item">
@@ -284,9 +283,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/admin/classes">Gestionar Clases</a>
+                    </li>                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/admin/notifications">Notificaciones</a>
                     </li>
                     <?php elseif(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'staff'): ?>
                     <!-- Menú de Staff -->
@@ -300,8 +301,7 @@
                         <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
                     </li>
                     <?php else: ?>
-                    <!-- Menú de Usuario Normal -->
-                    <li class="nav-item">
+                    <!-- Menú de Usuario Normal -->                    <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/user/classes">Clases</a>
                     </li>
                     <li class="nav-item">

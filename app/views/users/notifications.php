@@ -2,6 +2,16 @@
 /**
  * Vista para que los usuarios vean sus notificaciones (versión simplificada)
  */
+
+// Obtener las notificaciones leídas de la cookie si existe
+$readNotifications = [];
+if (isset($_SESSION['user_id'])) {
+  $userId = $_SESSION['user_id'];
+  $cookieName = "read_notifications_{$userId}";
+  if (isset($_COOKIE[$cookieName])) {
+    $readNotifications = json_decode($_COOKIE[$cookieName], true) ?: [];
+  }
+}
 ?>
 
 <div class="container-fluid">
@@ -10,9 +20,6 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Notificaciones</h1>
         <div id="notification-actions" class="btn-toolbar mb-2 mb-md-0">
-          <button type="button" id="mark-all-read" class="btn btn-sm btn-outline-primary me-2">
-            <i class="fas fa-check-double me-1"></i> Marcar todas como leídas
-          </button>
           <button type="button" id="refresh-notifications" class="btn btn-sm btn-outline-secondary">
             <i class="fas fa-sync me-1"></i> Actualizar
           </button>
@@ -23,7 +30,18 @@
         Operación completada con éxito.
       </div>
 
-      <?php if(empty($data['notifications'])): ?>
+      <?php 
+      // Filtrar notificaciones leídas
+      $filteredNotifications = [];
+      foreach($data['notifications'] as $notification) {
+        $notifId = is_object($notification) ? $notification->id : $notification['id'];
+        if (!in_array($notifId, $readNotifications)) {
+          $filteredNotifications[] = $notification;
+        }
+      }
+      
+      if(empty($filteredNotifications)): 
+      ?>
         <div class="alert alert-info">
           <i class="fas fa-bell-slash me-2"></i>No hay notificaciones disponibles
         </div>
@@ -31,7 +49,7 @@
         <div class="row">
           <div class="col-12">
             <div class="list-group notification-list mb-4">
-              <?php foreach($data['notifications'] as $notification): 
+              <?php foreach($filteredNotifications as $notification): 
                 // Verificar si es un objeto o un array
                 $id = is_object($notification) ? $notification->id : $notification['id'];
                 $title = is_object($notification) ? $notification->title : $notification['title'];
@@ -71,9 +89,6 @@
                       <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-outline-primary mark-read" data-id="<?php echo $id; ?>" title="Marcar como leída">
                           <i class="fas fa-check"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary dismiss-notification" data-id="<?php echo $id; ?>" title="Descartar">
-                          <i class="fas fa-times"></i>
                         </button>
                       </div>
                     </div>
@@ -142,32 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Manejar clic en botón "Descartar"
-  document.querySelectorAll('.dismiss-notification').forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const notificationId = this.getAttribute('data-id');
-      dismissNotification(notificationId);
-    });
-  });
-  
-  // Manejar clic en "Marcar todas como leídas"
-  document.getElementById('mark-all-read').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelectorAll('.mark-read').forEach(button => {
-      const notificationId = button.getAttribute('data-id');
-      markAsRead(notificationId, false); // false para no animar cada uno individualmente
-    });
-    
-    // Mostrar mensaje de éxito
-    showStatusMessage('Todas las notificaciones han sido marcadas como leídas', 'success');
-    
-    // Esperar un poco y recargar la página
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
-  });
-  
   // Manejar clic en "Actualizar"
   document.getElementById('refresh-notifications').addEventListener('click', function(e) {
     e.preventDefault();
@@ -200,38 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         console.error('Error al marcar como leída:', data.message);
         showStatusMessage('Error al marcar la notificación como leída', 'danger');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      showStatusMessage('Error de conexión', 'danger');
-    });
-  }
-  
-  // Función para descartar notificación
-  function dismissNotification(notificationId) {
-    fetch(`<?php echo URLROOT; ?>/user/dismissNotification/${notificationId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Animar la desaparición de la notificación
-        const notification = document.getElementById(`notification-${notificationId}`);
-        if (notification) {
-          notification.classList.add('fade-out');
-          setTimeout(() => {
-            notification.remove();
-            checkEmptyNotifications();
-          }, 300);
-        }
-      } else {
-        console.error('Error al descartar:', data.message);
-        showStatusMessage('Error al descartar la notificación', 'danger');
       }
     })
     .catch(error => {

@@ -118,7 +118,6 @@ foreach ($data['reservations'] as $reservation) {
                       <th>Hora</th>
                       <th>Instructor</th>
                       <th>Sala</th>
-                      <th>Estado</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -129,13 +128,6 @@ foreach ($data['reservations'] as $reservation) {
                       <td><?= date('H:i', strtotime($reservation->hora)) ?></td>
                       <td><?= $reservation->monitor_nom ?></td>
                       <td><?= $reservation->sala ?></td>
-                      <td>
-                        <?php if ($reservation->assistencia == 1): ?>
-                          <span class="badge bg-success">Asistió</span>
-                        <?php else: ?>
-                          <span class="badge bg-danger">No asistió</span>
-                        <?php endif; ?>
-                      </td>
                     </tr>
                     <?php endforeach; ?>
                   </tbody>

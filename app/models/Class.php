@@ -355,5 +355,46 @@ class Class_ {
         
         return $this->db->resultSet();
     }
+    
+    /**
+     * Obtiene las clases programadas para los próximos N días de un monitor específico
+     * @param int $monitorId ID del monitor
+     * @param int $days Número de días a consultar desde hoy
+     * @return array Lista de clases del monitor para los próximos días
+     */
+    public function getUpcomingClassesByMonitor($monitorId, $days = 3) {
+        $currentDate = date('Y-m-d');
+        $endDate = date('Y-m-d', strtotime("+$days days"));
+        
+        $sql = 'SELECT c.*, tc.nom as tipus_nom, tc.descripcio as tipus_descripcio, 
+               CONCAT(u.nom, " ", u.cognoms) as monitor_nom, tc.nom as clase_tipo 
+               FROM classes c
+               JOIN tipus_classes tc ON c.tipus_classe_id = tc.tipus_classe_id
+               JOIN usuaris u ON c.monitor_id = u.usuari_id
+               WHERE c.data >= :current_date AND c.data <= :end_date 
+               AND c.monitor_id = :monitor_id
+               ORDER BY c.data ASC, c.hora ASC';
+        
+        $this->db->query($sql);
+        $this->db->bind(':current_date', $currentDate);
+        $this->db->bind(':end_date', $endDate);
+        $this->db->bind(':monitor_id', $monitorId);
+        
+        return $this->db->resultSet();
+    }
+    
+    /**
+     * Obtiene el número de clases programadas para hoy
+     * @return int Número de clases programadas para hoy
+     */
+    public function getTodayClassesCount() {
+        $currentDate = date('Y-m-d');
+        
+        $this->db->query('SELECT COUNT(*) as total FROM classes WHERE data = :current_date');
+        $this->db->bind(':current_date', $currentDate);
+        
+        $row = $this->db->single();
+        return $row->total;
+    }
 }
 ?>

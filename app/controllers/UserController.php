@@ -186,9 +186,6 @@ class UserController {
     public function reserveClass() {
         // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
-            $_SESSION['message'] = 'Debes iniciar sesión para reservar una clase';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Debes iniciar sesión para reservar una clase';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/auth/login');
@@ -197,9 +194,6 @@ class UserController {
         
         // Verificar si se recibió un ID de clase
         if (!isset($_POST['class_id']) || empty($_POST['class_id'])) {
-            $_SESSION['message'] = 'No se ha seleccionado ninguna clase';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'No se ha seleccionado ninguna clase';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
@@ -215,9 +209,6 @@ class UserController {
         
         // Verificar si el usuario ya tiene una reserva para esta clase
         if ($reservationModel->userHasReservation($userId, $classId)) {
-            $_SESSION['message'] = 'Ya tienes una reserva para esta clase';
-            $_SESSION['message_type'] = 'warning';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Ya tienes una reserva para esta clase';
             $_SESSION['toast_type'] = 'warning';
             header('Location: ' . URLROOT . '/user/classes');
@@ -226,9 +217,6 @@ class UserController {
         
         // Verificar si la clase tiene plazas disponibles
         if (!$reservationModel->isClassAvailable($classId)) {
-            $_SESSION['message'] = 'Esta clase no tiene plazas disponibles';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Esta clase no tiene plazas disponibles';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
@@ -241,15 +229,9 @@ class UserController {
         $reservationModel->setAttendance(0); // No ha asistido todavía
         
         if ($reservationModel->create()) {
-            $_SESSION['message'] = 'Reserva realizada con éxito';
-            $_SESSION['message_type'] = 'success';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Reserva realizada con éxito';
             $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['message'] = 'Error al realizar la reserva';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Error al realizar la reserva';
             $_SESSION['toast_type'] = 'error';
         }
@@ -264,9 +246,6 @@ class UserController {
     public function cancelReservation() {
         // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
-            $_SESSION['message'] = 'Debes iniciar sesión para cancelar una reserva';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Debes iniciar sesión para cancelar una reserva';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/auth/login');
@@ -275,9 +254,6 @@ class UserController {
         
         // Verificar si se recibió un ID de reserva
         if (!isset($_POST['reservation_id']) || empty($_POST['reservation_id'])) {
-            $_SESSION['message'] = 'No se ha seleccionado ninguna reserva';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'No se ha seleccionado ninguna reserva';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
@@ -294,9 +270,6 @@ class UserController {
         $reservationModel->findById($reservationId);
         
         if ($reservationModel->getUserId() != $_SESSION['user_id']) {
-            $_SESSION['message'] = 'No tienes permiso para cancelar esta reserva';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'No tienes permiso para cancelar esta reserva';
             $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/user/classes');
@@ -306,15 +279,9 @@ class UserController {
         // Cancelar la reserva
         $reservationModel->setId($reservationId);
         if ($reservationModel->cancel()) {
-            $_SESSION['message'] = 'Reserva cancelada con éxito';
-            $_SESSION['message_type'] = 'success';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Reserva cancelada con éxito';
             $_SESSION['toast_type'] = 'success';
         } else {
-            $_SESSION['message'] = 'Error al cancelar la reserva';
-            $_SESSION['message_type'] = 'danger';
-            // Añadir notificación toast
             $_SESSION['toast_message'] = 'Error al cancelar la reserva';
             $_SESSION['toast_type'] = 'error';
         }
@@ -329,8 +296,8 @@ class UserController {
     public function myReservations() {
         // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
-            $_SESSION['message'] = 'Debes iniciar sesión para ver tus reservas';
-            $_SESSION['message_type'] = 'danger';
+            $_SESSION['toast_message'] = 'Debes iniciar sesión para ver tus reservas';
+            $_SESSION['toast_type'] = 'error';
             header('Location: ' . URLROOT . '/auth/login');
             exit;
         }
@@ -355,40 +322,42 @@ class UserController {
         include_once APPROOT . '/views/users/my_reservations.php';
         
         // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
-    
-    /**
-     * Muestra la página de pistas
-     */
-    public function courts() {
-        $data = [
-            'title' => 'Pistas',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
-        ];
-        
-        // Aquí se cargarían las pistas desde el modelo
-        
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/courts.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
+        include_once APPROOT . '/views/shared/footer/main.php';    }
     
     /**
      * Muestra la página de tracking
      */
     public function tracking() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['toast_message'] = 'Debes iniciar sesión para ver el seguimiento físico';
+            $_SESSION['toast_type'] = 'error';
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        }
+        
+        // Cargar modelo de PhysicalTracking
+        require_once APPROOT . '/models/PhysicalTracking.php';
+        $trackingModel = new PhysicalTracking();
+        
+        // Obtener el historial de medidas del usuario
+        $userId = $_SESSION['user_id'];
+        $measurements = $trackingModel->getUserMeasurements($userId);
+        
+        // Obtener la última medición
+        $lastMeasurement = $trackingModel->getLastMeasurement($userId);
+        
+        // Obtener datos para el gráfico (últimos 6 meses por defecto)
+        $chartData = $trackingModel->getChartData($userId, 6);
+        
+        // Preparar datos para la vista
         $data = [
             'title' => 'Seguimiento Físico',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
+            'measurements' => $measurements,
+            'lastMeasurement' => $lastMeasurement,
+            'chartData' => $chartData
         ];
-        
-        // Aquí se cargarían los datos de tracking desde el modelo
         
         // Cargar el header
         include_once APPROOT . '/views/shared/header/main.php';
@@ -398,6 +367,221 @@ class UserController {
         
         // Cargar el footer
         include_once APPROOT . '/views/shared/footer/main.php';
+    }
+    
+    /**
+     * Añadir una nueva medición física
+     */
+    public function addMeasurement() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Debes iniciar sesión para añadir mediciones';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/auth/login');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No has iniciado sesión']);
+                return;
+            }
+        }
+        
+        // Verificar que sea una petición POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+                return;
+            }
+        }
+        
+        // Si es una petición AJAX, obtener datos del cuerpo
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            $json = file_get_contents('php://input');
+            $postData = json_decode($json, true);
+        } else {
+            // Si es una petición normal, obtener datos del formulario
+            $postData = $_POST;
+        }
+        
+        // Validar datos
+        if (empty($postData['weight']) || empty($postData['height'])) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'El peso y la altura son obligatorios';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'El peso y la altura son obligatorios']);
+                return;
+            }
+        }
+        
+        // Cargar modelo de PhysicalTracking
+        require_once APPROOT . '/models/PhysicalTracking.php';
+        $trackingModel = new PhysicalTracking();
+        
+        // Preparar datos para guardar
+        $measurementData = [
+            'usuari_id' => $_SESSION['user_id'],
+            'pes' => floatval($postData['weight']),
+            'alcada' => floatval($postData['height'])
+            // El IMC se calculará en el modelo
+        ];
+        
+        // Guardar la medición
+        if ($trackingModel->addMeasurement($measurementData)) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Medición guardada correctamente';
+                $_SESSION['toast_type'] = 'success';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                // Obtener la última medición para devolverla en la respuesta
+                $lastMeasurement = $trackingModel->getLastMeasurement($_SESSION['user_id']);
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Medición guardada correctamente',
+                    'measurement' => $lastMeasurement
+                ]);
+                return;
+            }
+        } else {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Error al guardar la medición';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al guardar la medición']);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Eliminar una medición
+     */
+    public function deleteMeasurement() {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Debes iniciar sesión para eliminar mediciones';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/auth/login');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No has iniciado sesión']);
+                return;
+            }
+        }
+        
+        // Verificar que sea una petición POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+                return;
+            }
+        }
+        
+        // Si es una petición AJAX, obtener datos del cuerpo
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            $json = file_get_contents('php://input');
+            $postData = json_decode($json, true);
+        } else {
+            // Si es una petición normal, obtener datos del formulario
+            $postData = $_POST;
+        }
+        
+        if (empty($postData['measurementId'])) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'ID de medición no válido';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'ID de medición no válido']);
+                return;
+            }
+        }
+        
+        // Cargar modelo de PhysicalTracking
+        require_once APPROOT . '/models/PhysicalTracking.php';
+        $trackingModel = new PhysicalTracking();
+        
+        // Eliminar la medición
+        $measurementId = $postData['measurementId'];
+        $userId = $_SESSION['user_id'];
+        
+        if ($trackingModel->deleteMeasurement($measurementId, $userId)) {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Medición eliminada correctamente';
+                $_SESSION['toast_type'] = 'success';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => true, 'message' => 'Medición eliminada correctamente']);
+                return;
+            }
+        } else {
+            if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+                $_SESSION['toast_message'] = 'Error al eliminar la medición';
+                $_SESSION['toast_type'] = 'error';
+                header('Location: ' . URLROOT . '/user/tracking');
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al eliminar la medición']);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Obtener datos para el gráfico de seguimiento (mediante AJAX)
+     * @param int $months Número de meses a mostrar (opcional)
+     */
+    public function getTrackingChartData($months = 6) {
+        // Verificar si el usuario está logueado
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'No has iniciado sesión']);
+            return;
+        }
+        
+        // Verificar que sea una petición AJAX
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'message' => 'Solicitud no permitida']);
+            return;
+        }
+        
+        // Si viene un parámetro de meses en la petición
+        $json = file_get_contents('php://input');
+        $data = json_decode($json);
+        if (isset($data->months)) {
+            $months = intval($data->months);
+        }
+        
+        // Validar el rango de meses
+        if (!in_array($months, [3, 6, 12])) {
+            $months = 6; // Valor por defecto
+        }
+        
+        // Cargar modelo de PhysicalTracking
+        require_once APPROOT . '/models/PhysicalTracking.php';
+        $trackingModel = new PhysicalTracking();
+        
+        // Obtener datos para el gráfico
+        $userId = $_SESSION['user_id'];
+        $chartData = $trackingModel->getChartData($userId, $months);
+        
+        echo json_encode([
+            'success' => true,
+            'data' => $chartData
+        ]);
     }
     
     /**
@@ -642,7 +826,6 @@ class UserController {
             
             // Validación de datos
             if (empty($data['name']) || empty($data['lastname']) || empty($data['email'])) {
-                flash('profile_message', 'Por favor, rellene todos los campos obligatorios', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Por favor, rellene todos los campos obligatorios';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/profile');
@@ -656,11 +839,9 @@ class UserController {
                 $_SESSION['user_lastname'] = $data['lastname'];
                 $_SESSION['user_email'] = $data['email'];
                 
-                flash('profile_message', 'Perfil actualizado con éxito', 'alert alert-success');
                 $_SESSION['toast_message'] = 'Perfil actualizado correctamente';
                 $_SESSION['toast_type'] = 'success';
             } else {
-                flash('profile_message', 'Error al actualizar el perfil', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al actualizar el perfil';
                 $_SESSION['toast_type'] = 'error';
             }
@@ -688,7 +869,6 @@ class UserController {
             
             // Validación de datos
             if (empty($data['current_password']) || empty($data['new_password']) || empty($data['confirm_password'])) {
-                flash('password_message', 'Por favor, rellene todos los campos', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Por favor, rellene todos los campos';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/profile');
@@ -696,7 +876,6 @@ class UserController {
             }
             
             if ($data['new_password'] !== $data['confirm_password']) {
-                flash('password_message', 'Las contraseñas no coinciden', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Las contraseñas no coinciden';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/profile');
@@ -704,7 +883,6 @@ class UserController {
             }
             
             if (strlen($data['new_password']) < 6) {
-                flash('password_message', 'La contraseña debe tener al menos 6 caracteres', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'La contraseña debe tener al menos 6 caracteres';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/profile');
@@ -714,7 +892,6 @@ class UserController {
             // Verificar la contraseña actual
             $user = $this->userModel->getUserById($data['id']);
             if (!$user || !password_verify($data['current_password'], $user->contrasenya)) {
-                flash('password_message', 'Contraseña actual incorrecta', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Contraseña actual incorrecta';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/profile');
@@ -723,11 +900,9 @@ class UserController {
             
             // Cambiar contraseña
             if ($this->userModel->changePassword($data['id'], $data['new_password'])) {
-                flash('password_message', 'Contraseña cambiada con éxito', 'alert alert-success');
                 $_SESSION['toast_message'] = 'Contraseña cambiada correctamente';
                 $_SESSION['toast_type'] = 'success';
             } else {
-                flash('password_message', 'Error al cambiar la contraseña', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al cambiar la contraseña';
                 $_SESSION['toast_type'] = 'error';
             }
@@ -749,7 +924,6 @@ class UserController {
             $userId = $_SESSION['user_id'];
             
             if (empty($classId)) {
-                flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al procesar la reserva';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/classes');
@@ -759,7 +933,6 @@ class UserController {
             // Verificar si la clase existe y tiene capacidad disponible
             $class = $this->classModel->getClassById($classId);
             if (!$class || $class->capacitat_actual >= $class->capacitat_maxima) {
-                flash('reservation_message', 'No hay plazas disponibles para esta clase', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'No hay plazas disponibles para esta clase';
                 $_SESSION['toast_type'] = 'error';
                 header('Location: ' . URLROOT . '/users/classes');
@@ -768,7 +941,6 @@ class UserController {
             
             // Verificar si el usuario ya tiene una reserva para esta clase
             if ($this->reservationModel->hasUserReservation($userId, $classId)) {
-                flash('reservation_message', 'Ya tienes una reserva para esta clase', 'alert alert-warning');
                 $_SESSION['toast_message'] = 'Ya tienes una reserva para esta clase';
                 $_SESSION['toast_type'] = 'warning';
                 header('Location: ' . URLROOT . '/users/classes');
@@ -779,18 +951,15 @@ class UserController {
             if ($this->reservationModel->addReservation($userId, $classId)) {
                 // Incrementar el contador de capacidad actual
                 if ($this->classModel->incrementCapacity($classId)) {
-                    flash('reservation_message', 'Reserva realizada con éxito', 'alert alert-success');
                     $_SESSION['toast_message'] = 'Reserva realizada correctamente';
                     $_SESSION['toast_type'] = 'success';
                 } else {
                     // Rollback: eliminar la reserva si no se pudo actualizar la capacidad
                     $this->reservationModel->deleteReservation($userId, $classId);
-                    flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
                     $_SESSION['toast_message'] = 'Error al procesar la reserva';
                     $_SESSION['toast_type'] = 'error';
                 }
             } else {
-                flash('reservation_message', 'Error al procesar la reserva', 'alert alert-danger');
                 $_SESSION['toast_message'] = 'Error al procesar la reserva';
                 $_SESSION['toast_type'] = 'error';
             }
@@ -829,15 +998,14 @@ class UserController {
      * 
      * @param array $userData Datos del usuario registrado
      * @return bool Éxito o fracaso del envío
-     */
-    private function sendWelcomeEmail($userData) {
+     */    private function sendWelcomeEmail($userData) {
         $to = $userData['email'];
-        $subject = "Benvingut/da a Gym Intranet!";
+        $subject = "¡Bienvenido/a a Gym Intranet!";
         
         $body = "
         <html>
         <head>
-            <title>Benvingut/da a Gym Intranet!</title>
+            <title>¡Bienvenido/a a Gym Intranet!</title>
             <style>
                 body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 0; background-color: #f9f9f9; }
                 .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -862,56 +1030,56 @@ class UserController {
         <body>
             <div class='container'>
                 <div class='header'>
-                    <h1>BENVINGUT/DA A GYM INTRANET!</h1>
+                    <h1>¡BIENVENIDO/A A GYM INTRANET!</h1>
                 </div>
                 <div class='content'>
-                    <p class='welcome-message'>Hola <strong>{$userData['fullName']}</strong>, ens alegra tenir-te amb nosaltres!</p>
+                    <p class='welcome-message'>Hola <strong>{$userData['fullName']}</strong>, ¡nos alegra tenerte con nosotros!</p>
                     
-                    <p>El teu compte ha estat creat amb èxit i ja pots començar a gaudir de tots els beneficis del nostre centre esportiu.</p>
+                    <p>Tu cuenta ha sido creada con éxito y ya puedes empezar a disfrutar de todos los beneficios de nuestro centro deportivo.</p>
                     
                     <div class='info-box'>
-                        <h3>💡 INFORMACIÓ D'ACCÉS</h3>
-                        <p>Pots iniciar sessió a la nostra plataforma amb les següents dades:</p>
+                        <h3>💡 INFORMACIÓN DE ACCESO</h3>
+                        <p>Puedes iniciar sesión en nuestra plataforma con los siguientes datos:</p>
                         <p><strong>Email:</strong> {$userData['email']}</p>
-                        <p><strong>Contrasenya:</strong> La que has establert durant el registre</p>
+                        <p><strong>Contraseña:</strong> Te la comunicará un administrador</p>
                     </div>
                     
                     <div class='benefits'>
-                        <h3>QUÈ POTS FER A LA NOSTRA PLATAFORMA?</h3>
+                        <h3>¿QUÉ PUEDES HACER EN NUESTRA PLATAFORMA?</h3>
                         <div class='benefit-item'>
                             <div class='benefit-icon'>🏋️</div>
-                            <div>Reservar classes dirigides amb els nostres millors instructors</div>
+                            <div>Reservar clases dirigidas con nuestros mejores instructores</div>
                         </div>
                         <div class='benefit-item'>
                             <div class='benefit-icon'>🎾</div>
-                            <div>Reservar pistes esportives per a les teves activitats favorites</div>
+                            <div>Reservar pistas deportivas para tus actividades favoritas</div>
                         </div>
                         <div class='benefit-item'>
                             <div class='benefit-icon'>📊</div>
-                            <div>Fer seguiment del teu progrés físic personal</div>
+                            <div>Hacer seguimiento de tu progreso físico personal</div>
                         </div>
                         <div class='benefit-item'>
                             <div class='benefit-icon'>📱</div>
-                            <div>Accedir a la teva informació des de qualsevol dispositiu</div>
+                            <div>Acceder a tu información desde cualquier dispositivo</div>
                         </div>
                     </div>
                     
                     <div class='button-container'>
-                        <a href='".URLROOT."/auth/login' class='button'>ACCEDIR ARA</a>
+                        <a href='".URLROOT."/auth/login' class='button'>ACCEDER AHORA</a>
                     </div>
                     
-                    <p>Si tens alguna pregunta o necessites ajuda, no dubtis en contactar amb el nostre equip de suport.</p>
+                    <p>Si tienes alguna pregunta o necesitas ayuda, no dudes en contactar con nuestro equipo de soporte.</p>
                     
                     <div class='social-links'>
-                        <p>Segueix-nos a les xarxes socials:</p>
+                        <p>Síguenos en las redes sociales:</p>
                         <a href='#' class='social-icon'>📱</a>
                         <a href='#' class='social-icon'>📘</a>
                         <a href='#' class='social-icon'>📸</a>
                     </div>
                 </div>
                 <div class='footer'>
-                    <p>© " . date('Y') . " Gym Intranet. Tots els drets reservats.</p>
-                    <p>Aquest és un missatge automàtic, si us plau no responguis a aquest correu.</p>
+                    <p>© " . date('Y') . " Gym Intranet. Todos los derechos reservados.</p>
+                    <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
                 </div>
             </div>
         </body>
@@ -1012,10 +1180,29 @@ class UserController {
         require_once APPROOT . '/models/Notification.php';
         $notificationModel = new Notification();
         
-        // Marcar como leída
+        // Marcar como leída en la base de datos
         $success = $notificationModel->markAsRead($notificationId, $_SESSION['user_id']);
         
+        // Almacenar en cookie para que no se muestre más
         if ($success) {
+            $userId = $_SESSION['user_id'];
+            $cookieName = "read_notifications_{$userId}";
+            
+            // Obtener las notificaciones leídas actuales
+            $readNotifications = [];
+            if (isset($_COOKIE[$cookieName])) {
+                $readNotifications = json_decode($_COOKIE[$cookieName], true) ?: [];
+            }
+            
+            // Agregar la nueva notificación leída si no está ya
+            if (!in_array($notificationId, $readNotifications)) {
+                $readNotifications[] = $notificationId;
+            }
+            
+            // Guardar la cookie actualizada (duración 30 días)
+            $expiryTime = time() + (30 * 24 * 60 * 60);
+            setcookie($cookieName, json_encode($readNotifications), $expiryTime, '/');
+            
             echo json_encode(['success' => true, 'message' => 'Notificación marcada como leída']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al marcar la notificación']);

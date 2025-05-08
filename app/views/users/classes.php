@@ -16,6 +16,48 @@ if (isset($_SESSION['message'])) {
 }
 ?>
 
+<style>
+  /* Estilos para el horario de la clase */
+  .time-display {
+    transition: all 0.2s ease;
+    padding: 4px 0;
+  }
+  .time-display:hover {
+    transform: scale(1.05);
+  }
+  .class-card:hover .time-display {
+    color: #0d6efd;
+  }
+  
+  /* Destacado de la tarjeta de clase */
+  .class-card .card {
+    transition: all 0.3s ease;
+  }
+  .class-card:hover .card {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+  }
+    /* Estilo para nombre del instructor */
+  .instructor-name {
+    color: #495057;
+  }
+  .class-card:hover .instructor-name {
+    color: #0d6efd;
+  }
+  
+  /* Estilos para las fechas */
+  .badge.date-badge {
+    padding: 8px 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+  }
+  .class-card:hover .date-badge {
+    transform: scale(1.05);
+    background-color: #0d47a1 !important;
+  }
+</style>
+
 <div class="container-fluid">
   <div class="row">
     <main class="col-12 px-md-4">
@@ -34,7 +76,7 @@ if (isset($_SESSION['message'])) {
               <?php endif; ?>
             </div>
           </form>
-          <div class="dropdown">
+          <div class="dropdown me-2">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-filter"></i> Filtrar por tipo
               <span id="activeTypeFilter" class="badge bg-primary ms-1" style="display: none;"></span>
@@ -46,6 +88,10 @@ if (isset($_SESSION['message'])) {
               <?php endforeach; ?>
             </ul>
           </div>
+          <!-- Botón para eliminar todos los filtros -->
+          <button id="clearAllFiltersBtn" class="btn btn-sm btn-outline-danger">
+            <i class="fas fa-eraser me-1"></i> Eliminar filtros
+          </button>
         </div>
       </div>
 
@@ -70,14 +116,12 @@ if (isset($_SESSION['message'])) {
             ?>
             <div class="col-md-4 mb-4">
               <div class="card border-left-primary shadow-sm h-100">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="card-body">                  <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 class="card-title mb-0"><?= $reservation->tipus_nom ?></h5>
-                    <span class="badge bg-primary"><?= date('d/m/Y', strtotime($reservation->data)) ?></span>
-                  </div>
-                  <div class="mb-2">
+                    <span class="badge bg-primary fs-6 date-badge"><?= date('d/m/Y', strtotime($reservation->data)) ?></span>
+                  </div>                  <div class="mb-2 time-display">
                     <i class="far fa-clock text-muted me-2"></i>
-                    <span><?= date('H:i', strtotime($reservation->hora)) ?></span>
+                    <span class="fs-5 fw-medium"><?= date('H:i', strtotime($reservation->hora)) ?></span>
                   </div>
                   <div class="mb-2">
                     <i class="fas fa-user text-muted me-2"></i>
@@ -107,11 +151,9 @@ if (isset($_SESSION['message'])) {
           </div>
         </div>
       </div>
-      <?php endif; ?>
-
-      <!-- Clases Disponibles -->
+      <?php endif; ?>      <!-- Clases Disponibles -->
       <div class="mb-3">
-        <h4>Clases disponibles para <?= date('d/m/Y', strtotime($filterDate)) ?></h4>
+        <h4>Clases disponibles para <span class="badge bg-primary p-2 fs-5"><?= date('d/m/Y', strtotime($filterDate)) ?></span></h4>
         <p class="text-muted">Reserva tu plaza en nuestras clases y empieza a disfrutar de nuestras actividades.</p>
       </div>
 
@@ -160,18 +202,16 @@ if (isset($_SESSION['message'])) {
             }
           ?>
           <div class="col-md-4 mb-4 class-card" data-class-type="<?= $class->tipus_classe_id ?>">
-            <div class="card shadow-sm h-100 <?= $cardStyle ?>">
-              <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div class="card shadow-sm h-100 <?= $cardStyle ?>">              <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0 fw-bold"><?= $class->tipus_nom ?></h5>
-                <span class="badge bg-primary">
+                <span class="badge bg-primary fs-6 date-badge">
                   <?= date('d/m/Y', strtotime($class->data)) ?>
                 </span>
               </div>
-              <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                  <div>
+              <div class="card-body">                <div class="d-flex justify-content-between mb-3">
+                  <div class="time-display">
                     <i class="far fa-clock me-1"></i> 
-                    <?= date('H:i', strtotime($class->hora)) ?> - <?= date('H:i', strtotime($class->hora) + $class->duracio * 60) ?>
+                    <span class="fs-4 fw-bold"><?= date('H:i', strtotime($class->hora)) ?> - <?= date('H:i', strtotime($class->hora) + $class->duracio * 60) ?></span>
                   </div>
                   <div class="<?= $textClass ?> fw-bold">
                     <i class="fas fa-users me-1"></i>
@@ -187,12 +227,11 @@ if (isset($_SESSION['message'])) {
                        aria-valuemin="0" 
                        aria-valuemax="100"></div>
                 </div>
-                
-                <div class="mb-3">
-                  <i class="fas fa-map-marker-alt me-2"></i> <?= $class->sala ?>
+                  <div class="mb-3">
+                  <i class="fas fa-map-marker-alt me-2"></i> <span class="fw-medium"><?= $class->sala ?></span>
                 </div>
                 <div class="mb-3">
-                  <i class="fas fa-user me-2"></i> <?= $class->monitor_nom ?>
+                  <i class="fas fa-user me-2"></i> <span class="instructor-name fw-medium"><?= $class->monitor_nom ?></span>
                 </div>
                 
                 <?php if (!empty($class->tipus_descripcio)): ?>
@@ -235,8 +274,17 @@ if (isset($_SESSION['message'])) {
   document.addEventListener('DOMContentLoaded', function() {
     // Establecer la fecha actual como valor predeterminado para el filtro si no hay filtro previo
     const dateInput = document.querySelector('input[name="date"]');
-    if (dateInput && dateInput.value === "") {
-      dateInput.valueAsDate = new Date();
+    if (dateInput) {
+      // Establecer la fecha mínima como hoy
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.setAttribute('min', today);
+      
+      if (dateInput.value === "") {
+        dateInput.valueAsDate = new Date();
+      } else if (dateInput.value < today) {
+        // Si la fecha seleccionada es anterior a hoy, actualizar a la fecha actual
+        dateInput.valueAsDate = new Date();
+      }
     }
     
     // Variables para tracking de filtros activos
@@ -318,17 +366,26 @@ if (isset($_SESSION['message'])) {
         dateFilterForm.submit();
       });
     }
-    
-    // Restablecer todos los filtros (botón dinámico)
+      // Restablecer todos los filtros (botón dinámico)
     document.addEventListener('click', function(event) {
       if (event.target && event.target.id === 'resetAllFilters') {
+        // Reiniciar el filtro de tipo
         activeTypeFilter = 'all';
-        const dateFilterForm = document.getElementById('dateFilterForm');
-        const dateFilterInput = document.getElementById('dateFilter');
-        dateFilterInput.valueAsDate = new Date();
-        dateFilterForm.submit();
+        
+        // En lugar de enviar el formulario con la fecha actual, redirigir a la página sin filtros
+        window.location.href = '<?= URLROOT ?>/user/classes';
       }
-    });
+    });// Eliminar todos los filtros (botón estático)
+    const clearAllFiltersBtn = document.getElementById('clearAllFiltersBtn');
+    if (clearAllFiltersBtn) {
+      clearAllFiltersBtn.addEventListener('click', () => {
+        // Reiniciar el filtro de tipo
+        activeTypeFilter = 'all';
+        
+        // En lugar de enviar el formulario con la fecha actual, redirigir a la página sin filtros
+        window.location.href = '<?= URLROOT ?>/user/classes';
+      });
+    }
     
     // Aplicar filtros iniciales
     applyFilters();

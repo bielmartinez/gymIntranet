@@ -79,16 +79,15 @@ if ($controllerName === 'AdminController' && $action === 'register') {
 }
 
 // Si no hay controlador especificado, cargar la página de inicio 
-// (DESHABILITADO TEMPORALMENTE: login para usuarios no autenticados)
+// Para usuarios no autenticados, redirigir al login
 if (empty($urlParts[0])) {
-    // Deshabilitar verificación de autenticación para pruebas
-    // if (!isset($_SESSION['user_id'])) {
-    //     $controllerName = 'AuthController';
-    //     $action = 'login';
-    // } else {
+    if (!isset($_SESSION['user_id'])) {
+        $controllerName = 'AuthController';
+        $action = 'login';
+    } else {
         $controllerName = 'UserController';
         $action = 'dashboard';
-    // }
+    }
 }
 
 // Verificar si el controlador existe
@@ -97,6 +96,14 @@ if (!file_exists(APPROOT . '/controllers/' . $controllerName . '.php')) {
     Logger::log('ERROR', "Controlador no encontrado: {$controllerName}");
     header("HTTP/1.0 404 Not Found");
     include_once APPROOT . '/views/shared/error/404.php';
+    exit;
+}
+
+// Verificar autenticación para rutas protegidas
+// Solo permitir acceso sin autenticación a AuthController
+if ($controllerName !== 'AuthController' && !isset($_SESSION['user_id'])) {
+    Logger::log('INFO', "Redirigiendo a login: usuario no autenticado intentando acceder a {$controllerName}->{$action}");
+    header('Location: ' . URLROOT . '/auth/login');
     exit;
 }
 

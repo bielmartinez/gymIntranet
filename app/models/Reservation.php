@@ -250,6 +250,9 @@ class Reservation {
         
         if($date) {
             $sql .= " AND c.data = :date";
+        } else {
+            // Si no se especifica una fecha, mostrar solo clases de hoy en adelante
+            $sql .= " AND c.data >= CURDATE()";
         }
         
         $sql .= " ORDER BY c.data ASC, c.hora ASC";

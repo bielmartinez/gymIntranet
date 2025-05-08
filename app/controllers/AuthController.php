@@ -22,15 +22,12 @@ class AuthController {
     
     /**
      * Muestra la página de inicio de sesión
-     */
-    public function login() {
-        // DESHABILITADO TEMPORALMENTE: Redirigir si ya está logueado
-        /*
+     */    public function login() {
+        // Redirigir si ya está logueado
         if (isset($_SESSION['user_id'])) {
             header('Location: ' . URLROOT . '/user/dashboard');
             exit;
         }
-        */
         
         // Verificar si hay datos de login redirigidos desde el archivo legacy
         if (isset($_SESSION['login_redirect_data'])) {

@@ -45,15 +45,23 @@ class StaffController {
         // Cargar el footer
         include_once APPROOT . '/views/shared/footer/main.php';
     }
-    
-    /**
+      /**
      * Página de inicio para el personal
      */
     public function index() {
+        // Obtener el ID del usuario (monitor)
+        $monitorId = $_SESSION['user_id'] ?? 0;
+        
+        // Cargar el modelo de clases para obtener las próximas clases del monitor
+        require_once APPROOT . '/models/Class.php';
+        $classModel = new Class_();
+        $staffClasses = $classModel->getUpcomingClassesByMonitor($monitorId, 3); // Próximos 3 días
+        
         // Obtener estadísticas para el dashboard
         $data = [
             'title' => 'Dashboard del Personal',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Staff'
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Staff',
+            'staff_classes' => $staffClasses
         ];
         
         // Cargar el header
@@ -77,215 +85,47 @@ class StaffController {
     
     /**
      * Vista de gestión de clases
+     * Ahora redirige a la gestión de clases de Admin
      */
     public function classManagement() {
-        $data = [
-            'title' => 'Gestión de Clases'
-        ];
-        
-        // Cargar header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar vista
-        include_once APPROOT . '/views/staff/class_management.php';
-        
-        // Cargar footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Redirigir a la vista de administración de clases
+        header('Location: ' . URLROOT . '/admin/classes');
+        exit;
     }
     
     /**
-     * Añadir una nueva clase
+     * Añadir una nueva clase - Redirige a Admin
      */
     public function addClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Recoger datos del formulario
-        $data = [
-            'tipus_classe_id' => trim($_POST['tipus_classe_id']),
-            'monitor_id' => trim($_POST['monitor_id']),
-            'data' => trim($_POST['data']),
-            'hora' => trim($_POST['hora']),
-            'duracio' => trim($_POST['duracio']),
-            'capacitat_maxima' => trim($_POST['capacitat_maxima']),
-            'sala' => trim($_POST['sala'])
-        ];
-        
-        // Verificar si hay conflictos de horario para el monitor
-        if ($this->classModel->hasScheduleConflict($data)) {
-            $_SESSION['staff_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Añadir la clase
-        if ($this->classModel->addClass($data)) {
-            $_SESSION['staff_message'] = 'Clase añadida correctamente';
-            $_SESSION['staff_message_type'] = 'success';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Clase añadida correctamente';
-            $_SESSION['toast_type'] = 'success';
-        } else {
-            $_SESSION['staff_message'] = 'Error al añadir la clase';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Error al añadir la clase';
-            $_SESSION['toast_type'] = 'error';
-        }
-        
-        header('Location: ' . URLROOT . '/staff/classManagement');
+        // Redirigir a Admin
+        header('Location: ' . URLROOT . '/admin/addClass');
         exit;
     }
     
     /**
-     * Obtener detalles de una clase (para AJAX)
-     * @param int $classId ID de la clase
+     * Obtener detalles de una clase - Redirige a Admin
      */
     public function getClassDetails($classId = null) {
-        // Verificar que se proporcione un ID
-        if (!$classId) {
-            echo json_encode(['success' => false, 'error' => 'ID de clase no válido']);
-            return;
-        }
-        
-        // Obtener la clase
-        $class = $this->classModel->getClassById($classId);
-        
-        if (!$class) {
-            echo json_encode(['success' => false, 'error' => 'Clase no encontrada']);
-            return;
-        }
-        
-        // Obtener información adicional
-        require_once APPROOT . '/models/TypeClass.php';
-        $typeClassModel = new TypeClass();
-        $typeClass = $typeClassModel->getById($class->tipus_classe_id);
-        $typeClassName = $typeClass ? $typeClass->nom : 'N/A';
-        
-        // Formatear la fecha y hora para el formulario
-        $class->data = date('Y-m-d', strtotime($class->data));
-        $class->hora = date('H:i', strtotime($class->hora));
-        
-        // Obtener alumnos inscritos en la clase
-        $students = $this->reservationModel->getClassReservations($classId);
-        
-        // Devolver los datos como JSON
-        echo json_encode([
-            'success' => true, 
-            'class' => $class,
-            'typeClassName' => $typeClassName,
-            'students' => $students
-        ]);
-    }
-    
-    /**
-     * Actualizar una clase existente
-     */
-    public function updateClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Recoger datos del formulario
-        $data = [
-            'classe_id' => trim($_POST['classe_id']),
-            'tipus_classe_id' => trim($_POST['tipus_classe_id']),
-            'monitor_id' => trim($_POST['monitor_id']),
-            'data' => trim($_POST['data']),
-            'hora' => trim($_POST['hora']),
-            'duracio' => trim($_POST['duracio']),
-            'capacitat_maxima' => trim($_POST['capacitat_maxima']),
-            'sala' => trim($_POST['sala'])
-        ];
-        
-        // Verificar que la capacidad máxima no sea menor que la actual
-        $currentClass = $this->classModel->getClassById($data['classe_id']);
-        if ($currentClass && $data['capacitat_maxima'] < $currentClass->capacitat_actual) {
-            $_SESSION['staff_message'] = 'La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Verificar si hay conflictos de horario para el monitor
-        if ($this->classModel->hasScheduleConflict($data, $data['classe_id'])) {
-            $_SESSION['staff_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Actualizar la clase
-        if ($this->classModel->updateClass($data)) {
-            $_SESSION['staff_message'] = 'Clase actualizada correctamente';
-            $_SESSION['staff_message_type'] = 'success';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Clase actualizada correctamente';
-            $_SESSION['toast_type'] = 'success';
-        } else {
-            $_SESSION['staff_message'] = 'Error al actualizar la clase';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Error al actualizar la clase';
-            $_SESSION['toast_type'] = 'error';
-        }
-        
-        header('Location: ' . URLROOT . '/staff/classManagement');
+        // Redirigir a Admin
+        header('Location: ' . URLROOT . '/admin/getClassDetails/' . $classId);
         exit;
     }
     
     /**
-     * Eliminar una clase
+     * Actualizar una clase existente - Redirige a Admin
+     */
+    public function updateClass() {
+        // Redirigir a Admin
+        header('Location: ' . URLROOT . '/admin/updateClass');
+        exit;
+    }
+    
+    /**
+     * Eliminar una clase - Redirige a Admin
      */
     public function deleteClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Verificar que se haya proporcionado un ID
-        if (!isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
-            $_SESSION['staff_message'] = 'ID de clase no válido';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'ID de clase no válido';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/staff/classManagement');
-            exit;
-        }
-        
-        // Eliminar la clase
-        if ($this->classModel->deleteClass($_POST['classe_id'])) {
-            $_SESSION['staff_message'] = 'Clase eliminada correctamente';
-            $_SESSION['staff_message_type'] = 'success';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Clase eliminada correctamente';
-            $_SESSION['toast_type'] = 'success';
-        } else {
-            $_SESSION['staff_message'] = 'Error al eliminar la clase';
-            $_SESSION['staff_message_type'] = 'danger';
-            // Añadir notificación toast
-            $_SESSION['toast_message'] = 'Error al eliminar la clase';
-            $_SESSION['toast_type'] = 'error';
-        }
-        
-        header('Location: ' . URLROOT . '/staff/classManagement');
+        // Redirigir a Admin
+        header('Location: ' . URLROOT . '/admin/deleteClass');
         exit;
     }
     
@@ -392,27 +232,12 @@ class StaffController {
     
     /**
      * Muestra la página de gestión de clases del staff
-     * Permitirá ver el horario del monitor y los alumnos asignados
+     * Ahora redirige a la gestión de clases de Admin
      */
     public function classes() {
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        
-        // Obtener el ID del staff autenticado
-        $staffId = $_SESSION['user_id'];
-        
-        // Obtener las clases asignadas a este monitor
-        $classes = $classModel->getClassesByStaff($staffId);
-        
-        // Preparar datos para la vista
-        $data = [
-            'title' => 'Mis Clases',
-            'classes' => $classes
-        ];
-        
-        // Cargar vista
-        $this->loadView('staff/class_management', $data);
+        // Redirigir a la vista de administración de clases
+        header('Location: ' . URLROOT . '/admin/classes');
+        exit;
     }
     
     /**
@@ -564,48 +389,12 @@ class StaffController {
     }
     
     /**
-     * Filtrar clases según los criterios seleccionados
+     * Filtrar clases - Redirige a Admin
      */
     public function filterClasses() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/staff/classes');
-            exit;
-        }
-        
-        // Recoger datos del formulario
-        $filters = [
-            'date' => !empty($_POST['date']) ? trim($_POST['date']) : null,
-            'type_id' => !empty($_POST['type_id']) ? trim($_POST['type_id']) : null,
-            'monitor_id' => $_SESSION['user_role'] === 'admin' ? 
-                            (!empty($_POST['monitor_id']) ? trim($_POST['monitor_id']) : null) : 
-                            $_SESSION['user_id'] // Si no es admin, solo puede ver sus propias clases
-        ];
-        
-        // Filtrar las clases
-        $filteredClasses = $this->classModel->filterClasses($filters);
-        
-        // Cargar tipos de clases
-        require_once APPROOT . '/models/TypeClass.php';
-        $typeClassModel = new TypeClass();
-        $classTypes = $typeClassModel->getAll();
-        
-        // Cargar monitores disponibles (solo para admin)
-        $monitors = [];
-        if ($_SESSION['user_role'] === 'admin') {
-            $monitors = $this->userModel->getAllMonitors();
-        }
-        
-        $data = [
-            'title' => 'Gestión de Clases - Resultados filtrados',
-            'classes' => $filteredClasses,
-            'classTypes' => $classTypes,
-            'monitors' => $monitors,
-            'filters' => $filters
-        ];
-        
-        // Cargar la vista
-        $this->loadView('staff/class_management', $data);
+        // Redirigir a Admin
+        header('Location: ' . URLROOT . '/admin/filterClasses');
+        exit;
     }
 }
 ?>

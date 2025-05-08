@@ -58,7 +58,7 @@ include_once APPROOT . '/views/shared/header/main.php';
                         
                         <div class="mb-3">
                             <label for="usuario_id" class="form-label">Usuario asignado <span class="text-danger">*</span></label>
-                            <select class="form-select" id="usuario_id" name="usuario_id" required>
+                            <select class="form-select" id="usuario_id" name="usuari_id" required>
                                 <option value="" selected disabled>Selecciona un usuario</option>
                                 <?php foreach ($data['users'] as $usuario): ?>
                                     <option value="<?= $usuario->id ?>"><?= htmlspecialchars($usuario->fullName) ?> (<?= htmlspecialchars($usuario->email) ?>)</option>

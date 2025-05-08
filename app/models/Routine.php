@@ -55,17 +55,23 @@ class Routine {
 
     // Crear una nueva rutina
     public function addRoutine($data) {
-        $this->db->query('INSERT INTO rutines (usuari_id, nom, descripcio) VALUES (:usuari_id, :nom, :descripcio)');
+        $this->db->query('INSERT INTO rutines (usuari_id, nom, descripcio, creat_el) 
+                          VALUES (:usuari_id, :nom, :descripcio, :creat_el)');
         
-        // Vincular valores
+        // Vincular valores obligatorios
         $this->db->bind(':usuari_id', $data['usuari_id']);
         $this->db->bind(':nom', $data['nom']);
         $this->db->bind(':descripcio', $data['descripcio']);
+        $this->db->bind(':creat_el', $data['creat_el'] ?? date('Y-m-d H:i:s'));
 
         // Ejecutar
         if ($this->db->execute()) {
             return $this->db->lastInsertId();
         } else {
+            // Registrar el error
+            if (class_exists('Logger')) {
+                Logger::log('ERROR', 'Error en addRoutine: ' . json_encode($this->db->getError()));
+            }
             return false;
         }
     }

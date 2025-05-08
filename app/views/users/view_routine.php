@@ -77,9 +77,6 @@ include_once APPROOT . '/views/shared/header/main.php';
                         <div class="col-md-6">
                             <p><strong>Fecha de creación:</strong> <?= date('d/m/Y', strtotime($data['routine']->creat_el)) ?></p>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Creada por:</strong> <?= isset($data['staffName']) ? htmlspecialchars($data['staffName']) : 'Entrenador del gimnasio' ?></p>
-                        </div>
                     </div>
                     <?php if (!empty($data['routine']->descripcio)): ?>
                         <div class="mb-3">

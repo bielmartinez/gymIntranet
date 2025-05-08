@@ -215,15 +215,15 @@ if (isset($data['filters'])) {
           </div>
           <div class="mb-3">
             <label for="classDuration" class="form-label">Duración (minutos)</label>
-            <input type="number" class="form-control" id="classDuration" name="duracio" min="15" step="15" required>
+            <input type="number" class="form-control" id="classDuration" name="duracio" min="15" max="60" step="5" required>
           </div>
           <div class="mb-3">
             <label for="classRoom" class="form-label">Sala</label>
-            <input type="text" class="form-control" id="classRoom" name="sala" required>
+            <input type="number" class="form-control" id="classRoom" name="sala" min="1" max="4" required>
           </div>
           <div class="mb-3">
             <label for="classCapacity" class="form-label">Capacidad Máxima</label>
-            <input type="number" class="form-control" id="classCapacity" name="capacitat_maxima" min="1" required>
+            <input type="number" class="form-control" id="classCapacity" name="capacitat_maxima" min="5" max="20" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -274,15 +274,15 @@ if (isset($data['filters'])) {
           </div>
           <div class="mb-3">
             <label for="editClassDuration" class="form-label">Duración (minutos)</label>
-            <input type="number" class="form-control" id="editClassDuration" name="duracio" min="15" step="15" required>
+            <input type="number" class="form-control" id="editClassDuration" name="duracio" min="15" max="60" step="5" required>
           </div>
           <div class="mb-3">
             <label for="editClassRoom" class="form-label">Sala</label>
-            <input type="text" class="form-control" id="editClassRoom" name="sala" required>
+            <input type="number" class="form-control" id="editClassRoom" name="sala" min="1" max="4" required>
           </div>
           <div class="mb-3">
             <label for="editClassCapacity" class="form-label">Capacidad Máxima</label>
-            <input type="number" class="form-control" id="editClassCapacity" name="capacitat_maxima" min="1" required>
+            <input type="number" class="form-control" id="editClassCapacity" name="capacitat_maxima" min="5" max="20" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -355,11 +355,34 @@ if (isset($data['filters'])) {
       button.addEventListener('click', function() {
         const classId = this.getAttribute('data-class-id');
         
-        // Aquí deberías hacer una solicitud AJAX para obtener los datos de la clase
+        // Mostrar mensaje de carga en el modal
+        const editModal = document.getElementById('editClassModal');
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'text-center my-3';
+        loadingMessage.innerHTML = '<div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando datos de la clase...</p>';
+        
+        // Añadir mensaje de carga al modal
+        const modalBody = editModal.querySelector('.modal-body');
+        const formElement = modalBody.querySelector('form');
+        modalBody.insertBefore(loadingMessage, formElement);
+        
+        // Obtener datos de la clase desde el servidor
         fetch(`<?= URLROOT ?>/Admin/getClassDetails/${classId}`)
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+          })
           .then(data => {
+            // Eliminar mensaje de carga
+            if (loadingMessage) {
+              loadingMessage.remove();
+            }
+            
             if (data.success) {
+              console.log('Datos recibidos para editar clase:', data); // Para debug
+              
               // Rellenar el formulario con los datos
               document.getElementById('editClassId').value = data.class.classe_id;
               document.getElementById('editClassType').value = data.class.tipus_classe_id;
@@ -370,12 +393,17 @@ if (isset($data['filters'])) {
               document.getElementById('editClassRoom').value = data.class.sala;
               document.getElementById('editClassCapacity').value = data.class.capacitat_maxima;
             } else {
-              alert('Error al cargar los datos de la clase');
+              alert('Error al cargar los datos de la clase: ' + (data.error || 'Error desconocido'));
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('Error al conectar con el servidor');
+            alert('Error al conectar con el servidor: ' + error.message);
+            
+            // Eliminar mensaje de carga en caso de error
+            if (loadingMessage) {
+              loadingMessage.remove();
+            }
           });
       });
     });

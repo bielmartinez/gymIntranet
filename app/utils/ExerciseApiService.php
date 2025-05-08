@@ -5,6 +5,7 @@
  */
 class ExerciseApiService {
     private $apiKey;
+    private $rapidApiKey;
     private $baseUrl;
     private $lastError = null;
     private $lastHttpCode = 200;
@@ -15,6 +16,8 @@ class ExerciseApiService {
     public function __construct() {
         // Obtener la API key desde el archivo de configuración o variables de entorno
         $this->apiKey = getenv('API_NINJAS_KEY') ?: 'sX/y+NBDrmBqMS3Crt8x/Q==ffda6PsfKGzOkZS3'; 
+        // Clave API específica para RapidAPI ExerciseDB
+        $this->rapidApiKey = getenv('RAPID_API_KEY') ?: '7bfb89b35fmshb26219938180c66p18b403jsnf0f4866bd5e7';
         $this->baseUrl = 'https://api.api-ninjas.com/v1/exercises';
     }
     
@@ -249,181 +252,237 @@ class ExerciseApiService {
     }
     
     /**
-     * Busca ejercicios por nombre o grupo muscular para la interfaz de búsqueda
+     * Busca ejercicios en la API externa
      * 
-     * @param string $searchTerm Término de búsqueda para el nombre del ejercicio
-     * @param string $muscle Grupo muscular a filtrar (un solo grupo)
-     * @return array Array de objetos de ejercicios formateados para la interfaz
+     * @param string $query Término de búsqueda (opcional)
+     * @param array $filters Filtros adicionales como 'muscle', 'type', 'difficulty', etc.
+     * @return array Array de ejercicios encontrados
      */
-    public function searchExercises($searchTerm = '', $muscle = '') {
-        $results = [];
+    public function searchExercises($query = '', $filters = []) {
+        // Construir la URL base
+        $url = $this->baseUrl;
         
-        // Si tenemos un término de búsqueda, buscar por nombre
-        if (!empty($searchTerm)) {
-            $nameResults = $this->searchByName($searchTerm);
-            $results = array_merge($results, $nameResults);
+        // Añadir parámetros de consulta
+        $queryParams = [];
+        
+        // Añadir el término de búsqueda si existe
+        if (!empty($query)) {
+            $queryParams[] = 'name=' . urlencode($query);
         }
         
-        // Si tenemos un grupo muscular, buscar por ese músculo
-        if (!empty($muscle)) {
-            // Mapear el nombre en español al valor en inglés que espera la API
-            $mappedMuscle = $this->mapSpanishToEnglishMuscle($muscle);
-            if (!empty($mappedMuscle)) {
-                $muscleResults = $this->searchByMuscle($mappedMuscle);
-                $results = array_merge($results, $muscleResults);
-            }
-        }
-        
-        // Eliminar duplicados basados en el nombre del ejercicio
-        $uniqueResults = [];
-        $seenNames = [];
-        
-        foreach ($results as $exercise) {
-            if (!in_array($exercise['name'], $seenNames)) {
-                $seenNames[] = $exercise['name'];
-                
-                // Convertir a objeto para la interfaz
-                $exerciseObj = new stdClass();
-                $exerciseObj->name = $exercise['name'];
-                $exerciseObj->description = $exercise['instructions'] ?? '';
-                $exerciseObj->muscles = $exercise['muscle'] ?? '';
-                
-                $uniqueResults[] = $exerciseObj;
-            }
-        }
-        
-        return $uniqueResults;
-    }
-    
-    /**
-     * Búsqueda avanzada que combina múltiples criterios incluyendo tipo de ejercicio
-     * 
-     * @param string $searchTerm Término de búsqueda para el nombre del ejercicio
-     * @param array $muscles Lista de grupos musculares a filtrar
-     * @param array $types Lista de tipos de ejercicio a filtrar
-     * @return array Array de objetos de ejercicios formateados para la interfaz
-     */
-    public function advancedSearchExercises($searchTerm = '', $muscles = [], $types = []) {
-        $results = [];
-        
-        // Si tenemos un término de búsqueda, buscar por nombre
-        if (!empty($searchTerm)) {
-            $nameResults = $this->searchByName($searchTerm);
-            $results = array_merge($results, $nameResults);
-        }
-        
-        // Si tenemos grupos musculares, buscar por cada músculo
-        if (!empty($muscles)) {
-            foreach ($muscles as $muscle) {
-                // Mapear los nombres en español a los valores en inglés que espera la API
-                $mappedMuscle = $this->mapSpanishToEnglishMuscle($muscle);
-                if (!empty($mappedMuscle)) {
-                    $muscleResults = $this->searchByMuscle($mappedMuscle);
-                    $results = array_merge($results, $muscleResults);
+        // Traducir el grupo muscular si está presente
+        if (!empty($filters['muscle'])) {
+            $translatedMuscle = $this->mapSpanishToEnglishMuscle($filters['muscle']);
+            if (!empty($translatedMuscle)) {
+                $filters['muscle'] = $translatedMuscle;
+            } else {
+                // Si no pudimos traducir el músculo, lo registramos
+                if (class_exists('Logger')) {
+                    Logger::log('WARNING', "No se pudo traducir el grupo muscular: {$filters['muscle']}");
                 }
             }
         }
         
-        // Si tenemos tipos de ejercicio, buscar por cada tipo
-        if (!empty($types)) {
-            foreach ($types as $type) {
-                $typeResults = $this->searchByType($type);
-                $results = array_merge($results, $typeResults);
+        // Añadir filtros si existen
+        foreach ($filters as $key => $value) {
+            if (!empty($value)) {
+                $queryParams[] = $key . '=' . urlencode($value);
             }
         }
         
-        // Eliminar duplicados y formatear resultados
-        return $this->formatResults($results);
+        // Añadir los parámetros a la URL
+        if (!empty($queryParams)) {
+            $url .= '?' . implode('&', $queryParams);
+        }
+        
+        // Registrar la búsqueda para depuración
+        if (class_exists('Logger')) {
+            Logger::log('INFO', "Realizando búsqueda de ejercicios con API Ninjas - URL: $url");
+        }
+        
+        // Realizar la petición a la API
+        return $this->makeRequest($url);
     }
     
     /**
-     * Formatea los resultados eliminando duplicados y convirtiendo a objetos
-     * 
-     * @param array $results Array de resultados de la API
-     * @return array Array de objetos formateados
-     */
-    private function formatResults($results) {
-        // Eliminar duplicados basados en el nombre del ejercicio
-        $uniqueResults = [];
-        $seenNames = [];
-        
-        foreach ($results as $exercise) {
-            if (!in_array($exercise['name'], $seenNames)) {
-                $seenNames[] = $exercise['name'];
-                
-                // Convertir a objeto para la interfaz
-                $exerciseObj = new stdClass();
-                $exerciseObj->name = $exercise['name'];
-                $exerciseObj->description = $exercise['instructions'] ?? '';
-                $exerciseObj->muscles = $exercise['muscle'] ?? '';
-                $exerciseObj->type = $exercise['type'] ?? '';
-                $exerciseObj->equipment = $exercise['equipment'] ?? '';
-                $exerciseObj->difficulty = $exercise['difficulty'] ?? '';
-                
-                // En un caso real, aquí podrías asignar una URL de imagen basada en el ejercicio
-                // Por ahora usaremos imágenes de placeholder específicas según tipo de ejercicio
-                $exerciseObj->image_url = $this->getExerciseImageUrl($exercise);
-                
-                $uniqueResults[] = $exerciseObj;
-            }
-        }
-        
-        return $uniqueResults;
-    }
-    
-    /**
-     * Genera URLs de imágenes de ejemplo basadas en el tipo y grupo muscular del ejercicio
-     * 
-     * @param array $exercise Datos del ejercicio
-     * @return string URL de la imagen
-     */
-    private function getExerciseImageUrl($exercise) {
-        // Este método simula asignar imágenes a los ejercicios basadas en su grupo muscular o tipo
-        // En una implementación real, esto podría extraerse de una base de datos o API externa
-        
-        $placeholderImages = [
-            'abdominals' => 'https://images.pexels.com/photos/3775566/pexels-photo-3775566.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'biceps' => 'https://images.pexels.com/photos/3837781/pexels-photo-3837781.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-            'chest' => 'https://images.unsplash.com/photo-1534438097545-a2c22c57f2ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-            'quadriceps' => 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1349&q=80',
-            'cardio' => 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80',
-            'strength' => 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-            'stretching' => 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1355&q=80'
-        ];
-        
-        $defaultImage = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80';
-        
-        // Intentar asignar una imagen según el grupo muscular
-        if (isset($exercise['muscle']) && isset($placeholderImages[$exercise['muscle']])) {
-            return $placeholderImages[$exercise['muscle']];
-        } 
-        // Si no, intentar según el tipo de ejercicio
-        elseif (isset($exercise['type']) && isset($placeholderImages[$exercise['type']])) {
-            return $placeholderImages[$exercise['type']];
-        }
-        // Si todo falla, usar imagen por defecto
-        else {
-            return $defaultImage;
-        }
-    }
-    
-    /**
-     * Mapea nombres de músculos en español a los valores en inglés que espera la API
+     * Mapea nombres de músculos en español a sus equivalentes en inglés para la API
      * 
      * @param string $spanishMuscle Nombre del músculo en español
-     * @return string Nombre del músculo en inglés para la API
-     */
-    private function mapSpanishToEnglishMuscle($spanishMuscle) {
-        $mapping = [
+     * @return string Nombre del músculo en inglés
+     */    private function mapSpanishToEnglishMuscle($spanishMuscle) {
+        Logger::log('DEBUG', "Mapeando grupo muscular: $spanishMuscle");
+        
+        // Normalizar el término (minúsculas y sin acentos)
+        $normalizedMuscle = $this->normalizeString($spanishMuscle);
+        
+        $muscleMap = [
+            // Mapeo completo de grupos musculares español -> inglés según valores exactos de API Ninjas
+            // Abdominals
+            'abdominales' => 'abdominals',
             'abdomen' => 'abdominals',
+            'abdominal' => 'abdominals',
+            'abs' => 'abdominals',
+            
+            // Abductors
+            'abductores' => 'abductors',
+            'abductor' => 'abductors',
+            
+            // Adductors
+            'adductors' => 'adductors',
+            'aductores' => 'adductors',
+            'aductor' => 'adductors',
+            
+            // Biceps
+            'biceps' => 'biceps',
+            'bicep' => 'biceps',
+            
+            // Triceps
+            'triceps' => 'triceps',
+            'tricep' => 'triceps',
+            
+            // Chest
             'pecho' => 'chest',
+            'pectorales' => 'chest',
+            'pectoral' => 'chest',
+            'chest' => 'chest',
+            
+            // Middle Back
             'espalda' => 'middle_back',
+            'back' => 'middle_back',
+            'espalda media' => 'middle_back',
+            'dorsal medio' => 'middle_back',
+            'middle_back' => 'middle_back',
+            
+            // Lats
+            'dorsal' => 'lats',
+            'dorsales' => 'lats',
+            'lats' => 'lats',
+            'espalda alta' => 'lats',
+            
+            // Shoulders (Traps)
             'hombros' => 'traps',
-            'brazos' => 'biceps', // Simplificado, podría ser biceps o triceps
-            'piernas' => 'quadriceps', // Simplificado, podría ser varios grupos
-            'gluteos' => 'glutes'
+            'hombro' => 'traps',
+            'deltoides' => 'traps',
+            'deltoide' => 'traps',
+            'shoulders' => 'traps',
+            
+            // Quadriceps
+            'piernas' => 'quadriceps',
+            'pierna' => 'quadriceps',
+            'cuadriceps' => 'quadriceps',
+            'quad' => 'quadriceps',
+            'quads' => 'quadriceps',
+            'quadriceps' => 'quadriceps',
+            
+            // Glutes
+            'gluteos' => 'glutes',
+            'gluteo' => 'glutes',
+            'glutes' => 'glutes',
+            
+            // Calves
+            'pantorrillas' => 'calves',
+            'pantorrilla' => 'calves',
+            'gemelos' => 'calves',
+            'calves' => 'calves',
+            
+            // Forearms
+            'antebrazos' => 'forearms',
+            'antebrazo' => 'forearms',
+            'forearms' => 'forearms',
+            
+            // Traps
+            'trapecio' => 'traps',
+            'trapecios' => 'traps',
+            'traps' => 'traps',
+            
+            // Hamstrings
+            'isquiotibiales' => 'hamstrings',
+            'isquios' => 'hamstrings',
+            'femoral' => 'hamstrings',
+            'femorales' => 'hamstrings',
+            'hamstrings' => 'hamstrings',
+            
+            // Neck
+            'cuello' => 'neck',
+            'neck' => 'neck',
+            
+            // Lower Back
+            'lower_back' => 'lower_back',
+            'lower back' => 'lower_back',
+            'lumbar' => 'lower_back',
+            'lumbares' => 'lower_back',
+            'columna' => 'spine',
+            'tronco' => 'spine',
+            
+            'cuerpo completo' => 'full body',
+            'full body' => 'full body',
+            'todo el cuerpo' => 'full body',
+            
+            'brazos' => 'upper arms',
+            'brazo' => 'upper arms',
+            'upper arms' => 'upper arms',
+            
+            'lower legs' => 'lower legs',
+            'piernas inferiores' => 'lower legs',
         ];
         
-        return $mapping[strtolower($spanishMuscle)] ?? '';
+        if (isset($muscleMap[$normalizedMuscle])) {
+            $englishMuscle = $muscleMap[$normalizedMuscle];
+            Logger::log('DEBUG', "Músculo mapeado: $normalizedMuscle -> $englishMuscle");
+            return $englishMuscle;
+        }
+        
+        // Si no hay coincidencia exacta, buscar coincidencias parciales
+        foreach ($muscleMap as $spanish => $english) {
+            if (strpos($normalizedMuscle, $spanish) !== false) {
+                Logger::log('DEBUG', "Coincidencia parcial encontrada: $normalizedMuscle contiene $spanish -> $english");
+                return $english;
+            }
+        }
+        
+        Logger::log('WARNING', "No se pudo mapear el grupo muscular: $spanishMuscle");
+        return '';
+    }
+    
+    /**
+     * Normaliza una cadena (minúsculas, sin acentos)
+     * 
+     * @param string $string Cadena a normalizar
+     * @return string Cadena normalizada
+     */
+    private function normalizeString($string) {
+        $string = mb_strtolower($string, 'UTF-8');
+        $string = str_replace(
+            ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], 
+            ['a', 'e', 'i', 'o', 'u', 'u', 'n'], 
+            $string
+        );
+        return trim($string);
+    }
+    
+    /**
+     * Devuelve un array con todos los grupos musculares soportados por la API
+     * 
+     * @return array Array con los grupos musculares soportados
+     */
+    public function getMuscleGroups() {
+        return [
+            'abdominals',
+            'abductors',
+            'adductors',
+            'biceps',
+            'calves',
+            'chest',
+            'forearms',
+            'glutes',
+            'hamstrings',
+            'lats',
+            'lower_back',
+            'middle_back',
+            'neck',
+            'quadriceps',
+            'traps',
+            'triceps'
+        ];
     }
 }

@@ -47,13 +47,7 @@
                                     <td><?php echo $notification->id; ?></td>
                                     <td><?php echo $notification->title; ?></td>
                                     <td><?php echo date('d/m/Y H:i', strtotime($notification->created_at)); ?></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-outline-primary view-notification" 
-                                                    data-id="<?php echo $notification->id; ?>"
-                                                    data-bs-toggle="modal" data-bs-target="#viewNotificationModal">
-                                                <i class="fas fa-eye" title="Ver detalles"></i>
-                                            </button>
+                                    <td>                                        <div class="btn-group btn-group-sm">
                                             <button type="button" class="btn btn-outline-danger delete-notification" 
                                                     data-id="<?php echo $notification->id; ?>"
                                                     data-title="<?php echo htmlspecialchars($notification->title); ?>">
@@ -99,31 +93,7 @@
     </div>
 </div>
 
-<!-- Modal para ver detalles de notificación -->
-<div class="modal fade" id="viewNotificationModal" tabindex="-1" aria-labelledby="viewNotificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="viewNotificationModalLabel">Detalles de la Notificación</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-4">
-                    <h4 id="view-notification-title" class="mb-2"></h4>
-                    <div class="d-flex justify-content-end mb-3">
-                        <span class="text-muted">
-                            <i class="fas fa-calendar-alt me-1"></i> <span id="view-notification-date"></span>
-                        </span>
-                    </div>
-                    <div class="alert alert-info" id="view-notification-message"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -137,33 +107,7 @@
                 responsive: true
             });
         }
-        
-        // Cargar datos de la notificación al abrir el modal de detalles
-        document.querySelectorAll('.view-notification').forEach(button => {
-            button.addEventListener('click', function() {
-                const notificationId = this.getAttribute('data-id');
-                
-                // Hacer una petición AJAX para obtener los detalles de la notificación
-                fetch(`<?php echo URLROOT; ?>/admin/getNotificationDetails/${notificationId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Actualizar la información en el modal
-                            document.getElementById('view-notification-title').textContent = data.notification.title;
-                            document.getElementById('view-notification-date').textContent = new Date(data.notification.created_at).toLocaleString();
-                            
-                            // Actualizar el contenido del mensaje
-                            const messageElement = document.getElementById('view-notification-message');
-                            messageElement.textContent = data.notification.message;
-                        } else {
-                            console.error('Error al cargar los detalles de la notificación:', data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error en la petición AJAX:', error);
-                    });
-            });
-        });
+  
         
         // Confirmar eliminación de notificación
         document.querySelectorAll('.delete-notification').forEach(button => {

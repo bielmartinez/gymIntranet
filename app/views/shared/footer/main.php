@@ -1,16 +1,15 @@
 </div> <!-- Cierre del div principal del contenido -->
 
+<!-- Botón para volver arriba -->
+<button id="back-to-top" class="btn btn-dark btn-sm rounded-circle position-fixed bottom-0 end-0 mb-4 me-4" style="z-index: 1000; display: none;">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
 <footer class="bg-dark text-light py-4 mt-5">
   <div class="container">
     <div class="row">
-      <div class="col-md-6">
-        <p class="mb-0">&copy; <?php echo date('Y'); ?> GymIntranet. Todos los derechos reservados.</p>
-      </div>
-      <div class="col-md-6 text-end">
-        <a href="#" class="text-light me-2"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" class="text-light me-2"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="text-light me-2"><i class="fab fa-instagram"></i></a>
-        <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+      <div class="col-md-12 text-center">
+        <p class="mb-0">&copy; <?php echo date('Y'); ?> GymIntranet</p>
       </div>
     </div>
   </div>
@@ -37,6 +36,24 @@
       var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
       popoverTriggerList.map(function(popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
+      });
+
+      // Funcionalidad para el botón de volver arriba
+      const backToTopButton = document.getElementById('back-to-top');
+      
+      // Mostrar el botón cuando el usuario se desplaza hacia abajo
+      window.onscroll = function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+          backToTopButton.style.display = "block";
+        } else {
+          backToTopButton.style.display = "none";
+        }
+      };
+      
+      // Acción del botón: volver arriba al hacer clic
+      backToTopButton.addEventListener('click', function() {
+        document.body.scrollTop = 0; // Para Safari
+        document.documentElement.scrollTop = 0; // Para Chrome, Firefox, IE y Opera
       });
 
       // Mostrar notificación toast si existe en la sesión

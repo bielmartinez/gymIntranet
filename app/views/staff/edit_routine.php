@@ -183,36 +183,37 @@ include_once APPROOT . '/views/shared/header/main.php';
             </div>
             <div class="modal-body">
                 <form action="<?= URLROOT ?>/staffRoutine/addExercise/<?= $data['routine']->rutina_id ?>" method="POST">
+                    <input type="hidden" name="routine_id" value="<?= $data['routine']->rutina_id ?>">
                     <div class="mb-3">
-                        <label for="exercise_name" class="form-label">Nombre del ejercicio *</label>
-                        <input type="text" class="form-control" id="exercise_name" name="exercise_name" required>
+                        <label for="name" class="form-label">Nombre del ejercicio *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="exercise_description" class="form-label">Descripción/Instrucciones</label>
-                        <textarea class="form-control" id="exercise_description" name="exercise_description" rows="3"></textarea>
+                        <label for="description" class="form-label">Descripción/Instrucciones</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label for="exercise_sets" class="form-label">Series *</label>
-                            <input type="number" class="form-control" id="exercise_sets" name="exercise_sets" min="1" value="3" required>
+                            <label for="sets" class="form-label">Series *</label>
+                            <input type="number" class="form-control" id="sets" name="sets" min="1" value="3" required>
                         </div>
                         
                         <div class="col-md-4 mb-3">
-                            <label for="exercise_reps" class="form-label">Repeticiones *</label>
-                            <input type="number" class="form-control" id="exercise_reps" name="exercise_reps" min="1" value="12" required>
+                            <label for="reps" class="form-label">Repeticiones *</label>
+                            <input type="number" class="form-control" id="reps" name="reps" min="1" value="12" required>
                         </div>
                         
                         <div class="col-md-4 mb-3">
-                            <label for="exercise_rest" class="form-label">Descanso (segundos) *</label>
-                            <input type="number" class="form-control" id="exercise_rest" name="exercise_rest" min="0" value="60" required>
+                            <label for="rest" class="form-label">Descanso (segundos) *</label>
+                            <input type="number" class="form-control" id="rest" name="rest" min="0" value="60" required>
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="exercise_order" class="form-label">Orden en la rutina *</label>
-                        <input type="number" class="form-control" id="exercise_order" name="exercise_order" min="1" value="<?= count($data['exercises']) + 1 ?>" required>
+                        <label for="order" class="form-label">Orden en la rutina *</label>
+                        <input type="number" class="form-control" id="order" name="order" min="1" value="<?= count($data['exercises']) + 1 ?>" required>
                     </div>
                     
                     <div class="modal-footer">
@@ -236,37 +237,38 @@ include_once APPROOT . '/views/shared/header/main.php';
             <div class="modal-body">
                 <form id="editExerciseForm" action="" method="POST">
                     <input type="hidden" id="edit_exercise_id" name="exercise_id">
+                    <input type="hidden" name="routine_id" value="<?= $data['routine']->rutina_id ?>">
                     
                     <div class="mb-3">
                         <label for="edit_exercise_name" class="form-label">Nombre del ejercicio *</label>
-                        <input type="text" class="form-control" id="edit_exercise_name" name="exercise_name" required>
+                        <input type="text" class="form-control" id="edit_exercise_name" name="name" required>
                     </div>
                     
                     <div class="mb-3">
                         <label for="edit_exercise_description" class="form-label">Descripción/Instrucciones</label>
-                        <textarea class="form-control" id="edit_exercise_description" name="exercise_description" rows="3"></textarea>
+                        <textarea class="form-control" id="edit_exercise_description" name="description" rows="3"></textarea>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="edit_exercise_sets" class="form-label">Series *</label>
-                            <input type="number" class="form-control" id="edit_exercise_sets" name="exercise_sets" min="1" required>
+                            <input type="number" class="form-control" id="edit_exercise_sets" name="sets" min="1" required>
                         </div>
                         
                         <div class="col-md-4 mb-3">
                             <label for="edit_exercise_reps" class="form-label">Repeticiones *</label>
-                            <input type="number" class="form-control" id="edit_exercise_reps" name="exercise_reps" min="1" required>
+                            <input type="number" class="form-control" id="edit_exercise_reps" name="reps" min="1" required>
                         </div>
                         
                         <div class="col-md-4 mb-3">
                             <label for="edit_exercise_rest" class="form-label">Descanso (segundos) *</label>
-                            <input type="number" class="form-control" id="edit_exercise_rest" name="exercise_rest" min="0" required>
+                            <input type="number" class="form-control" id="edit_exercise_rest" name="rest" min="0" required>
                         </div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="edit_exercise_order" class="form-label">Orden en la rutina *</label>
-                        <input type="number" class="form-control" id="edit_exercise_order" name="exercise_order" min="1" required>
+                        <input type="number" class="form-control" id="edit_exercise_order" name="order" min="1" required>
                     </div>
                     
                     <div class="modal-footer">
@@ -309,7 +311,7 @@ include_once APPROOT . '/views/shared/header/main.php';
                 // Configurar la acción del formulario
                 const routineId = <?= $data['routine']->rutina_id ?>;
                 document.getElementById('editExerciseForm').action = 
-                    `<?= URLROOT ?>/staffRoutine/updateExercise/${id}`;
+                    `<?= URLROOT ?>/staffRoutine/updateExercise/${id}/${routineId}`;
             });
         }
     });
