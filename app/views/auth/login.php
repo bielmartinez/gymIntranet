@@ -1,6 +1,6 @@
 <?php 
 // Definir el directorio base para las inclusiones
-$base_url = "/gymIntranet/gymIntranet";
+$base_url = "/gymIntranet";
 $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 ?>
 
@@ -57,9 +57,6 @@ $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="remember" name="remember">
                                 <label class="form-check-label" for="remember">Recordarme</label>
-                            </div>
-                            <div>
-                                <a href="<?php echo URLROOT; ?>/auth/forgotPassword" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
                             </div>
                         </div>
                         <div class="d-grid gap-2">

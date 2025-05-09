@@ -11,7 +11,7 @@ define('APPROOT', dirname(dirname(__FILE__)));
 // URL Root - configuración dinámica para detectar el puerto correctamente
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST']; // Incluye puerto si es diferente de 80/443
-define('URLROOT', $protocol . '://' . $host . '/gymIntranet/gymIntranet');
+define('URLROOT', $protocol . '://' . $host . '/gymIntranet');
 
 // Site Name
 define('SITENAME', 'Gym Intranet');

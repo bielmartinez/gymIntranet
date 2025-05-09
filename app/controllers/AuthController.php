@@ -127,49 +127,7 @@ class AuthController extends BaseController {
     }    /**
      * Muestra la página de recuperación de contraseña
      */
-    public function forgotPassword() {
-        // DESHABILITADO TEMPORALMENTE: Redirigir si ya está logueado
-        /*
-        if (isset($_SESSION['user_id'])) {
-            $this->redirect('user/dashboard');
-            return;
-        }
-        */
-        
-        // Verificar si se ha enviado el formulario usando el método del BaseController
-        if ($this->isPost()) {
-            // Procesar la solicitud de recuperación
-            $email = $this->sanitizeInput($_POST['email'] ?? '');
-            
-            // Validar email
-            if (!$this->validateEmail($email)) {
-                $this->handleError('Por favor ingrese un correo electrónico válido', 'auth/forgotPassword');
-                return;
-            }
-            
-            // Instanciar el controlador de usuario para usar su método de recuperación
-            $userController = new UserController();
-            $userController->sendPasswordReset($email);
-            
-            // Mostrar mensaje de éxito (siempre, para no revelar emails existentes)
-            $this->handleSuccess('Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña', 'auth/forgotPassword');
-            return;
-        }
-        
-        // Preparar datos para la vista
-        $data = [
-            'title' => 'Recuperar Contraseña',
-            'email' => $_SESSION['forgot_data']['email'] ?? '',
-            'email_err' => $_SESSION['forgot_errors']['email_err'] ?? ''
-        ];
-        
-        // Limpiar datos temporales de sesión
-        unset($_SESSION['forgot_data']);
-        unset($_SESSION['forgot_errors']);
-        
-        // Cargar la vista usando el método del BaseController
-        $this->loadView('auth/forgotPassword', $data);
-    }    /**
+  /**
      * Muestra la página de reseteo de contraseña
      */
     public function resetPassword($token = null) {

@@ -58584,3 +58584,80 @@ Log iniciado: 2025-05-09 21:34:30
 [2025-05-09 21:34:30] [DEBUG] Método de solicitud: GET
 [2025-05-09 21:34:30] [INFO] Instanciando controlador: AdminController
 [2025-05-09 21:34:30] [INFO] Ejecutando acción: AdminController->notifications()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:32
+--------------------------------------------------
+[2025-05-09 21:35:32] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:32] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:32] [INFO] URL solicitada: user/classes
+[2025-05-09 21:35:32] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:32] [INFO] Instanciando controlador: UserController
+[2025-05-09 21:35:32] [INFO] Ejecutando acción: UserController->classes()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:34
+--------------------------------------------------
+[2025-05-09 21:35:34] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:34] [INFO] URL solicitada: auth/logout
+[2025-05-09 21:35:34] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:34] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:34] [INFO] Ejecutando acción: AuthController->logout()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:34
+--------------------------------------------------
+[2025-05-09 21:35:34] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:34] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:34] [INFO] URL solicitada: auth/login
+[2025-05-09 21:35:34] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:34] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:34] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:38
+--------------------------------------------------
+[2025-05-09 21:35:38] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:38] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:38] [INFO] URL solicitada: auth/login
+[2025-05-09 21:35:38] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:38] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:38] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:38
+--------------------------------------------------
+[2025-05-09 21:35:38] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:38] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:38] [INFO] URL solicitada: 
+[2025-05-09 21:35:38] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:38] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:38] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:41
+--------------------------------------------------
+[2025-05-09 21:35:41] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:41] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:41] [INFO] URL solicitada: 
+[2025-05-09 21:35:41] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:41] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:41] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-09 21:35:42
+--------------------------------------------------
+[2025-05-09 21:35:42] [INFO] Logger inicializado correctamente
+[2025-05-09 21:35:42] [INFO] Iniciando aplicación desde index.php
+[2025-05-09 21:35:42] [INFO] URL solicitada: auth/login
+[2025-05-09 21:35:42] [DEBUG] Método de solicitud: GET
+[2025-05-09 21:35:42] [INFO] Instanciando controlador: AuthController
+[2025-05-09 21:35:42] [INFO] Ejecutando acción: AuthController->login()

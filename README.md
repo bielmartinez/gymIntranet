@@ -1,80 +1,51 @@
 # GymIntranet
 
-Sistema de gestión interna para gimnasios.
+## Descripción
+GymIntranet es una aplicación web completa para la gestión interna de gimnasios. Diseñada para facilitar la comunicación y la organización entre el personal del gimnasio, los entrenadores y los usuarios. La plataforma permite administrar clases, rutinas de entrenamiento, reservas, notificaciones y seguimiento físico de los usuarios.
 
-## Reestructuración del Código
+## Características principales
 
-Se ha reestructurado el código siguiendo el patrón MVC (Modelo-Vista-Controlador) para mejorar la legibilidad, mantenibilidad y organización del proyecto.
+### Para administradores
+- **Gestión de usuarios**: Registro, visualización y edición de usuarios con diferentes roles (administrador, staff, usuario).
+- **Administración de clases**: Creación, modificación y eliminación de clases grupales con horarios y aforo.
+- **Panel de control**: Vista general de estadísticas del gimnasio, incluyendo asistencias, clases más populares y usuarios activos.
+- **Sistema de notificaciones**: Envío de comunicaciones importantes a usuarios o miembros del staff.
 
-### Estructura de Carpetas
+### Para personal del gimnasio (staff)
+- **Creación de rutinas**: Diseño de programas de entrenamiento personalizados para los usuarios.
+- **Búsqueda de ejercicios**: Acceso a una amplia base de datos de ejercicios para incluir en las rutinas.
+- **Seguimiento de usuarios**: Monitorización del progreso y asistencia de los clientes.
+- **Comunicación directa**: Envío de notificaciones personalizadas a usuarios específicos.
 
-```
-gymIntranet/
-├── app/
-│   ├── config/        # Configuración de la aplicación
-│   ├── controllers/   # Controladores que manejan la lógica de negocio
-│   ├── libraries/     # Bibliotecas y clases de utilidad
-│   ├── models/        # Modelos para interactuar con la base de datos
-│   ├── utils/         # Utilidades y funciones auxiliares
-│   └── views/         # Vistas (presentación HTML)
-│       ├── admin/     # Vistas para administradores
-│       ├── auth/      # Vistas de autenticación
-│       ├── shared/    # Componentes compartidos (header, footer)
-│       ├── staff/     # Vistas para personal del gimnasio
-│       └── users/     # Vistas para usuarios regulares
-│
-└── public/            # Archivos públicos accesibles desde el navegador
-    ├── css/           # Archivos CSS organizados por secciones
-    │   ├── admin/     # Estilos específicos para admin
-    │   ├── shared/    # Estilos compartidos
-    │   └── user/      # Estilos específicos para usuarios
-    ├── js/            # Archivos JavaScript organizados por secciones
-    │   ├── admin/     # Scripts específicos para admin
-    │   ├── shared/    # Scripts compartidos
-    │   └── user/      # Scripts específicos para usuarios
-    └── uploads/       # Archivos subidos por usuarios
-```
+### Para usuarios
+- **Reserva de clases**: Visualización del calendario de clases y sistema de reservas.
+- **Acceso a rutinas**: Consulta de rutinas asignadas por el personal del gimnasio.
+- **Seguimiento físico**: Registro y visualización del progreso en medidas corporales y rendimiento.
+- **Centro de notificaciones**: Recepción de avisos importantes del gimnasio y comunicaciones de los entrenadores.
 
-## Cambios Realizados
+## Tecnologías utilizadas
+- PHP (Patrón MVC)
+- MySQL
+- JavaScript/jQuery
+- HTML5/CSS3
+- Bootstrap
+- PHPMailer (sistema de correos)
+- TCPDF (generación de documentos PDF)
 
-### Separación de Código
+## Requisitos del sistema
+- Servidor web con PHP 7.4 o superior
+- MySQL 5.7 o superior
+- Extensiones PHP: PDO, GD, mbstring, json
 
-- **PHP**: Los archivos PHP se mantienen en sus ubicaciones originales bajo la carpeta `app/`, siguiendo la estructura MVC.
-- **CSS**: Los estilos se han movido a `public/css/` y se han organizado por sección.
-- **JavaScript**: El código JavaScript se ha trasladado a `public/js/` y se ha organizado por sección.
+## Instalación
+1. Clone el repositorio en su servidor web local o remoto
+2. Importe el archivo `gymintranet.sql` en su base de datos MySQL
+3. Configure los parámetros de conexión a la base de datos en `app/config/config.php`
+4. Asegúrese de que el servidor web tenga permisos de escritura en la carpeta `public/uploads`
 
-### Beneficios
+## Acceso al sistema
+- **URL**: http://[localhost]/gymIntranet
+- **Administrador predeterminado**:
+  - Usuario: admin@admin.com
+  - Contraseña: admin12345
 
-1. **Mantenibilidad**: Es más fácil encontrar y modificar código específico.
-2. **Rendimiento**: Los navegadores pueden cachear mejor los archivos estáticos (CSS y JS) separados.
-3. **Organización**: Clara separación de responsabilidades.
-4. **Escalabilidad**: Estructura preparada para crecer sin volverse caótica.
-
-### Convenciones de Nomenclatura
-
-- Los archivos CSS siguen el patrón: `seccion.css` o `funcionalidad.css`
-- Los archivos JS siguen el patrón: `seccion.js` o `funcionalidad.js`
-- Los nombres de archivo utilizan minúsculas y guiones (`-`) para separar palabras
-
-## Uso
-
-Para incluir archivos CSS y JS en las vistas:
-
-```php
-<!-- Incluir CSS -->
-<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/[carpeta]/[archivo].css">
-
-<!-- Incluir JavaScript -->
-<script src="<?php echo URLROOT; ?>/js/[carpeta]/[archivo].js"></script>
-```
-
-## Variables Globales en JavaScript
-
-Para acceder a variables PHP desde JavaScript:
-
-```php
-<script>
-  // Variable global para el controlador
-  const URLROOT = '<?php echo URLROOT; ?>';
-</script>
-```

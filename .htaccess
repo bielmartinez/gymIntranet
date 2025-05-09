@@ -1,6 +1,6 @@
 Options -Indexes
 RewriteEngine On
-RewriteBase /gymIntranet/gymIntranet/
+RewriteBase /gymIntranet
 
 # Si la ruta comienza con public/, servir directamente
 RewriteRule ^public/ - [L]

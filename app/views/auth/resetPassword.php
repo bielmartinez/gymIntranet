@@ -1,6 +1,6 @@
 <?php 
 // Definir el directorio base para las inclusiones
-$base_url = "/gymIntranet/gymIntranet";
+$base_url = "/gymIntranet";
 $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 ?>
 
