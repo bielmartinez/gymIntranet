@@ -48,4 +48,5 @@ GymIntranet es una aplicación web completa para la gestión interna de gimnasio
 - **Administrador predeterminado**:
   - Usuario: admin@admin.com
   - Contraseña: admin12345
+  El resto de usuarios tiene la misma contraseña.
 
