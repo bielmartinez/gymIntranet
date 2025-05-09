@@ -10,19 +10,8 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Mis Rutinas';
 include_once APPROOT . '/views/shared/header/main.php';
 ?>
 
-<style>
-    .routine-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .routine-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .badge-status {
-        font-weight: normal;
-        padding: 5px 10px;
-    }
-</style>
+<!-- Incluir estilos específicos para la página de rutinas de usuario -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/user/routines.css">
 
 <div class="container-fluid">
     <div class="row">
@@ -76,11 +65,16 @@ include_once APPROOT . '/views/shared/header/main.php';
                         </div>
                     <?php endforeach; ?>
                 </div>
-            <?php endif; ?>
-
-        </div>
+            <?php endif; ?>        </div>
     </div>
 </div>
+
+<!-- Incluir script específico para la página de rutinas de usuario -->
+<script src="<?php echo URLROOT; ?>/js/user/routines.js"></script>
+<script>
+    // Variable global para el controlador
+    const URLROOT = '<?php echo URLROOT; ?>';
+</script>
 
 <?php
 // Incluir el footer

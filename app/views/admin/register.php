@@ -9,6 +9,9 @@ if(!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 */
 ?>
 
+<!-- Incluir estilos específicos para la página de registro -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/admin/register.css">
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 mx-auto">
@@ -104,49 +107,5 @@ if(!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Toggle password visibility
-    const togglePassword = document.getElementById('togglePassword');
-    const password = document.getElementById('password');
-    
-    togglePassword.addEventListener('click', function() {
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-        
-        // Toggle eye icon
-        const eyeIcon = this.querySelector('i');
-        eyeIcon.classList.toggle('fa-eye');
-        eyeIcon.classList.toggle('fa-eye-slash');
-    });
-    
-    // Form validation
-    const registerForm = document.getElementById('registerForm');
-    const confirmPassword = document.getElementById('confirmPassword');
-    
-    registerForm.addEventListener('submit', function(event) {
-        if (password.value !== confirmPassword.value) {
-            confirmPassword.setCustomValidity('Las contraseñas no coinciden');
-            event.preventDefault();
-        } else {
-            confirmPassword.setCustomValidity('');
-        }
-    });
-    
-    // Role dependent fields
-    const roleSelect = document.getElementById('role');
-    const membershipSelect = document.getElementById('membershipType');
-    
-    roleSelect.addEventListener('change', function() {
-        if (this.value === 'user') {
-            membershipSelect.setAttribute('required', 'required');
-            membershipSelect.value = membershipSelect.value || 'basic';
-        } else {
-            membershipSelect.removeAttribute('required');
-            if (this.value === 'staff' || this.value === 'admin') {
-                membershipSelect.value = 'none';
-            }
-        }
-    });
-});
-</script>
+<!-- Incluir JavaScript específico para la página de registro -->
+<script src="<?php echo URLROOT; ?>/public/js/admin/register.js"></script>

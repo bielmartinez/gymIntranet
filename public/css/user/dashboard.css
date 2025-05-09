@@ -1,0 +1,61 @@
+/* Estilos para el dashboard de usuario */
+
+/* Estilos para las tarjetas de acceso rápido */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* Efectos de hover para los enlaces de acceso rápido */
+.card.bg-primary:hover {
+    background-color: #0069d9 !important;
+}
+
+.card.bg-info:hover {
+    background-color: #17a2b8 !important;
+}
+
+.card.bg-success:hover {
+    background-color: #28a745 !important;
+}
+
+/* Estilos para los bordes de las tarjetas de stats */
+.card.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+
+.card.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+
+/* Estilos para iconos en las tarjetas */
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+/* Estilos para la tabla de actividades */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table thead th {
+    border-bottom: 2px solid #e3e6f0;
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Estilos para los botones de reserva */
+.btn-outline-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    transform: translateY(-2px);
+}

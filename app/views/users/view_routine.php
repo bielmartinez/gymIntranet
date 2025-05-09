@@ -10,37 +10,8 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Detalle de Rutina';
 include_once APPROOT . '/views/shared/header/main.php';
 ?>
 
-<style>
-    .exercise-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        margin-bottom: 20px;
-    }
-    .exercise-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .exercise-icon {
-        height: 150px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-    }
-    .order-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #007bff;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-</style>
+<!-- Enlazar hoja de estilos específica para vista de rutina -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/user/view_routine.css">
 
 <div class="container-fluid">
     <div class="row">
@@ -99,10 +70,9 @@ include_once APPROOT . '/views/shared/header/main.php';
                             Esta rutina aún no tiene ejercicios asignados. Contacta con el personal del gimnasio.
                         </div>
                     <?php else: ?>
-                        <div class="row">
-                            <?php foreach ($data['exercises'] as $exercise): ?>
+                        <div class="row">                            <?php foreach ($data['exercises'] as $exercise): ?>
                                 <div class="col-lg-4 col-md-6">
-                                    <div class="card exercise-card position-relative h-100">
+                                    <div class="card exercise-card position-relative h-100" data-exercise-id="<?= $exercise->exercici_id ?>">
                                         <div class="order-badge"><?= $exercise->ordre ?></div>
                                         
                                         <div class="exercise-icon">
@@ -188,9 +158,11 @@ include_once APPROOT . '/views/shared/header/main.php';
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </div>
+        </div>    </div>
 </div>
+
+<!-- Enlazar archivo JavaScript específico para vista de rutina -->
+<script src="<?= URLROOT ?>/public/js/user/view_routine.js"></script>
 
 <?php
 // Incluir el footer

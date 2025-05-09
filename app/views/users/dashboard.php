@@ -2,6 +2,9 @@
 // El header y footer ahora lo incluye direct-view.php, no necesitamos incluirlo aquí
 ?>
 
+<!-- Enlazar hoja de estilos específica para el dashboard -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/user/dashboard.css">
+
 <div class="container-fluid">
   <div class="row">
     <main class="col-12 px-md-4">
@@ -171,7 +174,9 @@
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </div>    </main>
   </div>
 </div>
+
+<!-- Enlazar archivo JavaScript específico para el dashboard -->
+<script src="<?= URLROOT ?>/public/js/user/dashboard.js"></script>

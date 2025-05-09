@@ -4,6 +4,9 @@ $base_url = "/gymIntranet/gymIntranet";
 $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 ?>
 
+<!-- Incluir estilos específicos para la recuperación de contraseña -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/auth/password-recovery.css">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">

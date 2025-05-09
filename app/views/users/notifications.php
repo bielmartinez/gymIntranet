@@ -2,17 +2,10 @@
 /**
  * Vista para que los usuarios vean sus notificaciones (versión simplificada)
  */
-
-// Obtener las notificaciones leídas de la cookie si existe
-$readNotifications = [];
-if (isset($_SESSION['user_id'])) {
-  $userId = $_SESSION['user_id'];
-  $cookieName = "read_notifications_{$userId}";
-  if (isset($_COOKIE[$cookieName])) {
-    $readNotifications = json_decode($_COOKIE[$cookieName], true) ?: [];
-  }
-}
 ?>
+
+<!-- Incluir estilos específicos para la página de notificaciones de usuarios -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/user/notifications.css">
 
 <div class="container-fluid">
   <div class="row">
@@ -28,17 +21,9 @@ if (isset($_SESSION['user_id'])) {
 
       <div id="notification-status" style="display: none;" class="alert alert-success">
         Operación completada con éxito.
-      </div>
-
-      <?php 
-      // Filtrar notificaciones leídas
-      $filteredNotifications = [];
-      foreach($data['notifications'] as $notification) {
-        $notifId = is_object($notification) ? $notification->id : $notification['id'];
-        if (!in_array($notifId, $readNotifications)) {
-          $filteredNotifications[] = $notification;
-        }
-      }
+      </div>      <?php 
+      // Ya no filtramos las notificaciones leídas
+      $filteredNotifications = $data['notifications'];
       
       if(empty($filteredNotifications)): 
       ?>
@@ -61,8 +46,7 @@ if (isset($_SESSION['user_id'])) {
                     <h5 class="mb-1">
                       <i class="fas fa-info-circle text-info me-2"></i>
                       <?php echo htmlspecialchars($title); ?>
-                    </h5>
-                    <div class="d-flex align-items-center">
+                    </h5>                    <div class="d-flex align-items-center">
                       <small class="text-muted me-3">
                         <?php 
                           $date = new DateTime($created_at);
@@ -86,11 +70,6 @@ if (isset($_SESSION['user_id'])) {
                           }
                         ?>
                       </small>
-                      <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-outline-primary mark-read" data-id="<?php echo $id; ?>" title="Marcar como leída">
-                          <i class="fas fa-check"></i>
-                        </button>
-                      </div>
                     </div>
                   </div>
                   <p class="mb-1"><?php echo htmlspecialchars($message); ?></p>
@@ -146,83 +125,9 @@ if (isset($_SESSION['user_id'])) {
   }
 </style>
 
+<!-- Incluir script específico para notificaciones de usuario -->
+<script src="<?php echo URLROOT; ?>/js/user/notifications.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Manejar clic en botón "Marcar como leído"
-  document.querySelectorAll('.mark-read').forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const notificationId = this.getAttribute('data-id');
-      markAsRead(notificationId);
-    });
-  });
-  
-  // Manejar clic en "Actualizar"
-  document.getElementById('refresh-notifications').addEventListener('click', function(e) {
-    e.preventDefault();
-    window.location.reload();
-  });
-  
-  // Función para marcar como leído
-  function markAsRead(notificationId, animate = true) {
-    fetch(`<?php echo URLROOT; ?>/user/markNotificationAsRead/${notificationId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        if (animate) {
-          // Animar la desaparición de la notificación
-          const notification = document.getElementById(`notification-${notificationId}`);
-          if (notification) {
-            notification.classList.add('fade-out');
-            setTimeout(() => {
-              notification.remove();
-              checkEmptyNotifications();
-            }, 300);
-          }
-        }
-      } else {
-        console.error('Error al marcar como leída:', data.message);
-        showStatusMessage('Error al marcar la notificación como leída', 'danger');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      showStatusMessage('Error de conexión', 'danger');
-    });
-  }
-  
-  // Verificar si no hay más notificaciones después de eliminar
-  function checkEmptyNotifications() {
-    const remainingNotifications = document.querySelectorAll('.notification-item:not(.fade-out)');
-    if (remainingNotifications.length === 0) {
-      const notificationList = document.querySelector('.notification-list');
-      if (notificationList) {
-        notificationList.innerHTML = `
-          <div class="alert alert-info">
-            <i class="fas fa-bell-slash me-2"></i>No hay notificaciones disponibles
-          </div>
-        `;
-      }
-    }
-  }
-  
-  // Mostrar mensaje de estado
-  function showStatusMessage(message, type = 'success') {
-    const statusDiv = document.getElementById('notification-status');
-    statusDiv.className = `alert alert-${type}`;
-    statusDiv.textContent = message;
-    statusDiv.style.display = 'block';
-    
-    // Ocultar después de 3 segundos
-    setTimeout(() => {
-      statusDiv.style.display = 'none';
-    }, 3000);
-  }
-});
+  // Variable global para el controlador
+  const URLROOT = '<?php echo URLROOT; ?>';
 </script>

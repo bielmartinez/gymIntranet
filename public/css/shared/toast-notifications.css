@@ -1,0 +1,62 @@
+/**
+ * Estilos para las notificaciones toast
+ */
+
+#toast-container {
+    z-index: 1060;
+}
+
+.toast {
+    min-width: 250px;
+    max-width: 350px;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+    border: none;
+    opacity: 1;
+}
+
+.toast-header {
+    border-bottom: none;
+}
+
+.toast-body {
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+}
+
+.toast .btn-close-white {
+    filter: brightness(0) invert(1);
+}
+
+/* Estilos para diferentes tipos de toast */
+.toast.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.toast.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.toast.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.toast.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+/* Animaciones para los toast */
+.toast.show {
+    animation: toastFadeIn 0.3s ease-in-out;
+}
+
+@keyframes toastFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

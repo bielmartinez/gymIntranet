@@ -2,7 +2,16 @@
 /**
  * Vista para editar un ejercicio existente de una rutina
  */
+
+// Definir el título de la página para el header
+$pageTitle = isset($data['title']) ? $data['title'] : 'Editar Ejercicio';
+
+// Incluir el header principal
+include_once APPROOT . '/views/shared/header/main.php';
 ?>
+
+<!-- Incluir estilos específicos para la página de edición de ejercicios -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/staff/edit_exercise.css">
 
 <div class="container mt-4">
     <div class="row">
@@ -77,9 +86,16 @@
                             <a href="<?= URLROOT ?>/staffRoutine/edit/<?= $data['exercise']->rutina_id ?>" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                         </div>
-                    </form>
-                </div>
+                    </form>                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Incluir scripts específicos para la página de edición de ejercicios -->
+<script src="<?= URLROOT ?>/public/js/staff/edit_exercise.js"></script>
+
+<?php
+// Incluir el footer
+include_once APPROOT . '/views/shared/footer/main.php';
+?>

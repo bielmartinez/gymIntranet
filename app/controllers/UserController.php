@@ -9,43 +9,37 @@ require_once dirname(__DIR__) . '/utils/MailService.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-class UserController {
-    private $userModel;
-    private $reservationModel;
-    private $classModel;
-    
-    /**
+class UserController extends BaseController {
+    protected $userModel;
+    protected $reservationModel;
+    protected $classModel;
+      /**
      * Constructor del controlador
      */
     public function __construct() {
-        // DESHABILITADO TEMPORALMENTE: Verificar autenticación para la mayoría de las acciones
-        // Excepto las que están en el array de métodos públicos
-        /*
+        parent::__construct();
+        
+        // Determinar si el método actual requiere autenticación
         $publicMethods = ['register', 'login', 'sendPasswordReset', 'resetPassword'];
         
-        $currentMethod = isset($_GET['url']) ? explode('/', $_GET['url'])[1] ?? 'index' : 'index';
+        // Obtener el método actual de la URL
+        $currentUrl = $_GET['url'] ?? '';
+        $urlParts = explode('/', $currentUrl);
+        $currentMethod = $urlParts[1] ?? 'index';
         
-        if (!in_array($currentMethod, $publicMethods) && !isset($_SESSION['user_id'])) {
-            header('Location: ' . URLROOT . '/auth/login');
-            exit;
+        // Si no es un método público, verificar autenticación
+        if (!in_array($currentMethod, $publicMethods)) {
+            $this->requireAuth();
         }
-        */
+          // Cargar explícitamente el modelo Class ya que es una palabra reservada
+        require_once dirname(__DIR__) . '/models/Class.php';
         
+        // Inicializar modelos
         $this->userModel = new User();
-        
-        // Inicializar los otros modelos solo si son necesarios
-        if (file_exists(APPROOT . '/models/Reservation.php')) {
-            require_once APPROOT . '/models/Reservation.php';
-            $this->reservationModel = new Reservation();
-        }
-        
-        if (file_exists(APPROOT . '/models/Class.php')) {
-            require_once APPROOT . '/models/Class.php';
-            $this->classModel = new Class_();
-        }
+        $this->reservationModel = new Reservation();
+        $this->classModel = new Class_();
     }
-    
-    /**
+      /**
      * Método por defecto - Redirige al dashboard
      */
     public function index() {
@@ -56,125 +50,100 @@ class UserController {
      * Muestra el dashboard del usuario
      */
     public function dashboard() {
-        // Cargar reservas del usuario
-        require_once APPROOT . '/models/Reservation.php';
-        $reservationModel = new Reservation();
-        $userReservations = [];
+        // La autenticación ya se verifica en el constructor
         
-        if (isset($_SESSION['user_id'])) {
-            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
-        }
+        // Obtener ID del usuario de la sesión
+        $userId = $_SESSION['user_id'];
+        
+        // Cargar reservas del usuario
+        $userReservations = $this->reservationModel->findByUserId($userId);
         
         // Cargar clases de los próximos 3 días
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        $upcomingClasses = $classModel->getUpcomingClasses(3); // Próximos 3 días
+        $upcomingClasses = $this->classModel->getUpcomingClasses(3);
         
+        // Preparar datos para la vista
         $data = [
             'title' => 'Dashboard',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
             'user_reservations' => $userReservations,
             'upcoming_classes' => $upcomingClasses
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/dashboard.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('users/dashboard', $data);
     }
-    
-    /**
+      /**
      * Muestra la página de clases
      */
     public function classes() {
-        // Cargar modelo de reservas
-        require_once APPROOT . '/models/Reservation.php';
-        $reservationModel = new Reservation();
+        // La autenticación ya se verifica en el constructor
         
         // Cargar modelo de tipos de clases
-        require_once APPROOT . '/models/TypeClass.php';
         $typeClassModel = new TypeClass();
         
         // Obtener todos los tipos de clases
         $classTypes = $typeClassModel->getAll();
         
-        // Obtener las clases disponibles y las reservas del usuario
-        $availableClasses = $reservationModel->getAvailableClasses();
-        $userReservations = [];
+        // Obtener las clases disponibles
+        $availableClasses = $this->reservationModel->getAvailableClasses();
         
+        // Obtener las reservas del usuario
+        $userReservations = [];
         if (isset($_SESSION['user_id'])) {
-            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+            $userReservations = $this->reservationModel->findByUserId($_SESSION['user_id']);
         }
         
+        // Preparar datos para la vista
         $data = [
             'title' => 'Clases',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
             'available_classes' => $availableClasses,
             'user_reservations' => $userReservations,
             'class_types' => $classTypes
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/classes.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('users/classes', $data);
     }
-    
-    /**
+      /**
      * Filtrar clases por fecha
      */
     public function filterClasses() {
-        // Verificar si se recibió una fecha
-        if (!isset($_POST['date']) || empty($_POST['date'])) {
-            // Redirigir a la página de clases sin filtro
-            header('Location: ' . URLROOT . '/user/classes');
-            exit;
+        // La autenticación ya se verifica en el constructor
+        
+        // Verificar si se recibió una fecha usando el método del BaseController
+        if (!$this->isPost() || !isset($_POST['date']) || empty($_POST['date'])) {
+            $this->redirect('user/classes');
+            return;
         }
         
-        // Cargar modelo de reservas
-        require_once APPROOT . '/models/Reservation.php';
-        $reservationModel = new Reservation();
-        
         // Cargar modelo de tipos de clases
-        require_once APPROOT . '/models/TypeClass.php';
         $typeClassModel = new TypeClass();
         
         // Obtener todos los tipos de clases
         $classTypes = $typeClassModel->getAll();
         
-        // Obtener la fecha del formulario
-        $filterDate = $_POST['date'];
+        // Sanitizar y obtener la fecha del formulario
+        $filterDate = $this->sanitizeInput($_POST['date']);
         
         // Obtener las clases disponibles para esa fecha
-        $availableClasses = $reservationModel->getAvailableClasses($filterDate);
-        $userReservations = [];
+        $availableClasses = $this->reservationModel->getAvailableClasses($filterDate);
         
+        // Obtener las reservas del usuario
+        $userReservations = [];
         if (isset($_SESSION['user_id'])) {
-            $userReservations = $reservationModel->findByUserId($_SESSION['user_id']);
+            $userReservations = $this->reservationModel->findByUserId($_SESSION['user_id']);
         }
         
+        // Preparar datos para la vista
         $data = [
             'title' => 'Clases - ' . $filterDate,
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario',
             'available_classes' => $availableClasses,
             'user_reservations' => $userReservations,
             'filter_date' => $filterDate,
             'class_types' => $classTypes
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/classes.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('users/classes', $data);
         
         // Cargar el footer
         include_once APPROOT . '/views/shared/footer/main.php';
@@ -632,8 +601,7 @@ class UserController {
                 $errors['email_err'] = 'Este correo electrónico ya está registrado';
             }
         }
-        
-        if(empty($userData['password'])) {
+          if(empty($userData['password'])) {
             $errors['password_err'] = 'La contraseña es obligatoria';
         } elseif(strlen($userData['password']) < 8) {
             $errors['password_err'] = 'La contraseña debe tener al menos 8 caracteres';

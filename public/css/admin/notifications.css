@@ -1,0 +1,30 @@
+/**
+ * Estilos específicos para la página de administración de notificaciones
+ */
+
+/* Estilos para la tabla de notificaciones */
+.table-notifications thead th {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Estilos para los botones de acción */
+.action-buttons .btn {
+    margin-right: 5px;
+}
+
+/* Estilos para la modal */
+.modal-header.bg-primary {
+    color: white;
+}
+
+/* Ajustes responsivos para móviles */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+}

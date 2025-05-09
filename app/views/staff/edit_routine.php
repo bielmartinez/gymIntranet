@@ -10,30 +10,8 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Editar Rutina';
 include_once APPROOT . '/views/shared/header/main.php';
 ?>
 
-<style>
-    .exercise-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-        height: 100%;
-    }
-    .exercise-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .order-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #007bff;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-</style>
+<!-- Incluir estilos específicos para la página de edición de rutinas -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/staff/edit_routine.css">
 
 <div class="row">
     <div class="col-12 px-md-4">
@@ -281,41 +259,15 @@ include_once APPROOT . '/views/shared/header/main.php';
     </div>
 </div>
 
+<!-- Incluir el ID de rutina para que el script externo lo use -->
+<input type="hidden" id="routine_id" value="<?= $data['routine']->rutina_id ?>">
+
+<!-- Incluir scripts específicos para la página de edición de rutinas -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Configurar el modal de edición para cargar datos cuando se abre
-        const editExerciseModal = document.getElementById('editExerciseModal');
-        if (editExerciseModal) {
-            editExerciseModal.addEventListener('show.bs.modal', function(event) {
-                // Botón que activó el modal
-                const button = event.relatedTarget;
-                
-                // Extraer información de los atributos data-*
-                const id = button.getAttribute('data-id');
-                const name = button.getAttribute('data-name');
-                const description = button.getAttribute('data-description');
-                const sets = button.getAttribute('data-sets');
-                const reps = button.getAttribute('data-reps');
-                const rest = button.getAttribute('data-rest');
-                const order = button.getAttribute('data-order');
-                
-                // Actualizar los campos del formulario
-                document.getElementById('edit_exercise_id').value = id;
-                document.getElementById('edit_exercise_name').value = name;
-                document.getElementById('edit_exercise_description').value = description;
-                document.getElementById('edit_exercise_sets').value = sets;
-                document.getElementById('edit_exercise_reps').value = reps;
-                document.getElementById('edit_exercise_rest').value = rest;
-                document.getElementById('edit_exercise_order').value = order;
-                
-                // Configurar la acción del formulario
-                const routineId = <?= $data['routine']->rutina_id ?>;
-                document.getElementById('editExerciseForm').action = 
-                    `<?= URLROOT ?>/staffRoutine/updateExercise/${id}/${routineId}`;
-            });
-        }
-    });
+    // Definir URLROOT como variable global para que el script externo pueda usarla
+    const URLROOT = '<?= URLROOT ?>';
 </script>
+<script src="<?= URLROOT ?>/public/js/staff/edit_routine.js"></script>
 
 <?php
 // Incluir el footer

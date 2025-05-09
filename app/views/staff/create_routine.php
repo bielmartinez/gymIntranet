@@ -10,16 +10,8 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Crear Nueva Rutina';
 include_once APPROOT . '/views/shared/header/main.php';
 ?>
 
-<style>
-    .form-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .card-shadow {
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-</style>
+<!-- Incluir estilos específicos para la página de creación de rutinas -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/staff/create_routine.css">
 
 <div class="row">
     <div class="col-12 px-md-4">
@@ -83,10 +75,12 @@ include_once APPROOT . '/views/shared/header/main.php';
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
+            </div>        </div>
     </div>
 </div>
+
+<!-- Incluir scripts específicos para la página de creación de rutinas -->
+<script src="<?= URLROOT ?>/public/js/staff/create_routine.js"></script>
 
 <?php
 // Incluir el footer

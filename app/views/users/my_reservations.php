@@ -164,6 +164,9 @@ foreach ($data['reservations'] as $reservation) {
   </div>
 </div>
 
+<!-- Enlazar hoja de estilos específica -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/user/my_reservations.css">
+
 <!-- Añadir referencia a jQuery y DataTables solo si hay historial de reservas -->
 <?php if (!empty($pastReservations)): ?>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -172,33 +175,5 @@ foreach ($data['reservations'] as $reservation) {
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <?php endif; ?>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar DataTable para el historial si existe
-    <?php if (!empty($pastReservations)): ?>
-    setTimeout(function() {
-      if (typeof $ !== 'undefined') {
-        try {
-          $('#historyTable').DataTable({
-            language: {
-              url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-            },
-            order: [[1, 'desc'], [2, 'desc']], // Ordenar por fecha (desc) y hora (desc)
-            responsive: true
-          });
-        } catch (error) {
-          console.error('Error al inicializar DataTables:', error);
-        }
-      }
-    }, 500);
-    <?php endif; ?>
-    
-    // Manejar el botón de cancelar reserva
-    document.querySelectorAll('.cancel-reservation').forEach(button => {
-      button.addEventListener('click', function() {
-        const reservationId = this.getAttribute('data-reservation-id');
-        document.getElementById('reservation_id_to_cancel').value = reservationId;
-      });
-    });
-  });
-</script>
+<!-- Enlazar archivo JavaScript específico -->
+<script src="<?= URLROOT ?>/public/js/user/my_reservations.js"></script>

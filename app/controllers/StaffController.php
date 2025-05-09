@@ -2,140 +2,109 @@
 /**
  * Controlador para la gestión de funciones del personal (staff)
  */
-class StaffController {
-    private $userModel;
-    private $classModel;
-    private $reservationModel;
-    
-    public function __construct() {
+class StaffController extends BaseController {
+    protected $userModel;
+    protected $classModel;
+    protected $reservationModel;
+      public function __construct() {
+        parent::__construct();
+        
         // Verificar que el usuario sea staff o admin
-        if(!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'staff' && $_SESSION['user_role'] !== 'admin')) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
+        $this->requireRole(['staff', 'admin']);
+          // Cargar explícitamente el modelo Class ya que es una palabra reservada
+        require_once dirname(__DIR__) . '/models/Class.php';
         
+        // Inicializar modelos
         $this->userModel = new User();
-        
-        // Cargar modelo de clases
-        require_once APPROOT . '/models/Class.php';
         $this->classModel = new Class_();
-        
-        // Cargar modelo de reservas
-        require_once APPROOT . '/models/Reservation.php';
         $this->reservationModel = new Reservation();
-    }
-    
-    /**
-     * Método helper para cargar vistas con datos
-     * @param string $view Nombre de la vista a cargar
-     * @param array $data Datos a pasar a la vista
-     */
-    private function loadView($view, $data = []) {
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista solicitada
-        if (file_exists(APPROOT . '/views/' . $view . '.php')) {
-            include_once APPROOT . '/views/' . $view . '.php';
-        } else {
-            // Mostrar un error si la vista no existe
-            include_once APPROOT . '/views/shared/error/404.php';
-        }
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
-      /**
+    }    /**
      * Página de inicio para el personal
-     */
+     */    
     public function index() {
         // Obtener el ID del usuario (monitor)
         $monitorId = $_SESSION['user_id'] ?? 0;
         
-        // Cargar el modelo de clases para obtener las próximas clases del monitor
-        require_once APPROOT . '/models/Class.php';
-        $classModel = new Class_();
-        $staffClasses = $classModel->getUpcomingClassesByMonitor($monitorId, 3); // Próximos 3 días
-        
-        // Obtener estadísticas para el dashboard
+        // Obtener las próximas clases del monitor
+        $staffClasses = $this->classModel->getUpcomingClassesByMonitor($monitorId, 3); // Próximos 3 días
+          // Obtener información del usuario para mostrar su nombre
+        $userData = $this->userModel->getUserById($monitorId);
+
+        // Preparar datos para la vista
         $data = [
             'title' => 'Dashboard del Personal',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Staff',
-            'staff_classes' => $staffClasses
+            'staff_classes' => $staffClasses,
+            'user_name' => $userData ? $userData->nombre : 'Usuario'
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar vista de dashboard para staff
-        include_once APPROOT . '/views/staff/dashboard.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('staff/dashboard', $data);
     }
     
     /**
      * Alias para index() - Dashboard para staff
      * Agregado para manejar redirecciones desde login
-     */
-    public function dashboard() {
+     */    public function dashboard() {
         // Simplemente redirigir a index()
         $this->index();
     }
     
     /**
+     * Manejo de acceso al antiguo método userTracking (redirigir a users)
+     * Para mantener compatibilidad con enlaces existentes
+     */
+    public function userTracking() {
+        // Redirigir a la nueva funcionalidad de usuarios
+        $this->redirect('staff/users');
+    }
+      
+    /**
      * Vista de gestión de clases
      * Ahora redirige a la gestión de clases de Admin
      */
     public function classManagement() {
-        // Redirigir a la vista de administración de clases
-        header('Location: ' . URLROOT . '/admin/classes');
-        exit;
+        // Redirigir a la vista de administración de clases usando el método del BaseController
+        $this->redirect('admin/classes');
     }
     
     /**
      * Añadir una nueva clase - Redirige a Admin
      */
     public function addClass() {
-        // Redirigir a Admin
-        header('Location: ' . URLROOT . '/admin/addClass');
-        exit;
+        // Redirigir a Admin usando el método del BaseController
+        $this->redirect('admin/addClass');
     }
     
     /**
      * Obtener detalles de una clase - Redirige a Admin
      */
     public function getClassDetails($classId = null) {
-        // Redirigir a Admin
-        header('Location: ' . URLROOT . '/admin/getClassDetails/' . $classId);
-        exit;
+        // Redirigir a Admin usando el método del BaseController
+        $this->redirect('admin/getClassDetails/' . ($classId ?? ''));
     }
     
     /**
      * Actualizar una clase existente - Redirige a Admin
      */
     public function updateClass() {
-        // Redirigir a Admin
-        header('Location: ' . URLROOT . '/admin/updateClass');
-        exit;
+        // Redirigir a Admin usando el método del BaseController
+        $this->redirect('admin/updateClass');
     }
     
     /**
      * Eliminar una clase - Redirige a Admin
-     */
+     */    
     public function deleteClass() {
-        // Redirigir a Admin
-        header('Location: ' . URLROOT . '/admin/deleteClass');
-        exit;
+        // Redirigir a Admin usando el método del BaseController
+        $this->redirect('admin/deleteClass');
     }
-    
-    /**
+      /**
      * Actualizar el registro de asistencia a clases (a través de AJAX)
      */
     public function updateAttendance() {
-        // Verificar que sea una petición AJAX POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        // Verificar que sea una petición POST usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
             return;
         }
         
@@ -144,7 +113,7 @@ class StaffController {
         $data = json_decode($json);
         
         if (empty($data->attendance)) {
-            echo json_encode(['success' => false, 'message' => 'No se proporcionaron datos de asistencia']);
+            $this->jsonResponse(['success' => false, 'message' => 'No se proporcionaron datos de asistencia'], 400);
             return;
         }
         
@@ -156,21 +125,27 @@ class StaffController {
             }
         }
         
-        // Devolver resultado
+        // Devolver resultado usando el método del BaseController
         if ($updatedCount > 0) {
-            echo json_encode(['success' => true, 'message' => 'Asistencia actualizada correctamente', 'updatedCount' => $updatedCount]);
+            $this->jsonResponse([
+                'success' => true, 
+                'message' => 'Asistencia actualizada correctamente', 
+                'updatedCount' => $updatedCount
+            ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'No se pudo actualizar la asistencia']);
+            $this->jsonResponse([
+                'success' => false, 
+                'message' => 'No se pudo actualizar la asistencia'
+            ], 500);
         }
     }
-    
-    /**
+      /**
      * Cancelar una reserva (a través de AJAX)
      */
     public function cancelReservation() {
-        // Verificar que sea una petición AJAX POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        // Verificar que sea una petición POST usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
             return;
         }
         
@@ -179,7 +154,7 @@ class StaffController {
         $data = json_decode($json);
         
         if (!isset($data->reservationId) || !isset($data->classId)) {
-            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+            $this->jsonResponse(['success' => false, 'message' => 'Datos incompletos'], 400);
             return;
         }
         
@@ -188,46 +163,27 @@ class StaffController {
             // Actualizar la capacidad actual de la clase
             $this->classModel->updateCapacity($data->classId);
             
-            echo json_encode(['success' => true, 'message' => 'Reserva cancelada correctamente']);
+            $this->jsonResponse(['success' => true, 'message' => 'Reserva cancelada correctamente']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la reserva']);
+            $this->jsonResponse(['success' => false, 'message' => 'No se pudo cancelar la reserva'], 500);
         }
     }
-    
-    /**
-     * Vista para enviar notificaciones
-     */
-    public function sendNotification() {
+      /**
+     * Lista todos los usuarios del sistema para consulta por parte del staff
+     * Similar a la vista de admin pero sin opciones de activar/desactivar
+     */    
+    public function users() {
+        // Obtener todos los usuarios
+        $users = $this->userModel->getAllUsers();
+        
         $data = [
-            'title' => 'Enviar Notificación'
+            'title' => 'Consulta de Usuarios',
+            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Staff',
+            'users' => $users
         ];
         
-        // Cargar header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar vista
-        include_once APPROOT . '/views/staff/send_notification.php';
-        
-        // Cargar footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
-    
-    /**
-     * Vista para seguimiento de usuarios
-     */
-    public function userTracking() {
-        $data = [
-            'title' => 'Seguimiento de Usuarios'
-        ];
-        
-        // Cargar header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar vista
-        include_once APPROOT . '/views/staff/user_tracking.php';
-        
-        // Cargar footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('staff/users', $data);
     }
     
     /**
@@ -235,166 +191,138 @@ class StaffController {
      * Ahora redirige a la gestión de clases de Admin
      */
     public function classes() {
-        // Redirigir a la vista de administración de clases
-        header('Location: ' . URLROOT . '/admin/classes');
-        exit;
+        // Redirigir a la vista de administración de clases usando el método del BaseController
+        $this->redirect('admin/classes');
     }
-    
-    /**
+      /**
      * Obtener los detalles de los alumnos de una clase
      * @param int $classId ID de la clase
      */
     public function getClassStudents($classId) {
-        // Verificar que la petición sea AJAX
-        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            header('HTTP/1.1 403 Forbidden');
-            echo 'Esta ruta solo acepta peticiones AJAX';
+        // Verificar que el ID sea válido
+        if (!$classId) {
+            $this->jsonResponse(['success' => false, 'message' => 'ID de clase no proporcionado'], 400);
             return;
         }
-        
-        // Cargar modelos necesarios
-        require_once APPROOT . '/models/Class.php';
-        require_once APPROOT . '/models/Reservation.php';
-        
-        $classModel = new Class_();
-        $reservationModel = new Reservation();
         
         // Obtener la clase
-        $class = $classModel->getClassById($classId);
+        $class = $this->classModel->getClassById($classId);
         
         if (!$class) {
-            echo json_encode(['success' => false, 'message' => 'Clase no encontrada']);
+            $this->jsonResponse(['success' => false, 'message' => 'Clase no encontrada'], 404);
             return;
         }
         
-        // Verificar que el staff actual sea el instructor asignado
+        // Verificar que el staff actual sea el instructor asignado o un admin
         if ($_SESSION['user_role'] !== 'admin' && $class->monitor_id != $_SESSION['user_id']) {
-            echo json_encode(['success' => false, 'message' => 'No tienes permiso para ver esta clase']);
+            $this->jsonResponse(['success' => false, 'message' => 'No tienes permiso para ver esta clase'], 403);
             return;
         }
         
         // Obtener reservas/alumnos para esta clase
-        $students = $reservationModel->getStudentsByClassId($classId);
+        $students = $this->reservationModel->getStudentsByClassId($classId);
         
-        // Devolver como JSON
-        echo json_encode([
+        // Devolver como JSON usando el método del BaseController
+        $this->jsonResponse([
             'success' => true,
             'class' => $class,
             'students' => $students
         ]);
     }
-    
-    /**
+      /**
      * Actualiza el registro de asistencia de los alumnos
      */
     public function updateStudentAttendance() {
-        // Verificar que la petición sea AJAX y POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || 
-            !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
-            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            header('HTTP/1.1 403 Forbidden');
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        // Verificar que sea una petición POST usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
             return;
         }
-        
-        // Cargar modelo de reservas
-        require_once APPROOT . '/models/Reservation.php';
-        $reservationModel = new Reservation();
         
         // Obtener datos del cuerpo de la petición
         $json = file_get_contents('php://input');
         $data = json_decode($json);
         
         if (empty($data->attendance)) {
-            echo json_encode(['success' => false, 'message' => 'No se proporcionaron datos de asistencia']);
+            $this->jsonResponse(['success' => false, 'message' => 'No se proporcionaron datos de asistencia'], 400);
             return;
         }
         
         // Actualizar cada registro de asistencia
         $updatedCount = 0;
         foreach ($data->attendance as $attendance) {
-            if ($reservationModel->updateAttendance($attendance->reservationId, $attendance->attended)) {
+            if ($this->reservationModel->updateAttendance($attendance->reservationId, $attendance->attended)) {
                 $updatedCount++;
             }
         }
         
-        // Devolver resultado
+        // Devolver resultado usando el método del BaseController
         if ($updatedCount > 0) {
-            echo json_encode([
+            $this->jsonResponse([
                 'success' => true, 
                 'message' => 'Asistencia actualizada correctamente', 
                 'updatedCount' => $updatedCount
             ]);
         } else {
-            echo json_encode([
+            $this->jsonResponse([
                 'success' => false, 
                 'message' => 'No se pudo actualizar la asistencia'
-            ]);
+            ], 500);
         }
     }
-    
-    /**
+      /**
      * Cancelar una reserva de un estudiante específica
      */
     public function cancelStudentReservation() {
-        // Verificar que la petición sea AJAX y POST
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || 
-            !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
-            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-            header('HTTP/1.1 403 Forbidden');
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        // Verificar que sea una petición POST usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
             return;
         }
-        
-        // Cargar modelos necesarios
-        require_once APPROOT . '/models/Reservation.php';
-        require_once APPROOT . '/models/Class.php';
-        
-        $reservationModel = new Reservation();
-        $classModel = new Class_();
         
         // Obtener datos del cuerpo de la petición
         $json = file_get_contents('php://input');
         $data = json_decode($json);
         
         if (empty($data->reservationId) || empty($data->classId)) {
-            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+            $this->jsonResponse(['success' => false, 'message' => 'Datos incompletos'], 400);
             return;
         }
         
         // Verificar permisos (solo el monitor asignado o un admin pueden cancelar)
-        $class = $classModel->getClassById($data->classId);
+        $class = $this->classModel->getClassById($data->classId);
         
         if (!$class) {
-            echo json_encode(['success' => false, 'message' => 'Clase no encontrada']);
+            $this->jsonResponse(['success' => false, 'message' => 'Clase no encontrada'], 404);
             return;
         }
         
         if ($_SESSION['user_role'] !== 'admin' && $class->monitor_id != $_SESSION['user_id']) {
-            echo json_encode(['success' => false, 'message' => 'No tienes permiso para cancelar esta reserva']);
+            $this->jsonResponse(['success' => false, 'message' => 'No tienes permiso para cancelar esta reserva'], 403);
             return;
         }
         
-        // Cancelar la reserva usando el método correcto: cancelReservation
-        if ($reservationModel->cancelReservation($data->reservationId)) {
+        // Cancelar la reserva
+        if ($this->reservationModel->cancelReservation($data->reservationId)) {
             // Actualizar capacidad actual de la clase
-            if ($classModel->updateCapacity($data->classId, -1)) {
-                echo json_encode(['success' => true, 'message' => 'Reserva cancelada correctamente']);
+            if ($this->classModel->updateCapacity($data->classId, -1)) {
+                $this->jsonResponse(['success' => true, 'message' => 'Reserva cancelada correctamente']);
             } else {
-                echo json_encode(['success' => true, 'message' => 'Reserva cancelada, pero hubo un problema al actualizar la capacidad']);
+                $this->jsonResponse([
+                    'success' => true, 
+                    'message' => 'Reserva cancelada, pero hubo un problema al actualizar la capacidad'
+                ]);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la reserva']);
+            $this->jsonResponse(['success' => false, 'message' => 'No se pudo cancelar la reserva'], 500);
         }
     }
-    
-    /**
+      /**
      * Filtrar clases - Redirige a Admin
      */
     public function filterClasses() {
-        // Redirigir a Admin
-        header('Location: ' . URLROOT . '/admin/filterClasses');
-        exit;
+        // Redirigir a Admin usando el método del BaseController
+        $this->redirect('admin/filterClasses');
     }
 }
 ?>

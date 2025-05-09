@@ -4,16 +4,18 @@ $base_url = "/gymIntranet/gymIntranet";
 $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 ?>
 
+<!-- Incluir estilos específicos para la página de login -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/auth/login.css">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white text-center py-3">
                     <h4 class="mb-0">Acceso a Gym Intranet</h4>
-                </div>
-                <div class="card-body p-5">
+                </div>                <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <img src="<?php echo URLROOT; ?>/public/images/logo.png" alt="Gym Intranet Logo" width="120" class="mb-4">
+                        <i class="fas fa-dumbbell fa-5x text-primary mb-4"></i>
                         <p class="text-muted">Introduce tus credenciales para acceder</p>
                     </div>
                     <?php if(isset($_SESSION['login_message'])): ?>
@@ -73,20 +75,5 @@ $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const togglePassword = document.getElementById('togglePassword');
-    const password = document.getElementById('password');
-    
-    togglePassword.addEventListener('click', function() {
-        // Toggle password visibility
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-        
-        // Toggle eye icon
-        const eyeIcon = this.querySelector('i');
-        eyeIcon.classList.toggle('fa-eye');
-        eyeIcon.classList.toggle('fa-eye-slash');
-    });
-});
-</script>
+<!-- Incluir JavaScript específico para la página de login -->
+<script src="<?php echo URLROOT; ?>/public/js/auth/login.js"></script>

@@ -5,6 +5,11 @@
  */
 ?>
 
+<!-- Incluir estilos específicos para la página de administración de usuarios -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/admin/users.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -98,22 +103,16 @@
                         </tbody>
                     </table>
                 </div>
-            <?php endif; ?>
-        </div>
+            <?php endif; ?>        </div>
     </div>
 </div>
 
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- Incluir script específico para la página de administración de usuarios -->
+<script src="<?php echo URLROOT; ?>/js/admin/users.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar DataTables para la tabla de usuarios
-        if (document.getElementById('usersTable')) {
-            $('#usersTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                },
-                order: [[0, 'desc']], // Ordenar por ID (columna 0) descendente por defecto
-                responsive: true
-            });
-        }
-    });
+    // Variable global para el controlador
+    const URLROOT = '<?php echo URLROOT; ?>';
 </script>

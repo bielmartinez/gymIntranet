@@ -3,7 +3,16 @@
  * Vista para editar usuario (para administradores)
  * Permite modificar todos los datos del usuario
  */
+
+// Definir el título de la página para el header
+$pageTitle = isset($data['title']) ? $data['title'] : 'Editar Usuario';
+
+// Incluir el header principal
+include_once APPROOT . '/views/shared/header/main.php';
 ?>
+
+<!-- Incluir estilos específicos para la página de edición de usuarios -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/admin/edit_user.css">
 
 <div class="container mt-4">
     <div class="card shadow">
@@ -104,8 +113,7 @@
                         <?php echo $data['user']['isActive'] ? 'checked' : ''; ?>>
                     <label class="form-check-label" for="is_active">Usuario activo</label>
                 </div>
-                
-                <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between">
                     <a href="<?php echo URLROOT; ?>/admin/users" class="btn btn-secondary">Volver</a>
                     <button type="submit" class="btn btn-primary">Guardar cambios</button>
                 </div>
@@ -113,3 +121,11 @@
         </div>
     </div>
 </div>
+
+<!-- Incluir scripts específicos para la página de edición de usuarios -->
+<script src="<?= URLROOT ?>/public/js/admin/edit_user.js"></script>
+
+<?php
+// Incluir el footer
+include_once APPROOT . '/views/shared/footer/main.php';
+?>

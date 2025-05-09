@@ -5,6 +5,9 @@
  */
 ?>
 
+<!-- Incluir estilos específicos para el dashboard de staff -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/staff/dashboard.css">
+
 <div class="container-fluid">
     <div class="row">
         <main class="col-12 px-md-4">
@@ -13,9 +16,8 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">Accesos Rápidos</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
+                    </div>                    <div class="card-body">
+                        <div class="row quick-access">
                             <div class="col-lg-4 col-md-6 mb-4">
                                 <a href="<?php echo URLROOT; ?>/admin/classes" class="text-decoration-none">
                                     <div class="card bg-primary text-white shadow">
@@ -25,26 +27,24 @@
                                             <div class="text-white-50">Administra tus clases</div>
                                         </div>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-lg-4 col-md-6 mb-4">
-                                <a href="<?php echo URLROOT; ?>/staff/userTracking" class="text-decoration-none">
+                                </a>                            </div>                            <div class="col-lg-4 col-md-6 mb-4">
+                                <a href="<?php echo URLROOT; ?>/staff/users" class="text-decoration-none">
                                     <div class="card bg-success text-white shadow">
                                         <div class="card-body text-center">
-                                            <i class="fas fa-user-friends fa-3x mb-3"></i>
-                                            <h5>Seguimiento</h5>
-                                            <div class="text-white-50">Progreso de usuarios</div>
+                                            <i class="fas fa-users fa-3x mb-3"></i>
+                                            <h5>Gestionar Usuarios</h5>
+                                            <div class="text-white-50">Consulta información de usuarios</div>
                                         </div>
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-lg-4 col-md-12 mb-4">
-                                <a href="<?php echo URLROOT; ?>/staff/sendNotification" class="text-decoration-none">
-                                    <div class="card bg-info text-white shadow">
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <a href="<?php echo URLROOT; ?>/staffRoutine" class="text-decoration-none">
+                                    <div class="card bg-warning text-white shadow">
                                         <div class="card-body text-center">
-                                            <i class="fas fa-bell fa-3x mb-3"></i>
-                                            <h5>Notificaciones</h5>
-                                            <div class="text-white-50">Mensajes a usuarios</div>
+                                            <i class="fas fa-running fa-3x mb-3"></i>
+                                            <h5>Gestionar Rutinas</h5>
+                                            <div class="text-white-50">Crea y administra rutinas</div>
                                         </div>
                                     </div>
                                 </a>
@@ -53,9 +53,8 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Bienvenido/a, <?php echo $data['user_name']; ?></h1>
+              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Bienvenido/a, <span class="user-name"><?php echo $data['user_name']; ?></span></h1>
             </div>
     
     <!-- Mensajes de estado -->
@@ -160,8 +159,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    <?php endif; ?>
+        </div>    <?php endif; ?>
 </main>
 </div>
 </div>
+
+<!-- Incluir script específico para el dashboard de staff -->
+<script src="<?php echo URLROOT; ?>/public/js/staff/dashboard.js"></script>

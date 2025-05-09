@@ -10,31 +10,8 @@ $pageTitle = isset($data['title']) ? $data['title'] : 'Gestión de Rutinas';
 include_once APPROOT . '/views/shared/header/main.php';
 ?>
 
-<style>
-    .table-responsive {
-        margin-top: 20px;
-    }
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin: 0 3px;
-    }
-    .badge-status {
-        font-weight: normal;
-        padding: 5px 10px;
-    }
-    .badge-status.with-pdf {
-        background-color: #28a745;
-    }
-    .badge-status.without-pdf {
-        background-color: #dc3545;
-    }
-</style>
+<!-- Incluir estilos específicos para la página de rutinas -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/staff/routines.css">
 
 <div class="container-fluid">
     <div class="row">
@@ -123,12 +100,11 @@ include_once APPROOT . '/views/shared/header/main.php';
                                                     <i class="fas fa-file-pdf"></i> PDF
                                                 </a>
                                             </td>
-                                            <td>
-                                                <div class="btn-group">
+                                            <td>                                                <div class="btn-group">
                                                     <a href="<?= URLROOT ?>/staffRoutine/edit/<?= $routine->rutina_id ?>" class="btn btn-sm btn-primary">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $routine->rutina_id ?>">
+                                                    <button type="button" class="btn btn-sm btn-danger open-delete-modal" data-modal-id="deleteModal<?= $routine->rutina_id ?>">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -165,20 +141,8 @@ include_once APPROOT . '/views/shared/header/main.php';
     </div>
 </div>
 
-<script>
-    // Inicializar DataTable para la tabla de rutinas si existe
-    document.addEventListener('DOMContentLoaded', function() {
-        const table = document.getElementById('routinesTable');
-        if (table && typeof $.fn.DataTable !== 'undefined') {
-            $(table).DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                },
-                order: [[0, 'desc']] // Ordenar por ID de forma descendente (las más recientes primero)
-            });
-        }
-    });
-</script>
+<!-- Incluir scripts específicos para la página de rutinas -->
+<script src="<?= URLROOT ?>/public/js/staff/routines.js"></script>
 
 <?php
 // Incluir el footer

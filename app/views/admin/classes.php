@@ -1,4 +1,12 @@
 <?php
+// Incluir estilos específicos para la página de administración de clases
+?>
+<!-- Incluir estilos específicos para la página de administración de clases -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/admin/classes.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<?php
 // Mensajes de alerta (éxito, error, etc.)
 if (isset($_SESSION['admin_message'])) {
     echo '<div class="alert alert-' . $_SESSION['admin_message_type'] . ' alert-dismissible fade show" role="alert">
@@ -11,9 +19,8 @@ if (isset($_SESSION['admin_message'])) {
 
 // IMPORTANTE: Solo cargar las clases si no vienen ya de un filtrado
 // Si hay datos de filtrado pasados desde el controlador, usarlos
-if (!isset($data['classes'])) {
-    // Cargar el modelo de clases
-    require_once APPROOT . '/models/Class.php';
+if (!isset($data['classes'])) {    // Cargar el modelo de clases (usando ruta absoluta para mayor seguridad)
+    require_once dirname(dirname(__DIR__)) . '/models/Class.php';
     $classModel = new Class_();
     
     // Cargar la información de las clases
@@ -323,109 +330,9 @@ if (isset($data['filters'])) {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
+<!-- Incluir script específico para la página de administración de clases -->
+<script src="<?php echo URLROOT; ?>/js/admin/classes.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar DataTables para la tabla de clases cuando jQuery esté disponible
-    setTimeout(function() {
-      if (typeof $ !== 'undefined') {
-        try {
-          $('#classesTable').DataTable({
-            language: {
-              url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json',
-              emptyTable: 'No hay clases disponibles'
-            },
-            order: [[3, 'asc'], [4, 'asc']], // Ordenar por fecha (col 3) y hora (col 4)
-            responsive: true,
-            columnDefs: [
-              { targets: [7, 8], orderable: false } // Columnas no ordenables
-            ]
-          });
-        } catch (error) {
-          console.error('Error al inicializar DataTables:', error);
-        }
-      } else {
-        console.warn('jQuery no está disponible para inicializar DataTables');
-      }
-    }, 500);
-
-    // Manejar el evento de editar clase
-    document.querySelectorAll('.edit-class-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const classId = this.getAttribute('data-class-id');
-        
-        // Mostrar mensaje de carga en el modal
-        const editModal = document.getElementById('editClassModal');
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'text-center my-3';
-        loadingMessage.innerHTML = '<div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando datos de la clase...</p>';
-        
-        // Añadir mensaje de carga al modal
-        const modalBody = editModal.querySelector('.modal-body');
-        const formElement = modalBody.querySelector('form');
-        modalBody.insertBefore(loadingMessage, formElement);
-        
-        // Obtener datos de la clase desde el servidor
-        fetch(`<?= URLROOT ?>/Admin/getClassDetails/${classId}`)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Eliminar mensaje de carga
-            if (loadingMessage) {
-              loadingMessage.remove();
-            }
-            
-            if (data.success) {
-              console.log('Datos recibidos para editar clase:', data); // Para debug
-              
-              // Rellenar el formulario con los datos
-              document.getElementById('editClassId').value = data.class.classe_id;
-              document.getElementById('editClassType').value = data.class.tipus_classe_id;
-              document.getElementById('editClassMonitor').value = data.class.monitor_id;
-              document.getElementById('editClassDate').value = data.class.data;
-              document.getElementById('editClassTime').value = data.class.hora;
-              document.getElementById('editClassDuration').value = data.class.duracio;
-              document.getElementById('editClassRoom').value = data.class.sala;
-              document.getElementById('editClassCapacity').value = data.class.capacitat_maxima;
-            } else {
-              alert('Error al cargar los datos de la clase: ' + (data.error || 'Error desconocido'));
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Error al conectar con el servidor: ' + error.message);
-            
-            // Eliminar mensaje de carga en caso de error
-            if (loadingMessage) {
-              loadingMessage.remove();
-            }
-          });
-      });
-    });
-
-    // Manejar el evento de eliminar clase
-    document.querySelectorAll('.delete-class-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const classId = this.getAttribute('data-class-id');
-        document.getElementById('deleteClassId').value = classId;
-      });
-    });
-    
-    // Establecer la fecha actual en el filtro de fecha
-    if (document.getElementById('filterDate')) {
-      document.getElementById('filterDate').valueAsDate = new Date();
-    }
-    
-    // Establecer fecha actual mínima en el formulario de crear clase
-    if (document.getElementById('classDate')) {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('classDate').min = today;
-      document.getElementById('classDate').value = today;
-    }
-  });
-</script>
+  // Variable global para el controlador
+  const URLROOT = '<?php echo URLROOT; ?>';</script>

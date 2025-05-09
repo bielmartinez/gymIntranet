@@ -1,0 +1,89 @@
+/**
+ * Estilos específicos para el dashboard de administración
+ */
+
+/* Estilos para las tarjetas de acceso rápido */
+.quick-access .card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+}
+
+.quick-access .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.quick-access .card-body {
+    padding: 1.5rem;
+}
+
+.quick-access h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.quick-access .text-white-50 {
+    font-size: 0.85rem;
+}
+
+/* Estilos para las tarjetas de estadísticas */
+.card.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.card.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.card.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.card.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.card.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+/* Estilos para los iconos de las tarjetas de estadísticas */
+.text-xs {
+    font-size: 0.7rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para los encabezados de las secciones */
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 767.98px) {
+    .quick-access .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}

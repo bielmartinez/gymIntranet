@@ -1,39 +1,84 @@
 <?php
 /**
- * Modelo para gestión de notificaciones del sistema (versión simplificada)
+ * Modelo para gestión de notificaciones del sistema
  */
 
-// Cargar configuración y base de datos
-require_once dirname(dirname(__FILE__)) . '/config/config.php';
-require_once dirname(dirname(__FILE__)) . '/libraries/Database.php';
+require_once dirname(__FILE__) . '/BaseModel.php';
 require_once dirname(dirname(__FILE__)) . '/utils/Logger.php';
 
-class Notification {
-    private $db;
+class Notification extends BaseModel {
+    protected $table = 'notificacions';
+    protected $primaryKey = 'notificacio_id';
     
-    // Constructor
+    /**
+     * Constructor del modelo
+     */
     public function __construct() {
-        $this->db = new Database();
+        parent::__construct();
+    }
+    
+    /**
+     * Valida los datos de entrada para una notificación
+     * @param array $data Datos a validar
+     * @return array Array de errores o array vacío si no hay errores
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        // Validar título
+        if (empty($data['titol']) && empty($data['title'])) {
+            $errors['titol'] = 'El título es requerido';
+        } elseif (!empty($data['titol']) && strlen($data['titol']) > 100) {
+            $errors['titol'] = 'El título no puede exceder los 100 caracteres';
+        } elseif (!empty($data['title']) && strlen($data['title']) > 100) {
+            $errors['title'] = 'El título no puede exceder los 100 caracteres';
+        }
+        
+        // Validar mensaje
+        if (empty($data['missatge']) && empty($data['message'])) {
+            $errors['missatge'] = 'El mensaje es requerido';
+        }
+        
+        return $errors;
     }
 
     /**
-     * Crea una nueva notificación (versión simplificada)
+     * Crea una nueva notificación
      * @param array $notificationData Datos básicos de la notificación
      * @return int|bool ID de la notificación creada o false si hay error
      */
-    public function create($notificationData) {
-        Logger::log('DEBUG', 'Iniciando creación de notificación simplificada: ' . $notificationData['title']);
+    public function createNotification($notificationData) {
+        Logger::log('DEBUG', 'Iniciando creación de notificación: ' . 
+                   ($notificationData['title'] ?? $notificationData['titol']));
         
         try {
-            // Insertar la notificación en la tabla notificacions (versión simplificada)
-            $this->db->query('INSERT INTO notificacions (titol, missatge, creat_el) 
-                            VALUES (:title, :message, NOW())');
+            // Validar datos
+            $errors = $this->validate($notificationData);
+            if (!empty($errors)) {
+                Logger::log('ERROR', 'Validación fallida para la notificación: ' . json_encode($errors));
+                return false;
+            }
             
-            $this->db->bind(':title', $notificationData['title']);
-            $this->db->bind(':message', $notificationData['message']);
+            // Preparar datos para la inserción
+            $insertData = [
+                'titol' => $notificationData['title'] ?? $notificationData['titol'],
+                'missatge' => $notificationData['message'] ?? $notificationData['missatge'],
+                'creat_el' => date('Y-m-d H:i:s')
+            ];
             
-            if($this->db->execute()) {
-                $notificationId = $this->db->lastInsertId();
+            // Si hay datos adicionales, los añadimos
+            if (isset($notificationData['clase_id']) || isset($notificationData['classe_id'])) {
+                $insertData['classe_id'] = $notificationData['clase_id'] ?? $notificationData['classe_id'];
+            }
+            
+            if (isset($notificationData['emisor_id']) || isset($notificationData['sender_id'])) {
+                $insertData['emisor_id'] = $notificationData['emisor_id'] ?? $notificationData['sender_id'];
+            }
+            
+            // Usar el método create de BaseModel
+            $notificationId = parent::create($insertData);
+            
+            if ($notificationId) {
                 Logger::log('INFO', 'Notificación creada correctamente con ID: ' . $notificationId);
                 return $notificationId;
             } else {
@@ -41,7 +86,7 @@ class Notification {
                 return false;
             }
         } catch (Exception $e) {
-            Logger::log('ERROR', 'Excepción al crear notificación simplificada: ' . $e->getMessage());
+            Logger::log('ERROR', 'Excepción al crear notificación: ' . $e->getMessage());
             return false;
         }
     }
@@ -69,17 +114,8 @@ class Notification {
      * @return array Lista de notificaciones
      */
     public function getUserNotifications() {
-        try {
-            $this->db->query('SELECT notificacio_id as id, titol as title, missatge as message, 
-                            creat_el as created_at
-                            FROM notificacions 
-                            ORDER BY creat_el DESC');
-            
-            return $this->db->resultSet();
-        } catch (Exception $e) {
-            Logger::log('ERROR', 'Error al obtener notificaciones: ' . $e->getMessage());
-            return [];
-        }
+        // Reutilizamos getAllNotifications ya que por ahora hacen lo mismo
+        return $this->getAllNotifications();
     }
     
     /**
@@ -88,9 +124,7 @@ class Notification {
      */
     public function getNotificationsCount() {
         try {
-            $this->db->query('SELECT COUNT(*) as count FROM notificacions');
-            $result = $this->db->single();
-            return $result->count;
+            return $this->count();
         } catch (Exception $e) {
             Logger::log('ERROR', 'Error al obtener conteo de notificaciones: ' . $e->getMessage());
             return 0;
@@ -102,15 +136,8 @@ class Notification {
      * @param int $notificationId ID de la notificación
      * @return bool
      */
-    public function delete($notificationId) {
-        try {
-            $this->db->query('DELETE FROM notificacions WHERE notificacio_id = :id');
-            $this->db->bind(':id', $notificationId);
-            return $this->db->execute();
-        } catch (Exception $e) {
-            Logger::log('ERROR', 'Error al eliminar notificación: ' . $e->getMessage());
-            return false;
-        }
+    public function deleteNotification($notificationId) {
+        return $this->delete($notificationId);
     }
     
     /**
@@ -148,7 +175,7 @@ class Notification {
     public function markAsRead($notificationId, $userId) {
         try {
             // Primero verificamos si ya existe un registro para este usuario y notificación
-            $this->db->query('SELECT * FROM destinataris_notificacions 
+            $this->db->query('SELECT * FROM destinataris_notificacions
                             WHERE notificacio_id = :notification_id 
                             AND usuari_id = :user_id');
             $this->db->bind(':notification_id', $notificationId);
@@ -234,4 +261,34 @@ class Notification {
             return 0;
         }
     }
+    
+    /**
+     * Sobreescribe el método delete para eliminar primero las relaciones en destinataris_notificacions
+     * @param int $id ID de la notificación a eliminar
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function delete($id) {
+        try {
+            Logger::log('DEBUG', 'Iniciando eliminación de notificación con ID: ' . $id);
+            
+            // Primero eliminar los registros relacionados en destinataris_notificacions
+            $this->db->query("DELETE FROM destinataris_notificacions WHERE notificacio_id = :id");
+            $this->db->bind(':id', $id);
+            $deleteDestRecords = $this->db->execute();
+            
+            if (!$deleteDestRecords) {
+                Logger::log('ERROR', 'Error al eliminar registros de destinatarios de la notificación ID: ' . $id);
+                return false;
+            }
+            
+            Logger::log('INFO', 'Registros de destinatarios eliminados correctamente para la notificación ID: ' . $id);
+            
+            // Ahora eliminar la notificación principal
+            return parent::delete($id);
+        } catch (Exception $e) {
+            Logger::log('ERROR', 'Excepción al eliminar notificación ID: ' . $id . ' - ' . $e->getMessage());
+            return false;
+        }
+    }
 }
+?>

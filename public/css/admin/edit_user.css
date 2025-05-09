@@ -1,0 +1,39 @@
+/* Estilos específicos para la página de edición de usuarios */
+
+.card-header.bg-primary {
+    border-bottom: 0;
+}
+
+/* Estilos para el formulario de edición */
+.form-group-header {
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.custom-switch {
+    padding-left: 2.5rem;
+}
+
+.form-help-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para campos de formulario requeridos */
+.form-label.required::after {
+    content: '*';
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .btn-responsive {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}

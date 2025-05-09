@@ -1,0 +1,31 @@
+/* Estilos para la página de mis reservas */
+
+/* Estilos para las tarjetas de reserva */
+.card.border-left-primary {
+  border-left: 4px solid #4e73df !important;
+}
+
+/* Estilos para los badges */
+.badge.bg-primary {
+  transition: all 0.2s ease;
+}
+
+/* Efectos de hover para las tarjetas */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* Estilos para el botón de cancelar */
+.cancel-reservation {
+  transition: all 0.2s ease;
+}
+
+.cancel-reservation:hover {
+  background-color: #dc3545;
+  color: white;
+}

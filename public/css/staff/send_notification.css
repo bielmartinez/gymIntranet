@@ -1,0 +1,46 @@
+/* Estilos específicos para la página de envío de notificaciones */
+
+/* Estilos para las tarjetas */
+.card-header.bg-warning {
+    border-bottom: 0;
+}
+
+/* Estilos para la tabla de usuarios */
+.table-users {
+    font-size: 0.9rem;
+}
+
+.table-users .form-check {
+    margin: 0;
+}
+
+/* Estilos para la caja de búsqueda de usuarios */
+.search-box {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-box .form-control {
+    padding-left: 2.5rem;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+/* Estilos para las opciones de destinatario */
+.recipient-options .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+}

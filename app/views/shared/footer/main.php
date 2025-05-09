@@ -11,17 +11,15 @@
       <div class="col-md-12 text-center">
         <p class="mb-0">&copy; <?php echo date('Y'); ?> GymIntranet</p>
       </div>
-    </div>
-  </div>
-
+    </div>  </div>
   <!-- Scripts principales -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
   
-  <!-- Script de notificaciones toast -->
-  <script src="<?php echo URLROOT; ?>/public/js/notifications.js"></script>
+  <!-- Scripts compartidos -->
+  <script src="<?php echo URLROOT; ?>/js/shared/toast-notifications.js"></script>
 
   <!-- Script personalizado para inicializar tooltips y popovers de Bootstrap -->
   <script>

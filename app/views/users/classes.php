@@ -16,47 +16,8 @@ if (isset($_SESSION['message'])) {
 }
 ?>
 
-<style>
-  /* Estilos para el horario de la clase */
-  .time-display {
-    transition: all 0.2s ease;
-    padding: 4px 0;
-  }
-  .time-display:hover {
-    transform: scale(1.05);
-  }
-  .class-card:hover .time-display {
-    color: #0d6efd;
-  }
-  
-  /* Destacado de la tarjeta de clase */
-  .class-card .card {
-    transition: all 0.3s ease;
-  }
-  .class-card:hover .card {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-  }
-    /* Estilo para nombre del instructor */
-  .instructor-name {
-    color: #495057;
-  }
-  .class-card:hover .instructor-name {
-    color: #0d6efd;
-  }
-  
-  /* Estilos para las fechas */
-  .badge.date-badge {
-    padding: 8px 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.2s ease;
-  }
-  .class-card:hover .date-badge {
-    transform: scale(1.05);
-    background-color: #0d47a1 !important;
-  }
-</style>
+<!-- Enlazando hoja de estilos específica para clases -->
+<link rel="stylesheet" href="<?= URLROOT ?>/public/css/user/classes.css">
 
 <div class="container-fluid">
   <div class="row">
@@ -270,124 +231,11 @@ if (isset($_SESSION['message'])) {
   </div>
 </div>
 
+<!-- Añadir la variable URLROOT al script para poder usarla en el archivo JS -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Establecer la fecha actual como valor predeterminado para el filtro si no hay filtro previo
-    const dateInput = document.querySelector('input[name="date"]');
-    if (dateInput) {
-      // Establecer la fecha mínima como hoy
-      const today = new Date().toISOString().split('T')[0];
-      dateInput.setAttribute('min', today);
-      
-      if (dateInput.value === "") {
-        dateInput.valueAsDate = new Date();
-      } else if (dateInput.value < today) {
-        // Si la fecha seleccionada es anterior a hoy, actualizar a la fecha actual
-        dateInput.valueAsDate = new Date();
-      }
-    }
-    
-    // Variables para tracking de filtros activos
-    let activeTypeFilter = 'all';
-    const noResultsMessage = document.createElement('div');
-    noResultsMessage.className = 'col-12';
-    noResultsMessage.innerHTML = `
-      <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i>
-        No hay clases disponibles con los filtros seleccionados.
-        <button class="btn btn-sm btn-outline-primary ms-2" id="resetAllFilters">Restablecer filtros</button>
-      </div>
-    `;
-    
-    // Función para aplicar filtros
-    function applyFilters() {
-      let visibleCards = 0;
-      
-      document.querySelectorAll('.class-card').forEach(card => {
-        // Verificar si cumple con el filtro de tipo
-        const matchesTypeFilter = (activeTypeFilter === 'all' || card.dataset.classType === activeTypeFilter);
-        
-        // Mostrar u ocultar la tarjeta según los filtros
-        if (matchesTypeFilter) {
-          card.style.display = 'block';
-          visibleCards++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      // Mostrar mensaje si no hay resultados
-      const classesContainer = document.getElementById('classesContainer');
-      if (visibleCards === 0 && !document.querySelector('.alert-info')) {
-        classesContainer.appendChild(noResultsMessage);
-      } else if (visibleCards > 0) {
-        const existingMessage = classesContainer.querySelector('.alert-info');
-        if (existingMessage && existingMessage.parentNode === classesContainer) {
-          classesContainer.removeChild(existingMessage);
-        }
-      }
-      
-      // Actualizar indicador de filtro activo
-      updateActiveFilterIndicator();
-    }
-    
-    // Actualizar indicador visual de filtro activo
-    function updateActiveFilterIndicator() {
-      const activeFilterBadge = document.getElementById('activeTypeFilter');
-      
-      if (activeTypeFilter === 'all') {
-        activeFilterBadge.style.display = 'none';
-      } else {
-        // Encontrar el nombre del tipo de clase seleccionado
-        const selectedFilterElement = document.querySelector(`.filter-class[data-filter="${activeTypeFilter}"]`);
-        if (selectedFilterElement) {
-          activeFilterBadge.textContent = selectedFilterElement.textContent;
-          activeFilterBadge.style.display = 'inline-block';
-        }
-      }
-    }
-    
-    // Filtrar clases por tipo
-    document.querySelectorAll('.filter-class').forEach(item => {
-      item.addEventListener('click', event => {
-        event.preventDefault();
-        activeTypeFilter = event.target.dataset.filter;
-        applyFilters();
-      });
-    });
-
-    // Restablecer filtro de fecha
-    const resetDateFilterButton = document.getElementById('resetDateFilter');
-    if (resetDateFilterButton) {
-      resetDateFilterButton.addEventListener('click', () => {
-        const dateFilterForm = document.getElementById('dateFilterForm');
-        const dateFilterInput = document.getElementById('dateFilter');
-        dateFilterInput.valueAsDate = new Date();
-        dateFilterForm.submit();
-      });
-    }
-      // Restablecer todos los filtros (botón dinámico)
-    document.addEventListener('click', function(event) {
-      if (event.target && event.target.id === 'resetAllFilters') {
-        // Reiniciar el filtro de tipo
-        activeTypeFilter = 'all';
-        
-        // En lugar de enviar el formulario con la fecha actual, redirigir a la página sin filtros
-        window.location.href = '<?= URLROOT ?>/user/classes';
-      }
-    });// Eliminar todos los filtros (botón estático)
-    const clearAllFiltersBtn = document.getElementById('clearAllFiltersBtn');
-    if (clearAllFiltersBtn) {
-      clearAllFiltersBtn.addEventListener('click', () => {
-        // Reiniciar el filtro de tipo
-        activeTypeFilter = 'all';
-        
-        // En lugar de enviar el formulario con la fecha actual, redirigir a la página sin filtros
-        window.location.href = '<?= URLROOT ?>/user/classes';
-      });
-    }
-    
-    // Aplicar filtros iniciales
-    applyFilters();
-  });
+  // Definir la variable URLROOT para que esté disponible en el archivo JS
+  const URLROOT = '<?= URLROOT ?>';
 </script>
+
+<!-- Enlazando archivo JavaScript específico para clases -->
+<script src="<?= URLROOT ?>/public/js/user/classes.js"></script>

@@ -4,6 +4,9 @@ $base_url = "/gymIntranet/gymIntranet";
 $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 ?>
 
+<!-- Incluir estilos específicos para la recuperación de contraseña -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/auth/password-recovery.css">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -67,17 +70,5 @@ $base_dir = $_SERVER['DOCUMENT_ROOT'] . $base_url;
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const newPassword = document.getElementById('newPassword');
-    const confirmPassword = document.getElementById('confirmPassword');
-    const form = document.querySelector('form');
-    
-    form.addEventListener('submit', function(event) {
-        if (newPassword.value !== confirmPassword.value) {
-            event.preventDefault();
-            alert('Las contraseñas no coinciden');
-        }
-    });
-});
-</script>
+<!-- Incluir JavaScript específico para la página de restablecimiento de contraseña -->
+<script src="<?php echo URLROOT; ?>/public/js/auth/reset-password.js"></script>

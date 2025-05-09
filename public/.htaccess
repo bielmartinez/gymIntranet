@@ -1,0 +1,7 @@
+# Permitir el acceso a archivos estáticos directamente
+<IfModule mod_rewrite.c>
+  RewriteEngine Off
+</IfModule>
+
+# Prevenir listados de directorios
+Options -Indexes

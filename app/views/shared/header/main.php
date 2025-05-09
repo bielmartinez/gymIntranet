@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' . SITENAME : SITENAME; ?></title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- FullCalendar (para vistas de calendario) -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
-    <!-- Estilos personalizados -->
+    <!-- Estilos principales de la aplicación -->
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/shared/main.css">
+    <!-- Estilos para notificaciones toast -->
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/shared/toast-notifications.css">
+    <!-- Estilos personalizados (se mantienen por compatibilidad) -->
     <style>
         :root {
             /* Nueva paleta de colores más energética */
@@ -262,10 +265,21 @@
     </style>
 </head>
 <body>
-    <!-- Barra de navegación superior -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Barra de navegación superior -->    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="<?php echo (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') ? URLROOT . '/admin/dashboard' : URLROOT . '/user/dashboard'; ?>"><?php echo SITENAME; ?></a>
+            <a class="navbar-brand" href="<?php 
+                if (isset($_SESSION['user_role'])) {
+                    if ($_SESSION['user_role'] == 'admin') {
+                        echo URLROOT . '/admin/dashboard';
+                    } elseif ($_SESSION['user_role'] == 'staff') {
+                        echo URLROOT . '/staff/dashboard';
+                    } else {
+                        echo URLROOT . '/user/dashboard';
+                    }
+                } else {
+                    echo URLROOT;
+                }
+            ?>"><?php echo SITENAME; ?></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -289,13 +303,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/admin/notifications">Notificaciones</a>
                     </li>
-                    <?php elseif(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'staff'): ?>
-                    <!-- Menú de Staff -->
+                    <?php elseif(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'staff'): ?>                    <!-- Menú de Staff -->
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/staff/dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/staff/classes">Gestionar Clases</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo URLROOT; ?>/staff/users">Gestionar Usuarios</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo URLROOT; ?>/staffRoutine">Gestionar Rutinas</a>
@@ -318,8 +334,11 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell"></i>
-                            <?php 
+                            <i class="fas fa-bell"></i>                            <?php 
+                                // Incluir UserController y Class.php
+                                require_once dirname(dirname(dirname(__DIR__))) . '/controllers/UserController.php';
+                                require_once dirname(dirname(dirname(__DIR__))) . '/models/Class.php';
+                                
                                 // Inicializar UserController para obtener el conteo
                                 $userController = new UserController();
                                 $notificationCount = $userController->getUnreadNotificationsCount();
@@ -391,13 +410,11 @@
                 <?php endif; ?>
             </div>
         </div>
-    </nav>
-
-    <!-- Contenido principal con espaciado para la navbar -->
+    </nav>    <!-- Contenido principal con espaciado para la navbar -->
     <div style="padding-top: 56px;"><?php // Este div se cierra en el footer ?>
         
     <!-- Script para notificaciones toast -->
-    <script src="<?php echo URLROOT; ?>/public/js/notifications.js"></script>
+    <script src="<?php echo URLROOT; ?>/js/notifications.js"></script>
     
     <!-- Código para pasar variables de sesión toast a JavaScript -->
     <?php if(isset($_SESSION['toast_message'])): ?>

@@ -2,13 +2,56 @@
 /**
  * Modelo para gestionar el seguimiento físico de los usuarios
  */
-class PhysicalTracking {
-    private $db;
+require_once dirname(__FILE__) . '/BaseModel.php';
+
+class PhysicalTracking extends BaseModel {
+    protected $table = 'seguiment_fisic';
+    protected $primaryKey = 'seguiment_id';
     
     public function __construct() {
-        $this->db = new Database;
+        parent::__construct();
     }
-    
+
+    /**
+     * Validar los datos de entrada para el seguimiento físico
+     * @param array $data Datos a validar
+     * @return array Array de errores o array vacío si no hay errores
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        // Validar campos requeridos
+        if (empty($data['usuari_id'])) {
+            $errors['usuari_id'] = 'El ID del usuario es requerido';
+        }
+        
+        // Validar peso
+        if (empty($data['pes'])) {
+            $errors['pes'] = 'El peso es requerido';
+        } else if (!is_numeric($data['pes']) || $data['pes'] <= 0) {
+            $errors['pes'] = 'El peso debe ser un número positivo';
+        }
+        
+        // Validar altura
+        if (empty($data['alcada'])) {
+            $errors['alcada'] = 'La altura es requerida';
+        } else if (!is_numeric($data['alcada']) || $data['alcada'] <= 0) {
+            $errors['alcada'] = 'La altura debe ser un número positivo (en centímetros)';
+        }
+        
+        // Opcional: validar fecha si está presente
+        if (!empty($data['data_mesura'])) {
+            $format = 'Y-m-d';
+            $d = DateTime::createFromFormat($format, $data['data_mesura']);
+            
+            if (!($d && $d->format($format) === $data['data_mesura'])) {
+                $errors['data_mesura'] = 'El formato de fecha no es válido (YYYY-MM-DD)';
+            }
+        }
+        
+        return $errors;
+    }
+
     /**
      * Obtener todas las mediciones de un usuario
      * @param int $userId ID del usuario
@@ -52,6 +95,12 @@ class PhysicalTracking {
      * @return bool True si se ha añadido correctamente
      */
     public function addMeasurement($data) {
+        // Validar datos de entrada
+        $errors = $this->validate($data);
+        if (!empty($errors)) {
+            return false;
+        }
+        
         // Calcular IMC si tenemos peso y altura
         if (!empty($data['pes']) && !empty($data['alcada'])) {
             // El IMC se calcula como peso (kg) / (altura (m))^2
@@ -81,6 +130,12 @@ class PhysicalTracking {
      * @return bool True si se ha actualizado correctamente
      */
     public function updateMeasurement($data) {
+        // Validar datos de entrada
+        $errors = $this->validate($data);
+        if (!empty($errors)) {
+            return false;
+        }
+        
         // Calcular IMC si tenemos peso y altura
         if (!empty($data['pes']) && !empty($data['alcada'])) {
             // El IMC se calcula como peso (kg) / (altura (m))^2

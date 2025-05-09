@@ -1,0 +1,73 @@
+/**
+ * Estilos específicos para la página de notificaciones de usuarios
+ */
+
+/* Estilos para la lista de notificaciones */
+.notification-list .list-group-item {
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border-left: 5px solid #4e73df;
+}
+
+.notification-list .list-group-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.notification-list .notification-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.notification-list .notification-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.notification-list .notification-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.notification-list .notification-content {
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.notification-list .badge {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.5rem;
+}
+
+.notification-list .notification-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Estilos para notificaciones leídas */
+.notification-list .list-group-item.read {
+    opacity: 0.7;
+    border-left-color: #6c757d;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .notification-list .notification-header {
+        flex-direction: column;
+    }
+    
+    .notification-list .notification-actions {
+        margin-top: 0.5rem;
+    }
+    
+    .notification-list .list-group-item {
+        padding: 0.75rem;
+    }
+}

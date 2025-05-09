@@ -2,9 +2,21 @@ Options -Indexes
 RewriteEngine On
 RewriteBase /gymIntranet/gymIntranet/
 
+# Si la ruta comienza con public/, servir directamente
+RewriteRule ^public/ - [L]
+
+# Redirigir CSS y JS a la carpeta public
+RewriteRule ^css/(.*)$ public/css/$1 [L]
+RewriteRule ^js/(.*)$ public/js/$1 [L]
+RewriteRule ^images/(.*)$ public/images/$1 [L] 
+RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+
+# Permitir acceso a archivos estáticos comunes directamente
+RewriteRule \.(css|js|jpg|jpeg|png|gif|ico|pdf|svg|woff|woff2|ttf|eot)$ - [L]
+
 # Permitir acceso a directorios y archivos reales
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-# Redirigir todas las peticiones al index.php con la URL como parámetro
+# Redirigir todas las peticiones restantes al index.php con la URL como parámetro
 RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]

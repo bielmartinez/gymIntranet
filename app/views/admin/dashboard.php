@@ -5,17 +5,19 @@
  */
 ?>
 
+<!-- Incluir estilos específicos para el dashboard de administración -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/admin/dashboard.css">
+
 <div class="container-fluid">
     <div class="row">
-        <main class="col-12 px-md-4">
-            <!-- Accesos Rápidos -->
+        <main class="col-12 px-md-4">            <!-- Accesos Rápidos -->
             <div class="col-12 mt-3 mb-4">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">Accesos Rápidos</h6>
                     </div>
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row quick-access">
                             <div class="col-lg-3 col-md-6 mb-4">
                                 <a href="<?php echo URLROOT; ?>/admin/registerForm" class="text-decoration-none">
                                     <div class="card bg-primary text-white shadow">
@@ -62,9 +64,8 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Bienvenido/a, <?php echo isset($data['user_name']) ? $data['user_name'] : 'Administrador'; ?></h1>
+              <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Bienvenido/a, <span class="welcome-message"><?php echo isset($data['user_name']) ? $data['user_name'] : 'Administrador'; ?></span></h1>
             </div>
       <!-- Stats at a glance -->
     <div class="row mb-4">
@@ -141,3 +142,6 @@
 </main>
 </div>
 </div>
+
+<!-- Incluir JavaScript específico para el dashboard de administración -->
+<script src="<?php echo URLROOT; ?>/public/js/admin/dashboard.js"></script>

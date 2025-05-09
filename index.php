@@ -33,6 +33,12 @@ spl_autoload_register(function($className) {
         return;
     }
     
+    // Caso especial para Class_ (palabra reservada)
+    if ($className === 'Class_' && file_exists(APPROOT . '/models/Class.php')) {
+        require_once APPROOT . '/models/Class.php';
+        return;
+    }
+    
     // Mapear utilidades
     if (file_exists(APPROOT . '/utils/' . $className . '.php')) {
         require_once APPROOT . '/utils/' . $className . '.php';

@@ -8,17 +8,16 @@ require_once dirname(__DIR__) . '/models/Class.php';
 require_once dirname(__DIR__) . '/models/TypeClass.php';
 require_once dirname(__DIR__) . '/models/Notification.php';
 
-class AdminController {
-    private $userController;
-    private $userModel;
-    private $classModel;
+class AdminController extends BaseController {
+    protected $userController;
+    protected $userModel;
+    protected $classModel;
     
     public function __construct() {
-        // Verificar que el usuario sea administrador o staff para permitir acceso a clases
-        if(!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'staff')) {
-            header('Location: ' . URLROOT);
-            exit;
-        }
+        parent::__construct();
+        
+        // Verificar que el usuario sea administrador o staff para permitir acceso
+        $this->requireRole(['admin', 'staff']);
         
         $this->userController = new UserController();
         $this->userModel = new User();
@@ -27,7 +26,8 @@ class AdminController {
     
     /**
      * Página de inicio para administradores
-     */    public function index() {
+     */
+    public function index() {
         // Obtener estadísticas para el dashboard
         $totalUsers = count($this->userModel->getAllUsers());
         $activeUsers = count($this->userModel->getAllUsers('user'));
@@ -36,22 +36,14 @@ class AdminController {
         
         $data = [
             'title' => 'Panel de Administración',
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Administrador',
             'totalUsers' => $totalUsers,
             'activeUsers' => $activeUsers,
             'staffUsers' => $staffUsers,
-            'todayClasses' => $todayClasses,
-            'staffUsers' => $staffUsers
+            'todayClasses' => $todayClasses
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar vista de dashboard para administradores
-        include_once APPROOT . '/views/admin/dashboard.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/dashboard', $data);
     }
     
     /**
@@ -99,67 +91,52 @@ class AdminController {
             unset($_SESSION['register_data']);
         }
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/register.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/register', $data);
     }
-    
-    /**
+      /**
      * Procesa el registro de un nuevo usuario
      */
     public function register() {
-        // Verificar si se envió el formulario
-        if($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/registerForm');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if(!$this->isPost()) {
+            $this->redirect('admin/registerForm');
+            return;
         }
         
-        // Procesar datos del formulario
+        // Procesar y sanitizar datos del formulario
         $userData = [
-            'fullName' => trim($_POST['fullName']),
-            'username' => trim($_POST['username']),
-            'email' => trim($_POST['email']),
-            'password' => trim($_POST['password']),
-            'confirmPassword' => trim($_POST['confirmPassword']),
-            'role' => trim($_POST['role']),
-            'membershipType' => isset($_POST['membershipType']) ? trim($_POST['membershipType']) : '',
-            'phone' => isset($_POST['phone']) ? trim($_POST['phone']) : '',
-            'birthDate' => isset($_POST['birthDate']) ? trim($_POST['birthDate']) : '',
+            'fullName' => $this->sanitizeInput($_POST['fullName'] ?? ''),
+            'username' => $this->sanitizeInput($_POST['username'] ?? ''),
+            'email' => $this->sanitizeInput($_POST['email'] ?? ''),
+            'password' => $this->sanitizeInput($_POST['password'] ?? ''),
+            'confirmPassword' => $this->sanitizeInput($_POST['confirmPassword'] ?? ''),
+            'role' => $this->sanitizeInput($_POST['role'] ?? ''),
+            'membershipType' => $this->sanitizeInput($_POST['membershipType'] ?? ''),
+            'phone' => $this->sanitizeInput($_POST['phone'] ?? ''),
+            'birthDate' => $this->sanitizeInput($_POST['birthDate'] ?? ''),
             'sendWelcomeEmail' => isset($_POST['sendWelcomeEmail'])
         ];
         
         // Registrar usuario usando UserController
         $userId = $this->userController->register($userData);
         
-        if($userId) {
-            // Si el usuario es staff, crear entrada en la tabla personal
-            if($userData['role'] === 'staff') {
-                if($this->userModel->createStaffRecord($userId)) {
-                    $_SESSION['toast_message'] = 'Monitor registrado correctamente y vinculado como personal';
-                    $_SESSION['toast_type'] = 'success';
-                } else {
-                    $_SESSION['toast_message'] = 'Usuario creado correctamente, pero hubo un error al vincularlo como personal';
-                    $_SESSION['toast_type'] = 'warning';
-                }
-            } else {
-                $_SESSION['toast_message'] = 'Usuario creado correctamente';
-                $_SESSION['toast_type'] = 'success';
-            }
-            
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
-        } else {
-            // Error - Volver al formulario
-            $_SESSION['toast_message'] = 'Error al crear el usuario. Por favor revise los datos ingresados.';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/registerForm');
-            exit;
+        if(!$userId) {
+            $this->handleError('Error al crear el usuario. Por favor revise los datos ingresados.', 'admin/registerForm');
+            return;
         }
+        
+        // Si el usuario es staff, crear entrada en la tabla personal
+        if($userData['role'] === 'staff') {
+            if($this->userModel->createStaffRecord($userId)) {
+                $this->handleSuccess('Monitor registrado correctamente y vinculado como personal', 'admin/users');
+            } else {
+                $this->handleSuccess('Usuario creado correctamente, pero hubo un error al vincularlo como personal', 'admin/users');
+            }
+            return;
+        }
+        
+        $this->handleSuccess('Usuario creado correctamente', 'admin/users');
     }
     
     /**
@@ -175,14 +152,8 @@ class AdminController {
             'users' => $users
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/users.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/users', $data);
     }
     
     /**
@@ -190,21 +161,16 @@ class AdminController {
      */
     public function deleteUser($userId = null) {
         if(!$userId) {
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
+            $this->redirect('admin/users');
+            return;
         }
         
         // Eliminar usuario
         if($this->userModel->deleteUser($userId)) {
-            $_SESSION['toast_message'] = 'Usuario eliminado correctamente';
-            $_SESSION['toast_type'] = 'success';
+            $this->handleSuccess('Usuario eliminado correctamente', 'admin/users');
         } else {
-            $_SESSION['toast_message'] = 'Error al eliminar usuario';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al eliminar usuario', 'admin/users');
         }
-        
-        header('Location: ' . URLROOT . '/admin/users');
-        exit;
     }
     
     /**
@@ -213,31 +179,24 @@ class AdminController {
      */
     public function reactivateUser($userId = null) {
         if(!$userId) {
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
+            $this->redirect('admin/users');
+            return;
         }
         
         // Obtener información del usuario
         $user = $this->userModel->findById($userId);
         
         if(!$user) {
-            $_SESSION['toast_message'] = 'Usuario no encontrado';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/users');
-            exit;
+            $this->handleError('Usuario no encontrado', 'admin/users');
+            return;
         }
         
         // Reactivar el usuario
         if($this->userModel->activate($userId)) {
-            $_SESSION['toast_message'] = 'Usuario reactivado correctamente';
-            $_SESSION['toast_type'] = 'success';
+            $this->handleSuccess('Usuario reactivado correctamente', 'admin/users');
         } else {
-            $_SESSION['toast_message'] = 'Error al reactivar el usuario';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al reactivar el usuario', 'admin/users');
         }
-        
-        header('Location: ' . URLROOT . '/admin/users');
-        exit;
     }
     
     /**
@@ -262,31 +221,25 @@ class AdminController {
             'classes' => $classes
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/classes.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/classes', $data);
     }
     
     /**
      * Filtrar clases según los criterios seleccionados
      */
     public function filterClasses() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/Admin/classes');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
         }
         
         // Recoger datos del formulario
         $filters = [
-            'date' => !empty($_POST['date']) ? trim($_POST['date']) : null,
-            'type_id' => !empty($_POST['type_id']) ? trim($_POST['type_id']) : null,
-            'monitor_id' => !empty($_POST['monitor_id']) ? trim($_POST['monitor_id']) : null
+            'date' => !empty($_POST['date']) ? $this->sanitizeInput($_POST['date']) : null,
+            'type_id' => !empty($_POST['type_id']) ? $this->sanitizeInput($_POST['type_id']) : null,
+            'monitor_id' => !empty($_POST['monitor_id']) ? $this->sanitizeInput($_POST['monitor_id']) : null
         ];
         
         // Filtrar las clases
@@ -308,14 +261,8 @@ class AdminController {
             'filters' => $filters
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/classes.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/classes', $data);
     }
     
     /**
@@ -343,62 +290,62 @@ class AdminController {
             'users' => $users
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/admin/notifications.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('admin/notifications', $data);
     }
     
     /**
      * Crea una nueva notificación
      */
     public function createNotification() {
-        // Verificar si se envió el formulario
-        if($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/notifications');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if(!$this->isPost()) {
+            $this->redirect('admin/notifications');
+            return;
         }
         
         // Cargar modelo de notificaciones
         $notificationModel = new Notification();
-        
-        try {
-            // Obtener datos del formulario
+          try {            // Obtener datos del formulario
             $notificationData = [
-                // Usar NULL para personal_id para evitar el error de clave foránea
-                'personal_id' => null,
-                'title' => trim($_POST['title']),
-                'message' => trim($_POST['message']),
-                'type' => $_POST['type'],
+                'title' => $this->sanitizeInput($_POST['title']),
+                'message' => $this->sanitizeInput($_POST['message']),
+                'type' => isset($_POST['type']) ? $this->sanitizeInput($_POST['type']) : 'info', // Valor por defecto 'info'
                 'is_global' => isset($_POST['is_global']) ? 1 : 0,
-                'class_id' => !empty($_POST['class_id']) ? $_POST['class_id'] : null
+                'class_id' => !empty($_POST['class_id']) ? $this->sanitizeInput($_POST['class_id']) : null,
+                'emisor_id' => $_SESSION['user_id'] // Usar el ID del usuario actual como emisor
             ];
+            
+            // Registro de depuración
+            Logger::log('DEBUG', 'Iniciando creación de notificación simplificada: ' . $notificationData['title']);
             
             // Si no es global, obtener los destinatarios seleccionados
             if(!$notificationData['is_global'] && isset($_POST['recipients'])) {
                 $notificationData['recipients'] = $_POST['recipients'];
             }
+              // Convertir los nombres de campo a los nombres que coincidan con la estructura de la base de datos
+            $dbNotificationData = [
+                'titol' => $notificationData['title'],
+                'missatge' => $notificationData['message'],
+                'creat_el' => date('Y-m-d H:i:s'),
+                'emisor_id' => $notificationData['emisor_id']
+            ];
+            
+            // Si hay una clase específica seleccionada, agregarla 
+            if (!empty($notificationData['class_id'])) {
+                $dbNotificationData['classe_id'] = $notificationData['class_id'];
+            }
             
             // Crear la notificación
-            if($notificationModel->create($notificationData)) {
-                $_SESSION['toast_message'] = 'Notificación enviada correctamente';
-                $_SESSION['toast_type'] = 'success';
+            if($notificationModel->createNotification($dbNotificationData)) {
+                $this->handleSuccess('Notificación enviada correctamente', 'admin/notifications');
             } else {
-                $_SESSION['toast_message'] = 'Error al enviar la notificación';
-                $_SESSION['toast_type'] = 'error';
+                $this->handleError('Error al enviar la notificación', 'admin/notifications');
             }
         } catch (Exception $e) {
             Logger::log('ERROR', 'Error al procesar la notificación: ' . $e->getMessage());
-            $_SESSION['toast_message'] = 'Error al enviar la notificación: ' . $e->getMessage();
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al enviar la notificación: ' . $e->getMessage(), 'admin/notifications');
         }
-        
-        header('Location: ' . URLROOT . '/admin/notifications');
-        exit;
     }
     
     /**
@@ -441,10 +388,8 @@ class AdminController {
     public function deleteNotification($notificationId = null) {
         // Verificar que se haya proporcionado un ID
         if(!$notificationId) {
-            $_SESSION['toast_message'] = 'ID de notificación no válido';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/notifications');
-            exit;
+            $this->handleError('ID de notificación no válido', 'admin/notifications');
+            return;
         }
         
         // Cargar modelo de notificaciones
@@ -452,79 +397,61 @@ class AdminController {
         
         // Eliminar la notificación
         if($notificationModel->delete($notificationId)) {
-            $_SESSION['toast_message'] = 'Notificación eliminada correctamente';
-            $_SESSION['toast_type'] = 'success';
+            $this->handleSuccess('Notificación eliminada correctamente', 'admin/notifications');
         } else {
-            $_SESSION['toast_message'] = 'Error al eliminar la notificación';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al eliminar la notificación', 'admin/notifications');
         }
-        
-        header('Location: ' . URLROOT . '/admin/notifications');
-        exit;
     }
     
     /**
      * Añadir una nueva clase
      */
     public function addClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
         }
         
         // Recoger datos del formulario
         $data = [
-            'tipus_classe_id' => trim($_POST['tipus_classe_id']),
-            'monitor_id' => trim($_POST['monitor_id']),
-            'data' => trim($_POST['data']),
-            'hora' => trim($_POST['hora']),
-            'duracio' => trim($_POST['duracio']),
-            'capacitat_maxima' => trim($_POST['capacitat_maxima']),
-            'sala' => trim($_POST['sala'])
+            'tipus_classe_id' => $this->sanitizeInput($_POST['tipus_classe_id']),
+            'monitor_id' => $this->sanitizeInput($_POST['monitor_id']),
+            'data' => $this->sanitizeInput($_POST['data']),
+            'hora' => $this->sanitizeInput($_POST['hora']),
+            'duracio' => $this->sanitizeInput($_POST['duracio']),
+            'capacitat_maxima' => $this->sanitizeInput($_POST['capacitat_maxima']),
+            'sala' => $this->sanitizeInput($_POST['sala'])
         ];
         
         // Validar que los valores estén en los rangos correctos
         if ($data['duracio'] < 15 || $data['duracio'] > 60) {
-            $_SESSION['toast_message'] = 'La duración debe estar entre 15 y 60 minutos';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('La duración debe estar entre 15 y 60 minutos', 'admin/classes');
+            return;
         }
         
         if ($data['sala'] < 1 || $data['sala'] > 4) {
-            $_SESSION['toast_message'] = 'El número de sala debe estar entre 1 y 4';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('El número de sala debe estar entre 1 y 4', 'admin/classes');
+            return;
         }
         
         if ($data['capacitat_maxima'] < 5 || $data['capacitat_maxima'] > 20) {
-            $_SESSION['toast_message'] = 'La capacidad máxima debe estar entre 5 y 20 personas';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('La capacidad máxima debe estar entre 5 y 20 personas', 'admin/classes');
+            return;
         }
         
         // Verificar si hay conflictos de horario para el monitor
         if ($this->classModel->hasScheduleConflict($data)) {
-            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('El monitor ya tiene una clase programada en ese horario', 'admin/classes');
+            return;
         }
         
         // Crear la clase
         if ($this->classModel->addClass($data)) {
-            $_SESSION['toast_message'] = 'Clase añadida correctamente';
-            $_SESSION['toast_type'] = 'success';
+            $this->handleSuccess('Clase añadida correctamente', 'admin/classes');
         } else {
-            $_SESSION['toast_message'] = 'Error al añadir la clase';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al añadir la clase', 'admin/classes');
         }
-        
-        header('Location: ' . URLROOT . '/admin/classes');
-        exit;
     }
     
     /**
@@ -558,104 +485,191 @@ class AdminController {
      * Actualiza una clase existente
      */
     public function updateClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
         }
         
         // Recoger datos del formulario
         $data = [
-            'classe_id' => $_POST['classe_id'],
-            'tipus_classe_id' => trim($_POST['tipus_classe_id']),
-            'monitor_id' => trim($_POST['monitor_id']),
-            'data' => trim($_POST['data']),
-            'hora' => trim($_POST['hora']),
-            'duracio' => trim($_POST['duracio']),
-            'capacitat_maxima' => trim($_POST['capacitat_maxima']),
-            'sala' => trim($_POST['sala'])
+            'classe_id' => $this->sanitizeInput($_POST['classe_id']),
+            'tipus_classe_id' => $this->sanitizeInput($_POST['tipus_classe_id']),
+            'monitor_id' => $this->sanitizeInput($_POST['monitor_id']),
+            'data' => $this->sanitizeInput($_POST['data']),
+            'hora' => $this->sanitizeInput($_POST['hora']),
+            'duracio' => $this->sanitizeInput($_POST['duracio']),
+            'capacitat_maxima' => $this->sanitizeInput($_POST['capacitat_maxima']),
+            'sala' => $this->sanitizeInput($_POST['sala'])
         ];
         
         // Validar que los valores estén en los rangos correctos
         if ($data['duracio'] < 15 || $data['duracio'] > 60) {
-            $_SESSION['toast_message'] = 'La duración debe estar entre 15 y 60 minutos';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('La duración debe estar entre 15 y 60 minutos', 'admin/classes');
+            return;
         }
         
         if ($data['sala'] < 1 || $data['sala'] > 4) {
-            $_SESSION['toast_message'] = 'El número de sala debe estar entre 1 y 4';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('El número de sala debe estar entre 1 y 4', 'admin/classes');
+            return;
         }
         
         if ($data['capacitat_maxima'] < 5 || $data['capacitat_maxima'] > 20) {
-            $_SESSION['toast_message'] = 'La capacidad máxima debe estar entre 5 y 20 personas';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('La capacidad máxima debe estar entre 5 y 20 personas', 'admin/classes');
+            return;
         }
         
         // Verificar que la capacidad máxima no sea menor que la actual
         $currentClass = $this->classModel->getClassById($data['classe_id']);
         if ($currentClass && $data['capacitat_maxima'] < $currentClass->capacitat_actual) {
-            $_SESSION['toast_message'] = 'La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('La capacidad máxima no puede ser menor que el número actual de reservas (' . $currentClass->capacitat_actual . ')', 'admin/classes');
+            return;
         }
         
         // Verificar si hay conflictos de horario para el monitor
         if ($this->classModel->hasScheduleConflict($data, $data['classe_id'])) {
-            $_SESSION['toast_message'] = 'El monitor ya tiene una clase programada en ese horario';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('El monitor ya tiene una clase programada en ese horario', 'admin/classes');
+            return;
         }
         
         // Actualizar la clase
         if ($this->classModel->updateClass($data)) {
-            $_SESSION['toast_message'] = 'Clase actualizada correctamente';
-            $_SESSION['toast_type'] = 'success';
+            $this->handleSuccess('Clase actualizada correctamente', 'admin/classes');
         } else {
-            $_SESSION['toast_message'] = 'Error al actualizar la clase';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al actualizar la clase', 'admin/classes');
         }
-        
-        header('Location: ' . URLROOT . '/admin/classes');
-        exit;
     }
-    
-    /**
+      /**
      * Eliminar una clase
      */
     public function deleteClass() {
-        // Verificar si se envió el formulario
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
         }
         
         // Verificar que se haya proporcionado un ID
         if (!isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
-            $_SESSION['toast_message'] = 'ID de clase no válido';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/admin/classes');
-            exit;
+            $this->handleError('ID de clase no válido', 'admin/classes');
+            return;
         }
         
-        // Eliminar la clase
-        if ($this->classModel->deleteClass($_POST['classe_id'])) {
-            $_SESSION['toast_message'] = 'Clase eliminada correctamente';
-            $_SESSION['toast_type'] = 'success';
+        $classId = $this->sanitizeInput($_POST['classe_id']);
+        
+        // Primero eliminar todas las reservas asociadas a la clase
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        $reservationModel->deleteAllReservationsByClassId($classId);
+        
+        // Resetear la capacidad de la clase a 0 (por si acaso)
+        $this->classModel->resetCapacity($classId);
+        
+        // Ahora eliminar la clase
+        if ($this->classModel->deleteClass($classId)) {
+            $this->handleSuccess('Clase eliminada correctamente', 'admin/classes');
         } else {
-            $_SESSION['toast_message'] = 'Error al eliminar la clase';
-            $_SESSION['toast_type'] = 'error';
+            $this->handleError('Error al eliminar la clase', 'admin/classes');
+        }
+    }
+    
+    /**
+     * Cancelar una reserva específica
+     */
+    public function cancelReservation() {
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
         }
         
-        header('Location: ' . URLROOT . '/admin/classes');
-        exit;
+        // Verificar que se hayan proporcionado los IDs necesarios
+        if (!isset($_POST['reserva_id']) || empty($_POST['reserva_id']) || 
+            !isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
+            $this->handleError('Datos incompletos para cancelar la reserva', 'admin/classes');
+            return;
+        }
+        
+        $reservationId = $this->sanitizeInput($_POST['reserva_id']);
+        $classId = $this->sanitizeInput($_POST['classe_id']);
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Cancelar la reserva
+        if ($reservationModel->cancelReservation($reservationId)) {
+            $this->handleSuccess('Reserva cancelada correctamente', 'admin/viewClassReservations/' . $classId);
+        } else {
+            $this->handleError('Error al cancelar la reserva', 'admin/viewClassReservations/' . $classId);
+        }
+    }
+    
+    /**
+     * Cancelar todas las reservas de una clase
+     */
+    public function cancelAllReservations() {
+        // Verificar si se envió el formulario usando el método del BaseController
+        if (!$this->isPost()) {
+            $this->redirect('admin/classes');
+            return;
+        }
+        
+        // Verificar que se haya proporcionado un ID de clase
+        if (!isset($_POST['classe_id']) || empty($_POST['classe_id'])) {
+            $this->handleError('ID de clase no válido', 'admin/classes');
+            return;
+        }
+        
+        $classId = $this->sanitizeInput($_POST['classe_id']);
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Eliminar todas las reservas de esta clase
+        if ($reservationModel->deleteAllReservationsByClassId($classId)) {
+            // Actualizar capacidad de la clase a 0
+            $this->classModel->resetCapacity($classId);
+            $this->handleSuccess('Todas las reservas han sido eliminadas', 'admin/viewClassReservations/' . $classId);
+        } else {
+            $this->handleError('Error al eliminar las reservas', 'admin/viewClassReservations/' . $classId);
+        }
+    }
+    
+    /**
+     * Ver las reservas de una clase específica
+     * @param int $classId ID de la clase
+     */
+    public function viewClassReservations($classId = null) {
+        // Verificar que se haya proporcionado un ID
+        if (!$classId) {
+            $this->redirect('admin/classes');
+            return;
+        }
+        
+        // Obtener detalles de la clase
+        $class = $this->classModel->getClassById($classId);
+        
+        if (!$class) {
+            $this->handleError('Clase no encontrada', 'admin/classes');
+            return;
+        }
+        
+        // Cargar modelo de reservas
+        require_once APPROOT . '/models/Reservation.php';
+        $reservationModel = new Reservation();
+        
+        // Obtener reservas de la clase
+        $reservations = $reservationModel->getReservationsByClassId($classId);
+        
+        // Preparar datos para la vista
+        $data = [
+            'class' => $class,
+            'reservations' => $reservations
+        ];
+        
+        // Cargar vista
+        $this->loadView('admin/class_reservations', $data);
     }
 }

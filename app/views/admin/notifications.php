@@ -6,6 +6,11 @@
  */
 ?>
 
+<!-- Incluir estilos específicos para la página de notificaciones -->
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/css/admin/notifications.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -47,11 +52,12 @@
                                     <td><?php echo $notification->id; ?></td>
                                     <td><?php echo $notification->title; ?></td>
                                     <td><?php echo date('d/m/Y H:i', strtotime($notification->created_at)); ?></td>
-                                    <td>                                        <div class="btn-group btn-group-sm">
+                                    <td>                                        <div class="btn-group btn-group-sm action-buttons">
                                             <button type="button" class="btn btn-outline-danger delete-notification" 
                                                     data-id="<?php echo $notification->id; ?>"
-                                                    data-title="<?php echo htmlspecialchars($notification->title); ?>">
-                                                <i class="fas fa-trash" title="Eliminar"></i>
+                                                    data-title="<?php echo htmlspecialchars($notification->title); ?>"
+                                                    onclick="console.log('Click en botón ID: <?php echo $notification->id; ?>')">
+                                                <i class="fas fa-trash" title="Eliminar"></i> Eliminar
                                             </button>
                                         </div>
                                     </td>
@@ -83,6 +89,10 @@
                         <label for="message" class="form-label">Mensaje</label>
                         <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
                     </div>
+                    <!-- Campo oculto para el tipo de notificación -->
+                    <input type="hidden" name="type" value="info">
+                    <!-- Campo oculto para indicar que es una notificación global -->
+                    <input type="hidden" name="is_global" value="on">
                 </form>
             </div>
             <div class="modal-footer">
@@ -93,32 +103,34 @@
     </div>
 </div>
 
-
-
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<!-- Definir URLROOT antes de cargar el script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar DataTables para la tabla de notificaciones
-        if (document.getElementById('notificationsTable')) {
-            $('#notificationsTable').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                },
-                order: [[0, 'desc']], // Ordenar por ID (columna 0) descendente por defecto
-                responsive: true
-            });
+    // Variable global para el controlador
+    const URLROOT = '<?php echo URLROOT; ?>';
+    
+    // Función para depurar eventos de click
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.classList.contains('delete-notification') || 
+                        (e.target.parentElement && e.target.parentElement.classList.contains('delete-notification')))) {
+            console.log('Click en botón de eliminar detectado via event delegation');
+            
+            // Si el click fue en el ícono dentro del botón, usar el botón padre
+            const button = e.target.classList.contains('delete-notification') ? e.target : e.target.parentElement;
+            
+            const notificationId = button.getAttribute('data-id');
+            const notificationTitle = button.getAttribute('data-title');
+            
+            console.log('Datos del botón:', {id: notificationId, title: notificationTitle});
+            
+            if (confirm(`¿Está seguro de que desea eliminar la notificación "${notificationTitle}"? Esta acción no se puede deshacer.`)) {
+                console.log('Confirmado, redirigiendo a:', URLROOT + '/admin/deleteNotification/' + notificationId);
+                window.location.href = URLROOT + '/admin/deleteNotification/' + notificationId;
+            }
         }
-  
-        
-        // Confirmar eliminación de notificación
-        document.querySelectorAll('.delete-notification').forEach(button => {
-            button.addEventListener('click', function() {
-                const notificationId = this.getAttribute('data-id');
-                const notificationTitle = this.getAttribute('data-title');
-                
-                if (confirm(`¿Está seguro de que desea eliminar la notificación "${notificationTitle}"? Esta acción no se puede deshacer.`)) {
-                    window.location.href = `<?php echo URLROOT; ?>/admin/deleteNotification/${notificationId}`;
-                }
-            });
-        });
     });
 </script>
+<!-- Incluir script específico para la página de notificaciones -->
+<script src="<?php echo URLROOT; ?>/js/admin/notifications-admin.js"></script>

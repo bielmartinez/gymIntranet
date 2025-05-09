@@ -3,16 +3,69 @@
  * Modelo para gestión de usuarios del sistema
  */
 
-// Cargar configuración y base de datos
-require_once dirname(dirname(__FILE__)) . '/config/config.php';
-require_once dirname(dirname(__FILE__)) . '/libraries/Database.php';
+require_once dirname(__FILE__) . '/BaseModel.php';
+require_once dirname(dirname(__FILE__)) . '/utils/Logger.php';
 
-class User {
-    private $db;
+class User extends BaseModel {
+    protected $table = 'usuaris';
+    protected $primaryKey = 'usuari_id';
     
-    // Constructor
+    /**
+     * Constructor del modelo
+     */
     public function __construct() {
-        $this->db = new Database();
+        parent::__construct();
+    }
+    
+    /**
+     * Valida los datos de entrada para un usuario
+     * @param array $data Datos a validar
+     * @return array Array de errores o array vacío si no hay errores
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        // Validar correo electrónico
+        if (empty($data['correu']) && empty($data['email'])) {
+            $errors['correu'] = 'El correo electrónico es requerido';
+        } else {
+            $email = !empty($data['email']) ? $data['email'] : $data['correu'];
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors['correu'] = 'El formato del correo electrónico no es válido';
+            }
+        }
+        
+        // Validar nombre
+        if (empty($data['nom']) && (empty($data['fullName']) && empty($data['name']))) {
+            $errors['nom'] = 'El nombre es requerido';
+        }
+        
+        // Validar rol si está presente
+        if (!empty($data['role']) && !in_array($data['role'], ['admin', 'staff', 'user'])) {
+            $errors['role'] = 'El rol no es válido';
+        }
+          // Validar teléfono si está presente (debe tener entre 6 y 9 dígitos)
+        if (!empty($data['phone']) && !preg_match('/^\d{6,9}$/', $data['phone'])) {
+            $errors['phone'] = 'El formato del teléfono no es válido (debe tener entre 6 y 9 dígitos)';
+        }
+        
+        // Validar fecha de nacimiento si está presente
+        if (!empty($data['birthDate']) || !empty($data['data_naixement'])) {
+            $birthDate = !empty($data['birthDate']) ? $data['birthDate'] : $data['data_naixement'];
+            $format = 'Y-m-d';
+            $d = \DateTime::createFromFormat($format, $birthDate);
+            
+            if (!($d && $d->format($format) === $birthDate)) {
+                $errors['birthDate'] = 'El formato de fecha de nacimiento no es válido (YYYY-MM-DD)';
+            }
+        }
+        
+        // Validar contraseña en creación de usuario
+        if (isset($data['_action']) && $data['_action'] === 'create' && empty($data['contrasenya']) && empty($data['password'])) {
+            $errors['password'] = 'La contraseña es requerida';
+        }
+        
+        return $errors;
     }
 
     /**
@@ -39,19 +92,7 @@ class User {
      * Encuentra un usuario por su correo electrónico
      */
     public function findByEmail($email) {
-        $this->db->query('SELECT usuari_id as id, correu as email, contrasenya as password, 
-                        CONCAT(nom, " ", cognoms) as fullName,
-                        role as role, actiu as isActive, phone, data_naixement as birthDate
-                        FROM usuaris WHERE correu = :email');
-        $this->db->bind(':email', $email);
-        
-        $row = $this->db->singleArray();
-        
-        if($this->db->rowCount() > 0){
-            return $row;
-        } else {
-            return false;
-        }
+        return $this->findOneBy(['correu' => $email]);
     }
 
     /**
@@ -64,7 +105,7 @@ class User {
                         FROM usuaris WHERE usuari_id = :id');
         $this->db->bind(':id', $id);
         
-        $row = $this->db->single(); // Cambiado de singleArray() a single() para devolver un objeto
+        $row = $this->db->single();
         
         if($this->db->rowCount() > 0){
             return $row;
@@ -168,38 +209,51 @@ class User {
      */
     public function create($userData) {
         // Añadir logging para depuración
-        Logger::log('DEBUG', 'Iniciando creación de usuario: ' . $userData['email']);
+        Logger::log('DEBUG', 'Iniciando creación de usuario: ' . ($userData['email'] ?? $userData['correu']));
         
         try {
+            // Validar datos
+            $userData['_action'] = 'create';
+            $errors = $this->validate($userData);
+            if (!empty($errors)) {
+                Logger::log('ERROR', 'Validación fallida para creación de usuario: ' . json_encode($errors));
+                return false;
+            }
+            
             // Separar nombre y apellidos del nombre completo
-            $fullNameParts = explode(' ', $userData['fullName'], 2);
-            $nombre = $fullNameParts[0];
-            $apellidos = isset($fullNameParts[1]) ? $fullNameParts[1] : '';
+            $nombre = $userData['nom'] ?? '';
+            $apellidos = $userData['cognoms'] ?? '';
+            
+            if (!empty($userData['fullName'])) {
+                $fullNameParts = explode(' ', $userData['fullName'], 2);
+                $nombre = $fullNameParts[0];
+                $apellidos = isset($fullNameParts[1]) ? $fullNameParts[1] : '';
+            }
             
             // Formatear correctamente la fecha de nacimiento para MySQL o NULL si está vacía
-            $birthDate = !empty($userData['birthDate']) ? $userData['birthDate'] : null;
+            $birthDate = !empty($userData['birthDate']) ? $userData['birthDate'] : 
+                         (!empty($userData['data_naixement']) ? $userData['data_naixement'] : null);
             
-            // Crear el usuario con todos los campos disponibles
-            $this->db->query('INSERT INTO usuaris (correu, contrasenya, nom, cognoms, 
-                            role, actiu, phone, data_naixement, creat_el) 
-                            VALUES (:email, :password, :nom, :cognoms, 
-                            :role, :actiu, :phone, :birthDate, NOW())');
-            
-            $this->db->bind(':email', $userData['email']);
-            $this->db->bind(':password', $userData['password']);
-            $this->db->bind(':nom', $nombre);
-            $this->db->bind(':cognoms', $apellidos);
-            $this->db->bind(':role', $userData['role']);
-            $this->db->bind(':actiu', true);
-            $this->db->bind(':phone', $userData['phone'] ?? null);
-            $this->db->bind(':birthDate', $birthDate);
+            // Preparar datos para la inserción
+            $insertData = [
+                'correu' => $userData['email'] ?? $userData['correu'],
+                'contrasenya' => $userData['password'] ?? $userData['contrasenya'],
+                'nom' => $nombre,
+                'cognoms' => $apellidos,
+                'role' => $userData['role'] ?? 'user',
+                'actiu' => $userData['isActive'] ?? $userData['actiu'] ?? true,
+                'phone' => $userData['phone'] ?? null,
+                'data_naixement' => $birthDate,
+                'creat_el' => date('Y-m-d H:i:s')
+            ];
             
             Logger::log('DEBUG', 'Ejecutando SQL para crear usuario');
             
-            if($this->db->execute()) {
-                $lastId = $this->db->lastInsertId();
-                Logger::log('INFO', 'Usuario creado correctamente con ID: ' . $lastId);
-                return $lastId;
+            // Usar el método create de BaseModel
+            $userId = parent::create($insertData);
+            if ($userId) {
+                Logger::log('INFO', 'Usuario creado correctamente con ID: ' . $userId);
+                return $userId;
             } else {
                 Logger::log('ERROR', 'Error al ejecutar SQL para crear usuario');
                 return false;
@@ -240,94 +294,59 @@ class User {
     /**
      * Actualiza la información de un usuario
      */
-    public function update($userId, $userData) {
+    public function update($data) {
         try {
-            // Separar nombre y apellidos del nombre completo si existe
-            if (isset($userData['fullName'])) {
-                $fullNameParts = explode(' ', $userData['fullName'], 2);
-                $userData['nom'] = $fullNameParts[0];
-                $userData['cognoms'] = isset($fullNameParts[1]) ? $fullNameParts[1] : '';
+            // Validar datos
+            $errors = $this->validate($data);
+            if (!empty($errors)) {
+                Logger::log('ERROR', 'Validación fallida para actualización de usuario: ' . json_encode($errors));
+                return false;
             }
             
-            // Construir la consulta dinámica
-            $sql = 'UPDATE usuaris SET ';
-            $params = [];
-            
-            // Añadir cada campo al SQL solo si está presente en userData
-            if (isset($userData['nom'])) {
-                $params[] = 'nom = :nom';
+            // Extraer el ID y eliminar del array de datos
+            $userId = $data[$this->primaryKey] ?? $data['id'] ?? null;
+            if (!$userId) {
+                Logger::log('ERROR', 'ID de usuario no proporcionado para actualización');
+                return false;
             }
             
-            if (isset($userData['cognoms'])) {
-                $params[] = 'cognoms = :cognoms';
+            // Preparar datos para actualización
+            $updateData = [];
+            
+            // Mapear campos con nombres en inglés a nombres en español de la BD
+            $fieldMap = [
+                'email' => 'correu',
+                'password' => 'contrasenya',
+                'name' => 'nom',
+                'lastname' => 'cognoms',
+                'isActive' => 'actiu',
+                'birthDate' => 'data_naixement'
+            ];
+            
+            // Procesar campos estándar
+            foreach ($data as $key => $value) {
+                // Si el campo está en el mapa, usar el nombre en español
+                if (array_key_exists($key, $fieldMap)) {
+                    $updateData[$fieldMap[$key]] = $value;
+                } 
+                // Si no es un campo especial, añadirlo directamente
+                else if (!in_array($key, ['id', $this->primaryKey, 'fullName'])) {
+                    $updateData[$key] = $value;
+                }
             }
             
-            if (isset($userData['email'])) {
-                $params[] = 'correu = :email';
+            // Procesar nombre completo si está disponible
+            if (isset($data['fullName'])) {
+                $fullNameParts = explode(' ', $data['fullName'], 2);
+                $updateData['nom'] = $fullNameParts[0];
+                $updateData['cognoms'] = isset($fullNameParts[1]) ? $fullNameParts[1] : '';
             }
             
-            if (isset($userData['password'])) {
-                $params[] = 'contrasenya = :password';
-            }
+            // Añadir el ID para la actualización
+            $updateData[$this->primaryKey] = $userId;
             
-            if (isset($userData['role'])) {
-                $params[] = 'role = :role';
-            }
-            
-            if (isset($userData['isActive'])) {
-                $params[] = 'actiu = :actiu';
-            }
-            
-            if (isset($userData['phone'])) {
-                $params[] = 'phone = :phone';
-            }
-            
-            if (isset($userData['birthDate'])) {
-                $params[] = 'data_naixement = :birthDate';
-            }
-            
-            // Combinar parámetros con comas
-            $sql .= implode(', ', $params);
-            $sql .= ' WHERE usuari_id = :id';
-            
-            $this->db->query($sql);
-            
-            // Vincular cada parámetro solo si está presente
-            if (isset($userData['nom'])) {
-                $this->db->bind(':nom', $userData['nom']);
-            }
-            
-            if (isset($userData['cognoms'])) {
-                $this->db->bind(':cognoms', $userData['cognoms']);
-            }
-            
-            if (isset($userData['email'])) {
-                $this->db->bind(':email', $userData['email']);
-            }
-            
-            if (isset($userData['password'])) {
-                $this->db->bind(':password', $userData['password']);
-            }
-            
-            if (isset($userData['role'])) {
-                $this->db->bind(':role', $userData['role']);
-            }
-            
-            if (isset($userData['isActive'])) {
-                $this->db->bind(':actiu', $userData['isActive']);
-            }
-            
-            if (isset($userData['phone'])) {
-                $this->db->bind(':phone', $userData['phone']);
-            }
-            
-            if (isset($userData['birthDate'])) {
-                $this->db->bind(':birthDate', $userData['birthDate']);
-            }
-            
-            $this->db->bind(':id', $userId);
-            
-            return $this->db->execute();
+            // Usar el método update de BaseModel
+            return parent::update($updateData);
         } catch (Exception $e) {
             Logger::log('ERROR', 'Error al actualizar usuario: ' . $e->getMessage());
             return false;
@@ -369,13 +388,20 @@ class User {
      * @return array Lista de monitores
      */
     public function getAllMonitors() {
-        $sql = 'SELECT usuari_id as personal_id, usuari_id, nom, cognoms, correu
-                FROM usuaris 
-                WHERE role = "staff" AND actiu = 1
-                ORDER BY nom, cognoms';
-        
-        $this->db->query($sql);
-        return $this->db->resultSet();
+        return $this->findBy(['role' => 'staff', 'actiu' => 1]);
+    }
+
+    /**
+     * Obtiene todos los usuarios normales (rol 'user')
+     * @param bool $activeOnly Si es true, devuelve solo usuarios activos
+     * @return array Lista de usuarios normales
+     */
+    public function getAllNormalUsers($activeOnly = true) {
+        if ($activeOnly) {
+            return $this->findBy(['role' => 'user', 'actiu' => 1]);
+        } else {
+            return $this->findBy(['role' => 'user']);
+        }
     }
 
     /**
@@ -384,7 +410,7 @@ class User {
      * @return array Lista de usuarios con el rol especificado
      */
     public function getUsersByRole($role) {
-        return $this->getAllUsers($role);
+        return $this->findBy(['role' => $role]);
     }
 
     /**
@@ -397,7 +423,7 @@ class User {
     public function deleteUser($userId) {
         try {
             // Verificamos primero si el usuario existe
-            $user = $this->findById($userId);
+            $user = $this->getById($userId);
             if (!$user) {
                 return false;
             }
@@ -406,11 +432,7 @@ class User {
             return $this->deactivate($userId);
             
             // Si realmente quisieras eliminar físicamente:
-            /*
-            $this->db->query('DELETE FROM usuaris WHERE usuari_id = :id');
-            $this->db->bind(':id', $userId);
-            return $this->db->execute();
-            */
+            // return $this->delete($userId);
         } catch (Exception $e) {
             Logger::log('ERROR', 'Error al eliminar usuario: ' . $e->getMessage());
             return false;
@@ -427,7 +449,7 @@ class User {
     public function createStaffRecord($userId) {
         try {
             // Verificar si el usuario existe y tiene el rol correcto
-            $user = $this->findById($userId);
+            $user = $this->getById($userId);
             
             if (!$user || $user->role !== 'staff') {
                 return false;
@@ -465,7 +487,7 @@ class User {
      */
     public function ensureStaffRecord($userId) {
         // Verificar si el usuario tiene rol de staff
-        $user = $this->findById($userId);
+        $user = $this->getById($userId);
         
         if (!$user || $user->role !== 'staff') {
             return false;
@@ -495,31 +517,7 @@ class User {
      * @return bool True si se actualizó correctamente, False en caso contrario
      */
     public function updateUser($userData) {
-        try {
-            // Adaptar la estructura de datos a los nombres de campos de la BDD
-            $adaptedData = [
-                'nom' => null,
-                'cognoms' => null,
-                'correu' => isset($userData['email']) ? $userData['email'] : null,
-                'role' => isset($userData['role']) ? $userData['role'] : null,
-                'actiu' => isset($userData['status']) ? ($userData['status'] === 'active' ? 1 : 0) : null,
-                'phone' => isset($userData['phone']) ? $userData['phone'] : null,
-                'data_naixement' => isset($userData['birthDate']) ? $userData['birthDate'] : null
-            ];
-            
-            // Procesar el nombre completo si está disponible
-            if (isset($userData['fullName'])) {
-                $nameParts = explode(' ', $userData['fullName'], 2);
-                $adaptedData['nom'] = $nameParts[0];
-                $adaptedData['cognoms'] = isset($nameParts[1]) ? $nameParts[1] : '';
-            }
-            
-            // Llamar al método update con los datos adaptados
-            return $this->update($userData['id'], $adaptedData);
-        } catch (Exception $e) {
-            Logger::log('ERROR', 'Error en updateUser: ' . $e->getMessage());
-            return false;
-        }
+        return $this->update($userData);
     }
 
     /**
@@ -528,21 +526,29 @@ class User {
      * @return bool Éxito o fracaso de la operación
      */
     public function updateProfile($data) {
-        try {
-            // Crear un array con los datos a actualizar en el formato correcto para el método update
-            $userData = [
-                'nom' => $data['name'],
-                'cognoms' => $data['lastname'],
-                'correu' => $data['email'],
-                'phone' => $data['phone'] ?? null,
-                'data_naixement' => $data['birthdate'] ?? null
-            ];
-            
-            // Utilizar el método update existente para actualizar los datos
-            return $this->update($data['id'], $userData);
-        } catch (Exception $e) {
-            Logger::log('ERROR', 'Error en updateProfile: ' . $e->getMessage());
-            return false;
-        }
+        return $this->update($data);
+    }
+
+    /**
+     * Cuenta el número total de usuarios en el sistema.
+     * @return int Número total de usuarios
+     */
+    public function countUsers() {
+        $this->db->query('SELECT COUNT(*) as total FROM usuaris');
+        $result = $this->db->single();
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    /**
+     * Cuenta el número de usuarios por rol.
+     * @param string $role Rol de usuario (admin, staff, user)
+     * @return int Número de usuarios con el rol especificado
+     */
+    public function countUsersByRole($role) {
+        $this->db->query('SELECT COUNT(*) as total FROM usuaris WHERE role = :role');
+        $this->db->bind(':role', $role);
+        $result = $this->db->single();
+        return $result ? (int)$result['total'] : 0;
     }
 }
+?>

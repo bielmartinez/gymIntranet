@@ -1,21 +1,121 @@
 <?php
 /**
  * Modelo para la gestión de rutinas de ejercicios
+ * 
+ * @property int $id ID de la rutina (rutina_id)
+ * @property int $userId ID del usuario (usuari_id)
+ * @property string $name Nombre de la rutina (nom)
+ * @property string $description Descripción de la rutina (descripcio)
+ * @property string $createdAt Fecha de creación (creat_el)
  */
 
-// Cargar configuración y base de datos
-require_once dirname(dirname(__FILE__)) . '/config/config.php';
-require_once dirname(dirname(__FILE__)) . '/libraries/Database.php';
-require_once dirname(dirname(__FILE__)) . '/utils/Logger.php';
+require_once dirname(__FILE__) . '/BaseModel.php';
 
-class Routine {
-    private $db;
-
+class Routine extends BaseModel {
+    protected $table = 'rutines';
+    protected $primaryKey = 'rutina_id';
+    
+    // Mapeo de campos para compatibilidad entre español e inglés
+    protected $fieldMapping = [
+        'id' => 'rutina_id',
+        'userId' => 'usuari_id',
+        'name' => 'nom',
+        'description' => 'descripcio',
+        'createdAt' => 'creat_el'
+    ];
+    
+    // Propiedades para la compatibilidad con el código existente
+    private $id;
+    private $userId;
+    private $name;
+    private $description;
+    private $createdAt;
+    
+    /**
+     * Constructor del modelo
+     */
     public function __construct() {
-        $this->db = new Database;
+        parent::__construct();
+    }
+    
+    /**
+     * Valida los datos de entrada para una rutina
+     * @param array $data Datos a validar
+     * @return array Array de errores o array vacío si no hay errores
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        // Mapear nombres de campos en inglés a español si existen
+        $userId = $data['usuari_id'] ?? $data['userId'] ?? null;
+        $name = $data['nom'] ?? $data['name'] ?? null;
+        
+        // Validar usuario
+        if (empty($userId)) {
+            $errors['usuari_id'] = 'El usuario es requerido';
+        }
+        
+        // Validar nombre
+        if (empty($name)) {
+            $errors['nom'] = 'El nombre de la rutina es requerido';
+        } elseif (strlen($name) > 100) {
+            $errors['nom'] = 'El nombre no puede exceder los 100 caracteres';
+        }
+        
+        return $errors;
+    }
+    
+    // Getters y setters
+    public function getId() {
+        return $this->id;
+    }
+    
+    public function setId($id) {
+        $this->id = $id;
+    }
+    
+    public function getUserId() {
+        return $this->userId;
+    }
+    
+    public function setUserId($userId) {
+        $this->userId = $userId;
+    }
+    
+    public function getName() {
+        return $this->name;
+    }
+    
+    public function setName($name) {
+        $this->name = $name;
+    }
+    
+    public function getDescription() {
+        return $this->description;
+    }
+    
+    public function setDescription($description) {
+        $this->description = $description;
+    }
+    
+    /**
+     * Obtiene el último mensaje de error de la base de datos
+     * @return string|null El mensaje de error o null si no hay error
+     */
+    public function getLastError() {
+        return $this->db->getError();
     }
 
-    // Obtener todas las rutinas
+    public function getCreatedAt() {
+        return $this->createdAt;
+    }
+    
+    public function setCreatedAt($createdAt) {
+        $this->createdAt = $createdAt;
+    }    /**
+     * Obtener todas las rutinas
+     * @return array Lista de rutinas
+     */
     public function getAllRoutines() {
         $this->db->query('SELECT r.*, 
                          (SELECT COUNT(*) FROM exercicis e WHERE e.rutina_id = r.rutina_id) AS exercise_count 
@@ -23,8 +123,12 @@ class Routine {
                          ORDER BY r.rutina_id DESC');
         return $this->db->resultSet();
     }
-
-    // Obtener rutinas por usuario
+    
+    /**
+     * Obtener rutinas por usuario
+     * @param int $userId ID del usuario
+     * @return array Lista de rutinas del usuario
+     */
     public function getRoutinesByUser($userId) {
         $this->db->query('SELECT r.*, 
                          (SELECT COUNT(*) FROM exercicis e WHERE e.rutina_id = r.rutina_id) AS exercise_count 
@@ -33,77 +137,213 @@ class Routine {
                          ORDER BY r.creat_el DESC');
         $this->db->bind(':usuari_id', $userId);
         
-        $result = $this->db->resultSet();
+        return $this->db->resultSet();
+    }
+    
+    /**
+     * Obtener una rutina por ID
+     * @param int $id ID de la rutina
+     * @return object Datos de la rutina
+     */
+    public function getRoutineById($id) {
+        $routine = $this->getById($id);
         
-        // Registrar para depuración
-        if (class_exists('Logger') && empty($result)) {
-            Logger::log('DEBUG', 'No se encontraron rutinas para el usuario ID: ' . $userId);
+        if ($routine) {
+            // Obtener la cantidad de ejercicios para esta rutina
+            $this->db->query('SELECT COUNT(*) as exercise_count FROM exercicis WHERE rutina_id = :rutina_id');
+            $this->db->bind(':rutina_id', $id);
+            $exerciseCount = $this->db->single();
+            
+            // Añadir la propiedad exercise_count al objeto rutina
+            $routine->exercise_count = $exerciseCount->exercise_count;
+            
+            // Actualizar propiedades del objeto
+            $this->id = $routine->rutina_id;
+            $this->userId = $routine->usuari_id;
+            $this->name = $routine->nom;
+            $this->description = $routine->descripcio;
+            $this->createdAt = $routine->creat_el;
         }
         
-        return $result;
-    }
-
-    // Obtener una rutina por ID
-    public function getRoutineById($id) {
-        $this->db->query('SELECT r.*, 
-                         (SELECT COUNT(*) FROM exercicis e WHERE e.rutina_id = r.rutina_id) AS exercise_count 
-                         FROM rutines r 
-                         WHERE r.rutina_id = :rutina_id');
-        $this->db->bind(':rutina_id', $id);
-        return $this->db->single();
-    }
-
-    // Crear una nueva rutina
-    public function addRoutine($data) {
+        return $routine;
+    }    /**
+     * Crear una nueva rutina
+     * @param array $data Datos de la rutina
+     * @return bool|int ID de la rutina creada o false si hay error
+     */
+    public function create($data = null) {
+        // Si no se proporcionan datos, usar los valores del objeto
+        if ($data === null) {
+            $data = [
+                'usuari_id' => $this->userId,
+                'nom' => $this->name,
+                'descripcio' => $this->description,
+                'creat_el' => $this->createdAt ?? date('Y-m-d H:i:s')
+            ];
+        }
+        
+        // Aplicar mapeo de campo si es necesario
+        if (isset($data['userId']) && !isset($data['usuari_id'])) {
+            $data['usuari_id'] = $data['userId'];
+        }
+        
+        if (isset($data['name']) && !isset($data['nom'])) {
+            $data['nom'] = $data['name'];
+        }
+        
+        if (isset($data['description']) && !isset($data['descripcio'])) {
+            $data['descripcio'] = $data['description'];
+        }
+        
+        // Validar datos
+        $errors = $this->validate($data);
+        if (!empty($errors)) {
+            return false;
+        }
+        
+        // Preparar la consulta
         $this->db->query('INSERT INTO rutines (usuari_id, nom, descripcio, creat_el) 
                           VALUES (:usuari_id, :nom, :descripcio, :creat_el)');
         
-        // Vincular valores obligatorios
+        // Vincular valores
         $this->db->bind(':usuari_id', $data['usuari_id']);
         $this->db->bind(':nom', $data['nom']);
-        $this->db->bind(':descripcio', $data['descripcio']);
+        $this->db->bind(':descripcio', $data['descripcio'] ?? '');
         $this->db->bind(':creat_el', $data['creat_el'] ?? date('Y-m-d H:i:s'));
-
+        
         // Ejecutar
         if ($this->db->execute()) {
-            return $this->db->lastInsertId();
-        } else {
-            // Registrar el error
-            if (class_exists('Logger')) {
-                Logger::log('ERROR', 'Error en addRoutine: ' . json_encode($this->db->getError()));
-            }
+            $routineId = $this->db->lastInsertId();
+            
+            // Actualizar propiedades del objeto
+            $this->id = $routineId;
+            $this->userId = $data['usuari_id'];
+            $this->name = $data['nom'];
+            $this->description = $data['descripcio'] ?? '';
+            $this->createdAt = $data['creat_el'] ?? date('Y-m-d H:i:s');
+            
+            return $routineId;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Alias para create, mantiene compatibilidad
+     */
+    public function addRoutine($data) {
+        return $this->create($data);
+    }
+    
+    /**
+     * Actualizar una rutina existente
+     * @param array $data Datos actualizados
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function update($data = null) {
+        // Si no se proporcionan datos, usar los valores del objeto
+        if ($data === null) {
+            $data = [
+                'rutina_id' => $this->id,
+                'usuari_id' => $this->userId,
+                'nom' => $this->name,
+                'descripcio' => $this->description
+            ];
+        }
+        
+        // Asegurarse de que tenemos un ID
+        if (!isset($data['rutina_id']) && $this->id) {
+            $data['rutina_id'] = $this->id;
+        }
+        
+        if (!isset($data['rutina_id'])) {
             return false;
         }
-    }
-
-    // Actualizar una rutina
-    public function updateRoutine($data) {
-        $this->db->query('UPDATE rutines SET usuari_id = :usuari_id, nom = :nom, descripcio = :descripcio WHERE rutina_id = :rutina_id');
+        
+        // Aplicar mapeo de campo si es necesario
+        if (isset($data['id']) && !isset($data['rutina_id'])) {
+            $data['rutina_id'] = $data['id'];
+        }
+        
+        if (isset($data['userId']) && !isset($data['usuari_id'])) {
+            $data['usuari_id'] = $data['userId'];
+        }
+        
+        if (isset($data['name']) && !isset($data['nom'])) {
+            $data['nom'] = $data['name'];
+        }
+        
+        if (isset($data['description']) && !isset($data['descripcio'])) {
+            $data['descripcio'] = $data['description'];
+        }
+        
+        // Preparar la consulta
+        $this->db->query('UPDATE rutines SET usuari_id = :usuari_id, nom = :nom, descripcio = :descripcio 
+                          WHERE rutina_id = :rutina_id');
         
         // Vincular valores
-        $this->db->bind(':rutina_id', $data['id']);
+        $this->db->bind(':rutina_id', $data['rutina_id']);
         $this->db->bind(':usuari_id', $data['usuari_id']);
-        $this->db->bind(':nom', $data['name']);
-        $this->db->bind(':descripcio', $data['description']);
-
+        $this->db->bind(':nom', $data['nom']);
+        $this->db->bind(':descripcio', $data['descripcio'] ?? '');
+        
         // Ejecutar
-        return $this->db->execute();
+        $success = $this->db->execute();
+        
+        if ($success) {
+            // Actualizar propiedades del objeto
+            $this->id = $data['rutina_id'];
+            $this->userId = $data['usuari_id'];
+            $this->name = $data['nom'];
+            $this->description = $data['descripcio'] ?? '';
+        }
+        
+        return $success;
     }
-
-    // Eliminar una rutina
-    public function deleteRoutine($id) {
+    
+    /**
+     * Alias para update, mantiene compatibilidad
+     */
+    public function updateRoutine($data) {
+        return $this->update($data);
+    }
+    
+    /**
+     * Eliminar una rutina
+     * @param int $id ID de la rutina a eliminar (opcional)
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function delete($id = null) {
+        if ($id !== null) {
+            $this->id = $id;
+        }
+        
+        if (!$this->id) {
+            return false;
+        }
+        
         // Primero eliminamos los ejercicios asociados
         $this->db->query('DELETE FROM exercicis WHERE rutina_id = :rutina_id');
-        $this->db->bind(':rutina_id', $id);
+        $this->db->bind(':rutina_id', $this->id);
         $this->db->execute();
         
         // Luego eliminamos la rutina
         $this->db->query('DELETE FROM rutines WHERE rutina_id = :rutina_id');
-        $this->db->bind(':rutina_id', $id);
+        $this->db->bind(':rutina_id', $this->id);
         return $this->db->execute();
     }
-
-    // Verificar si una rutina pertenece a un usuario
+    
+    /**
+     * Alias para delete, mantiene compatibilidad
+     */
+    public function deleteRoutine($id) {
+        return $this->delete($id);
+    }    /**
+     * Verificar si una rutina pertenece a un usuario
+     * @param int $routineId ID de la rutina
+     * @param int $userId ID del usuario
+     * @return bool True si la rutina pertenece al usuario
+     */
     public function isRoutineOwnedByUser($routineId, $userId) {
         $this->db->query('SELECT COUNT(*) as count FROM rutines WHERE rutina_id = :rutina_id AND usuari_id = :usuari_id');
         $this->db->bind(':rutina_id', $routineId);
@@ -112,46 +352,43 @@ class Routine {
         $row = $this->db->single();
         return $row->count > 0;
     }
-
-    // Obtener ejercicios de una rutina
+    
+    /**
+     * Obtener ejercicios de una rutina
+     * @param int $routineId ID de la rutina
+     * @return array Lista de ejercicios
+     */
     public function getExercisesByRoutine($routineId) {
         $this->db->query('SELECT * FROM exercicis WHERE rutina_id = :rutina_id ORDER BY ordre ASC');
         $this->db->bind(':rutina_id', $routineId);
         return $this->db->resultSet();
     }
     
-    // Alias para getExercisesByRoutine para mantener compatibilidad con el controlador
+    /**
+     * Alias para getExercisesByRoutine para mantener compatibilidad con el controlador
+     */
     public function getExercisesByRoutineId($routineId) {
         return $this->getExercisesByRoutine($routineId);
     }
-
+    
     /**
      * Añade un ejercicio a una rutina
      * @param array $data Datos del ejercicio
-     * @return bool True si se añadió correctamente, False si no
+     * @return bool|int ID del ejercicio creado o false si hay error
      */
-    public function addExercise($data)
-    {
+    public function addExercise($data) {
         // Mapear claves para compatibilidad entre controlador y modelo
-        $rutina_id = $data['routine_id'] ?? null;
-        $nom = $data['name'] ?? null;
-        $descripcio = $data['description'] ?? '';
-        $series = $data['sets'] ?? 3;
-        $repeticions = $data['reps'] ?? 10;
-        $descans = $data['rest'] ?? 60;
-        $ordre = $data['order'] ?? $this->getNextExerciseOrder($rutina_id);
-        $info_adicional = $data['additional_info'] ?? null;
-        
-        // Registrar los datos para depuración
-        if (class_exists('Logger')) {
-            Logger::log('DEBUG', 'Datos recibidos en addExercise: ' . json_encode($data));
-        }
+        $rutina_id = $data['routine_id'] ?? $data['rutina_id'] ?? null;
+        $nom = $data['name'] ?? $data['nom'] ?? null;
+        $descripcio = $data['description'] ?? $data['descripcio'] ?? '';
+        $series = $data['sets'] ?? $data['series'] ?? 3;
+        $repeticions = $data['reps'] ?? $data['repeticions'] ?? 10;
+        $descans = $data['rest'] ?? $data['descans'] ?? 60;
+        $ordre = $data['order'] ?? $data['ordre'] ?? $this->getNextExerciseOrder($rutina_id);
+        $info_adicional = $data['additional_info'] ?? $data['info_adicional'] ?? null;
         
         // Verificar datos críticos
         if (empty($rutina_id) || empty($nom)) {
-            if (class_exists('Logger')) {
-                Logger::log('ERROR', 'Error en addExercise: ID de rutina o nombre del ejercicio faltantes');
-            }
             return false;
         }
 
@@ -338,12 +575,36 @@ class Routine {
         
         return $order;
     }
+      /**
+     * Obtiene estadísticas sobre las rutinas
+     * @return object Datos estadísticos
+     */
+    public function getRoutineStats() {
+        $this->db->query('SELECT 
+            COUNT(*) as total_routines,
+            (SELECT COUNT(*) FROM exercicis) as total_exercises,
+            (SELECT AVG(tmp.count) FROM (SELECT COUNT(*) as count FROM exercicis GROUP BY rutina_id) as tmp) as avg_exercises_per_routine,
+            (SELECT COUNT(DISTINCT usuari_id) FROM rutines) as users_with_routines
+        FROM rutines');
+        
+        return $this->db->single();
+    }
     
     /**
-     * Obtener el último error de la base de datos
-     * @return mixed Información del error
+     * Obtener las rutinas más populares basado en ejercicios
+     * @param int $limit Límite de resultados a devolver
+     * @return array Lista de rutinas populares
      */
-    public function getLastError() {
-        return $this->db->getError();
+    public function getPopularRoutines($limit = 5) {
+        $this->db->query('SELECT r.*, 
+            (SELECT COUNT(*) FROM exercicis e WHERE e.rutina_id = r.rutina_id) AS exercise_count,
+            u.nom as user_name, u.cognoms as user_surname
+            FROM rutines r
+            JOIN usuaris u ON r.usuari_id = u.usuari_id
+            ORDER BY exercise_count DESC, r.creat_el DESC
+            LIMIT :limit');
+            
+        $this->db->bind(':limit', $limit);
+        return $this->db->resultSet();
     }
 }

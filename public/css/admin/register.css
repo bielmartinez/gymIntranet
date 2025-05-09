@@ -1,0 +1,86 @@
+/**
+ * Estilos específicos para la página de registro
+ */
+
+/* Estilos para el contenedor principal */
+.card {
+    border-radius: 0.5rem;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-header {
+    border-bottom: 0;
+    font-weight: 600;
+}
+
+/* Estilos para los inputs */
+.form-control, .form-select {
+    border-radius: 0.25rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Estilos para los textos de ayuda */
+.form-text {
+    font-size: 0.8rem;
+}
+
+/* Estilos para los botones */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+/* Estilos para mensajes de error */
+.invalid-feedback {
+    display: block;
+    font-size: 80%;
+}
+
+/* Estilos para campos requeridos */
+.form-label .text-danger {
+    font-weight: bold;
+}
+
+/* Estilos para checkbox */
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Estilos para la línea divisoria */
+hr {
+    margin: 2rem 0;
+    opacity: 0.1;
+}

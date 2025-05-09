@@ -1,0 +1,51 @@
+/* Estilos específicos para la página de seguimiento físico */
+
+/* Estilo para las tarjetas */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* Estilos para iconos en las tarjetas de medidas */
+.text-gray-300 {
+  color: #dddfeb !important;
+}
+
+/* Estilos para los textos de IMC */
+.text-info {
+  font-weight: 500;
+}
+
+.text-success {
+  font-weight: 500;
+}
+
+.text-warning {
+  font-weight: 500;
+}
+
+.text-danger {
+  font-weight: 500;
+}
+
+/* Estilos para el área del gráfico */
+.chart-area {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Estilos para la tabla de historial */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Estilos para alertas de notificación */
+.alert.position-fixed {
+  z-index: 1050;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}

@@ -1,0 +1,89 @@
+/**
+ * Estilos específicos para la página de administración de clases
+ */
+
+/* Estilos para la tabla de clases */
+.table-classes thead th {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Estilos para las tarjetas de filtros */
+.card-header h6 {
+    font-weight: bold;
+    color: #4e73df;
+}
+
+.filter-form {
+    padding: 15px;
+}
+
+/* Estilos para los estados de las clases */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+/* Estilos para los botones de acción */
+.class-actions .btn {
+    margin-right: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.class-actions .btn i {
+    font-size: 0.85rem;
+}
+
+/* Estilos para modales */
+.modal-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.modal-header .modal-title {
+    color: #4e73df;
+    font-weight: bold;
+}
+
+/* Estilos específicos para el formulario */
+.capacity-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Estilos para indicadores de ocupación */
+.capacity-high {
+    color: #dc3545;
+}
+
+.capacity-medium {
+    color: #ffc107;
+}
+
+.capacity-low {
+    color: #198754;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    .filter-form .col-md-3 {
+        margin-bottom: 1rem;
+    }
+}

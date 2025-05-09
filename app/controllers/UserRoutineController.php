@@ -2,23 +2,27 @@
 /**
  * Controlador para la gestión de rutinas por parte de los usuarios
  */
-class UserRoutineController {
-    private $routineModel;
-    private $userModel;
+require_once dirname(__DIR__) . '/utils/PDFGenerator.php';
+
+class UserRoutineController extends BaseController {
+    protected $routineModel;
+    protected $userModel;
+    protected $pdfGenerator;
     
     public function __construct() {
+        parent::__construct();
+        
         // Verificar que el usuario esté logueado
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . URLROOT . '/auth/login');
-            exit;
-        }
+        $this->requireAuth();
 
         $this->routineModel = new Routine();
         $this->userModel = new User();
+        $this->pdfGenerator = new PDFGenerator();
     }
-
-    // Vista principal de rutinas del usuario
-    public function index() {
+    
+    /**
+     * Vista principal de rutinas del usuario
+     */    public function index() {
         // Obtener el ID del usuario logueado
         $userId = $_SESSION['user_id'];
         
@@ -27,63 +31,42 @@ class UserRoutineController {
 
         $data = [
             'title' => 'Mis Rutinas',
-            'routines' => $routines,
-            'user_name' => isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Usuario'
+            'routines' => $routines
         ];
 
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/routines.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('users/routines', $data);
     }
-
+    
     /**
      * Muestra los detalles de una rutina específica para el usuario
      * @param int $id ID de la rutina a ver
      */
     public function viewRoutine($id = null) {
-        // Verificar si el usuario está logueado
-        if (!isset($_SESSION['user_id'])) {
-            $_SESSION['toast_message'] = 'Debes iniciar sesión para ver las rutinas';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/auth/login');
-            exit;
-        }
+        // La autenticación ya se verifica en el constructor
         
         if (!$id) {
-            $_SESSION['toast_message'] = 'La rutina no existe';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('La rutina no existe', 'userRoutine');
+            return;
         }
         
         // Obtener la rutina
-        require_once APPROOT . '/models/Routine.php';
-        $routineModel = new Routine();
-        $routine = $routineModel->getRoutineById($id);
+        $routine = $this->routineModel->getRoutineById($id);
         
-        // Verificar si la rutina existe y pertenece al usuario
+        // Verificar si la rutina existe
         if (!$routine) {
-            $_SESSION['toast_message'] = 'La rutina no existe';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('La rutina no existe', 'userRoutine');
+            return;
         }
         
         // Verificar que el usuario tenga permiso para ver esta rutina
         if ($routine->usuari_id != $_SESSION['user_id'] && $_SESSION['user_role'] !== 'admin') {
-            $_SESSION['toast_message'] = 'No tienes permiso para ver esta rutina';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('No tienes permiso para ver esta rutina', 'userRoutine');
+            return;
         }
         
         // Obtener los ejercicios de la rutina
-        $exercises = $routineModel->getExercisesByRoutine($id);
+        $exercises = $this->routineModel->getExercisesByRoutine($id);
         
         $data = [
             'title' => 'Ver Rutina',
@@ -91,17 +74,9 @@ class UserRoutineController {
             'exercises' => $exercises
         ];
         
-        // Cargar el header
-        include_once APPROOT . '/views/shared/header/main.php';
-        
-        // Cargar la vista
-        include_once APPROOT . '/views/users/view_routine.php';
-        
-        // Cargar el footer
-        include_once APPROOT . '/views/shared/footer/main.php';
-    }
-
-    /**
+        // Cargar la vista usando el método del BaseController
+        $this->loadView('users/view_routine', $data);
+    }    /**
      * Método de compatibilidad para redirigir a viewRoutine
      * @param int $id ID de la rutina a ver
      */
@@ -115,49 +90,33 @@ class UserRoutineController {
      * @param int $id ID de la rutina a descargar
      */
     public function downloadRoutine($id = null) {
-        // Verificar si el usuario está logueado
-        if (!isset($_SESSION['user_id'])) {
-            $_SESSION['toast_message'] = 'Debes iniciar sesión para descargar rutinas';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/auth/login');
-            exit;
-        }
+        // La autenticación ya se verifica en el constructor
         
         if (!$id) {
-            $_SESSION['toast_message'] = 'La rutina no existe';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('La rutina no existe', 'userRoutine');
+            return;
         }
         
         // Obtener la rutina
-        require_once APPROOT . '/models/Routine.php';
-        $routineModel = new Routine();
-        $routine = $routineModel->getRoutineById($id);
+        $routine = $this->routineModel->getRoutineById($id);
         
         // Verificar si la rutina existe
         if (!$routine) {
-            $_SESSION['toast_message'] = 'La rutina no existe';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('La rutina no existe', 'userRoutine');
+            return;
         }
         
         // Verificar que el usuario tenga permiso para descargar esta rutina
         if ($routine->usuari_id != $_SESSION['user_id'] && $_SESSION['user_role'] !== 'admin') {
-            $_SESSION['toast_message'] = 'No tienes permiso para descargar esta rutina';
-            $_SESSION['toast_type'] = 'error';
-            header('Location: ' . URLROOT . '/user/routines');
-            exit;
+            $this->handleError('No tienes permiso para descargar esta rutina', 'userRoutine');
+            return;
         }
         
         // Obtener ejercicios de la rutina
-        $exercises = $routineModel->getExercisesByRoutine($id);
+        $exercises = $this->routineModel->getExercisesByRoutine($id);
         
         // Generar el PDF
-        require_once APPROOT . '/utils/PDFGenerator.php';
-        $pdfGenerator = new PDFGenerator();
-        $pdfPath = $pdfGenerator->generateRoutinePDF($routine, $exercises);
+        $pdfPath = $this->pdfGenerator->generateRoutinePDF($routine, $exercises);
         
         if ($pdfPath) {
             // Descargar el PDF
@@ -167,14 +126,14 @@ class UserRoutineController {
                 header('Cache-Control: max-age=0');
                 readfile(APPROOT . '/../public/' . $pdfPath);
                 exit;
+            } else {
+                $this->handleError('El archivo PDF no existe', 'userRoutine');
+                return;
             }
+        } else {
+            $this->handleError('Error al generar el PDF', 'userRoutine');
+            return;
         }
-        
-        // Si llegamos aquí, hubo un error
-        $_SESSION['toast_message'] = 'Error al generar el PDF';
-        $_SESSION['toast_type'] = 'error';
-        header('Location: ' . URLROOT . '/user/routines');
-        exit;
     }
 
     /**

@@ -3,19 +3,90 @@
  * Modelo para gestión de clases
  */
 
-// Cargar configuración y base de datos
-require_once dirname(dirname(__FILE__)) . '/config/config.php';
-require_once dirname(dirname(__FILE__)) . '/libraries/Database.php';
+require_once dirname(__FILE__) . '/BaseModel.php';
 
-class Class_ {
-    private $db;
+class Class_ extends BaseModel {
+    protected $table = 'classes';
+    protected $primaryKey = 'classe_id';
     
+    /**
+     * Constructor del modelo
+     */
     public function __construct() {
-        $this->db = new Database();
+        parent::__construct();
     }
     
     /**
-     * Obtiene una clase por su ID
+     * Valida los datos de entrada para una clase
+     * @param array $data Datos a validar
+     * @return array Array de errores o array vacío si no hay errores
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        // Validar tipo de clase
+        if (empty($data['tipus_classe_id'])) {
+            $errors['tipus_classe_id'] = 'El tipo de clase es requerido';
+        }
+        
+        // Validar monitor
+        if (empty($data['monitor_id'])) {
+            $errors['monitor_id'] = 'El monitor es requerido';
+        }
+        
+        // Validar fecha
+        if (empty($data['data'])) {
+            $errors['data'] = 'La fecha es requerida';
+        } else {
+            $format = 'Y-m-d';
+            $d = \DateTime::createFromFormat($format, $data['data']);
+            
+            if (!($d && $d->format($format) === $data['data'])) {
+                $errors['data'] = 'El formato de fecha no es válido (YYYY-MM-DD)';
+            }
+        }
+          // Validar hora
+        if (empty($data['hora'])) {
+            $errors['hora'] = 'La hora es requerida';
+        } else {
+            // Intentar varios formatos de hora permitidos (HH:MM:SS o HH:MM)
+            $format1 = 'H:i:s';
+            $format2 = 'H:i';
+            
+            $t1 = \DateTime::createFromFormat($format1, $data['hora']);
+            $t2 = \DateTime::createFromFormat($format2, $data['hora']);
+            
+            if (!($t1 && $t1->format($format1) === $data['hora']) && 
+                !($t2 && $t2->format($format2) === $data['hora'])) {
+                $errors['hora'] = 'El formato de hora no es válido (debe ser HH:MM o HH:MM:SS)';
+            }
+        }
+        
+        // Validar duración
+        if (empty($data['duracio'])) {
+            $errors['duracio'] = 'La duración es requerida';
+        } else if (!is_numeric($data['duracio']) || $data['duracio'] <= 0) {
+            $errors['duracio'] = 'La duración debe ser un número positivo';
+        }
+        
+        // Validar capacidad máxima
+        if (empty($data['capacitat_maxima'])) {
+            $errors['capacitat_maxima'] = 'La capacidad máxima es requerida';
+        } else if (!is_numeric($data['capacitat_maxima']) || $data['capacitat_maxima'] <= 0) {
+            $errors['capacitat_maxima'] = 'La capacidad máxima debe ser un número positivo';
+        }
+          // Validar sala
+        if (empty($data['sala'])) {
+            $errors['sala'] = 'La sala es requerida';
+        } else if (!is_numeric($data['sala']) || $data['sala'] < 1 || $data['sala'] > 4) {
+            $errors['sala'] = 'El número de sala debe estar entre 1 y 4';
+        }
+        
+        return $errors;
+    }
+    
+    /**
+     * Obtiene una clase por su ID con información adicional
      * @param int $classId ID de la clase
      * @return object|bool Objeto con datos de la clase o false si no existe
      */
@@ -28,13 +99,7 @@ class Class_ {
                           WHERE c.classe_id = :id');
         $this->db->bind(':id', $classId);
         
-        $row = $this->db->single();
-        
-        if($this->db->rowCount() > 0){
-            return $row;
-        } else {
-            return false;
-        }
+        return $this->db->single();
     }
     
     /**
@@ -65,71 +130,81 @@ class Class_ {
     }
     
     /**
-     * Crea una nueva clase
-     * @param array $data Datos de la clase
-     * @return int|bool ID de la clase creada o false en caso de error
-     */
-    public function create($data) {
-        $this->db->query('INSERT INTO classes (tipus_classe_id, monitor_id, data, hora, duracio, 
-                          capacitat_maxima, capacitat_actual, sala) 
-                          VALUES (:tipus, :monitor, :data, :hora, :duracio, :capacitat, 0, :sala)');
-                          
-        $this->db->bind(':tipus', $data['tipus_classe_id']);
-        $this->db->bind(':monitor', $data['monitor_id']);
-        $this->db->bind(':data', $data['data']);
-        $this->db->bind(':hora', $data['hora']);
-        $this->db->bind(':duracio', $data['duracio']);
-        $this->db->bind(':capacitat', $data['capacitat_maxima']);
-        $this->db->bind(':sala', $data['sala']);
-        
-        if ($this->db->execute()) {
-            return $this->db->lastInsertId();
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * Actualiza los datos de una clase
-     * @param array $data Datos actualizados de la clase
+     * Reinicia la capacidad actual de la clase a 0
+     * @param int $classId ID de la clase
      * @return bool Éxito o fracaso de la operación
      */
-    public function update($data) {
-        $this->db->query('UPDATE classes SET 
-                          tipus_classe_id = :tipus, 
-                          monitor_id = :monitor, 
-                          data = :data, 
-                          hora = :hora, 
-                          duracio = :duracio, 
-                          capacitat_maxima = :capacitat, 
-                          sala = :sala 
-                          WHERE classe_id = :id');
-                          
-        $this->db->bind(':id', $data['classe_id']);
-        $this->db->bind(':tipus', $data['tipus_classe_id']);
-        $this->db->bind(':monitor', $data['monitor_id']);
-        $this->db->bind(':data', $data['data']);
-        $this->db->bind(':hora', $data['hora']);
-        $this->db->bind(':duracio', $data['duracio']);
-        $this->db->bind(':capacitat', $data['capacitat_maxima']);
-        $this->db->bind(':sala', $data['sala']);
-        
-        return $this->db->execute();
-    }
-    
-    /**
-     * Elimina una clase
-     * @param int $classId ID de la clase a eliminar
-     * @return bool Éxito o fracaso de la operación
-     */
-    public function delete($classId) {
-        $this->db->query('DELETE FROM classes WHERE classe_id = :id');
+    public function resetCapacity($classId) {
+        $this->db->query('UPDATE classes SET capacitat_actual = 0 WHERE classe_id = :id');
         $this->db->bind(':id', $classId);
         return $this->db->execute();
     }
     
     /**
-     * Elimina una clase (alias para delete)
+     * Crea una nueva clase
+     * @param array $data Datos de la clase
+     * @return int|bool ID de la clase creada o false en caso de error
+     */
+    public function addClass($data) {
+        // Validar datos
+        $errors = $this->validate($data);
+        if (!empty($errors)) {
+            return false;
+        }
+        
+        // Verificar conflictos de horario
+        if ($this->hasScheduleConflict($data)) {
+            return false;
+        }
+          // Formatear la hora correctamente si viene sin segundos
+        $hora = $data['hora'];
+        if (strpos($hora, ':') !== false && substr_count($hora, ':') === 1) {
+            $hora .= ':00'; // Añadir segundos
+        }
+        
+        // Preparar datos para la creación
+        $insertData = [
+            'tipus_classe_id' => $data['tipus_classe_id'],
+            'monitor_id' => $data['monitor_id'],
+            'data' => $data['data'],
+            'hora' => $hora,
+            'duracio' => $data['duracio'],
+            'capacitat_maxima' => $data['capacitat_maxima'],
+            'capacitat_actual' => 0,
+            'sala' => $data['sala']
+        ];
+        
+        // Usar el método create de BaseModel
+        return $this->create($insertData);
+    }
+      /**
+     * Actualiza los datos de una clase
+     * @param array $data Datos actualizados de la clase
+     * @return bool Éxito o fracaso de la operación
+     */
+    public function updateClass($data) {
+        // Formatear la hora correctamente si viene sin segundos
+        if (isset($data['hora']) && strpos($data['hora'], ':') !== false && substr_count($data['hora'], ':') === 1) {
+            $data['hora'] .= ':00'; // Añadir segundos
+        }
+        
+        // Validar datos
+        $errors = $this->validate($data);
+        if (!empty($errors)) {
+            return false;
+        }
+        
+        // Verificar conflictos de horario (excluyendo la propia clase)
+        if ($this->hasScheduleConflict($data, $data['classe_id'])) {
+            return false;
+        }
+        
+        // Usar el método update de BaseModel
+        return $this->update($data);
+    }
+    
+    /**
+     * Elimina una clase (alias para delete de BaseModel)
      * @param int $classId ID de la clase a eliminar
      * @return bool Éxito o fracaso de la operación
      */
@@ -266,24 +341,6 @@ class Class_ {
         }
         
         return $this->db->resultSet();
-    }
-    
-    /**
-     * Añade una nueva clase (alias para create)
-     * @param array $data Datos de la clase
-     * @return int|bool ID de la clase creada o false en caso de error
-     */
-    public function addClass($data) {
-        return $this->create($data);
-    }
-    
-    /**
-     * Actualiza los datos de una clase
-     * @param array $data Datos actualizados de la clase
-     * @return bool Éxito o fracaso de la operación
-     */
-    public function updateClass($data) {
-        return $this->update($data);
     }
     
     /**

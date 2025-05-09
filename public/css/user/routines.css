@@ -1,0 +1,82 @@
+/**
+ * Estilos específicos para la página de rutinas de usuario
+ */
+
+/* Estilos para las tarjetas de rutinas */
+.routine-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.routine-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.routine-card .card-title {
+    font-weight: 600;
+    color: #4e73df;
+}
+
+/* Estilos para badges de estado */
+.badge-status {
+    font-weight: normal;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Estilos para la fecha de creación */
+.card-text.text-muted.small {
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+/* Estilos para la descripción */
+.card-text {
+    margin-bottom: 15px;
+    max-height: 100px;
+    overflow: hidden;
+}
+
+/* Estilos para los botones de acción */
+.card-body .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2e59d9;
+}
+
+.btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+}
+
+.btn-success:hover {
+    background-color: #17a673;
+    border-color: #169b6b;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+    .routine-card {
+        margin-bottom: 20px;
+    }
+    
+    .card-body .d-flex {
+        flex-direction: column;
+    }
+    
+    .card-body .btn {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+}
