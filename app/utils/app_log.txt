@@ -58661,3 +58661,73 @@ Log iniciado: 2025-05-09 21:35:42
 [2025-05-09 21:35:42] [DEBUG] Método de solicitud: GET
 [2025-05-09 21:35:42] [INFO] Instanciando controlador: AuthController
 [2025-05-09 21:35:42] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:39:12
+--------------------------------------------------
+[2025-05-17 12:39:12] [INFO] Logger inicializado correctamente
+[2025-05-17 12:39:12] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:39:12] [INFO] URL solicitada: direct-view.php
+[2025-05-17 12:39:12] [DEBUG] Método de solicitud: GET
+[2025-05-17 12:39:12] [ERROR] Controlador no encontrado: Direct-view.phpController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:39:18
+--------------------------------------------------
+[2025-05-17 12:39:18] [INFO] Logger inicializado correctamente
+[2025-05-17 12:39:18] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:39:18] [INFO] URL solicitada: 
+[2025-05-17 12:39:18] [DEBUG] Método de solicitud: GET
+[2025-05-17 12:39:18] [INFO] Instanciando controlador: AuthController
+[2025-05-17 12:39:18] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:39:36
+--------------------------------------------------
+[2025-05-17 12:39:36] [INFO] Logger inicializado correctamente
+[2025-05-17 12:39:36] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:39:36] [INFO] URL solicitada: direct-view.php
+[2025-05-17 12:39:36] [DEBUG] Método de solicitud: GET
+[2025-05-17 12:39:36] [ERROR] Controlador no encontrado: Direct-view.phpController
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:39:46
+--------------------------------------------------
+[2025-05-17 12:39:46] [INFO] Logger inicializado correctamente
+[2025-05-17 12:39:46] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:39:46] [INFO] URL solicitada: 
+[2025-05-17 12:39:46] [DEBUG] Método de solicitud: GET
+[2025-05-17 12:39:46] [INFO] Instanciando controlador: AuthController
+[2025-05-17 12:39:46] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:39:56
+--------------------------------------------------
+[2025-05-17 12:39:56] [INFO] Logger inicializado correctamente
+[2025-05-17 12:39:56] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:39:56] [INFO] URL solicitada: auth/login
+[2025-05-17 12:39:56] [DEBUG] Método de solicitud: POST
+[2025-05-17 12:39:56] [DEBUG] Datos POST: Array
+(
+    [email] => admin@admin.com
+    [password] => admin12345
+)
+
+[2025-05-17 12:39:56] [INFO] Instanciando controlador: AuthController
+[2025-05-17 12:39:56] [INFO] Ejecutando acción: AuthController->login()
+
+
+--------------------------------------------------
+Log iniciado: 2025-05-17 12:41:19
+--------------------------------------------------
+[2025-05-17 12:41:19] [INFO] Logger inicializado correctamente
+[2025-05-17 12:41:19] [INFO] Iniciando aplicación desde index.php
+[2025-05-17 12:41:19] [INFO] URL solicitada: 
+[2025-05-17 12:41:19] [DEBUG] Método de solicitud: GET
+[2025-05-17 12:41:19] [INFO] Instanciando controlador: AuthController
+[2025-05-17 12:41:19] [INFO] Ejecutando acción: AuthController->login()

@@ -3,14 +3,14 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'gymintranet');
+define('DB_NAME', 'ddb253123');
 
 // App Root
 define('APPROOT', dirname(dirname(__FILE__)));
 
 // URL Root - configuración dinámica para detectar el puerto correctamente
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST']; // Incluye puerto si es diferente de 80/443
+$host = $_SERVER['HTTP_HOST']; 
 define('URLROOT', $protocol . '://' . $host . '/gymIntranet');
 
 // Site Name
